@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第2回 極座標における運動 ｜ 物理学基礎論A</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">物理学基礎論A</a> ／ 第2回</div>
+</header>
+
+<main>
+  <h1>第2回 極座標における位置・速度・加速度</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>2次元極座標</h2>
+
+  <h3>1. 座標変換・単位ベクトル</h3>
+
+  <figure>
+    <svg viewBox="0 0 360 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="2次元極座標の単位ベクトル">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2328"/>
+        </marker>
+        <marker id="arrowAccent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4f46e5"/>
+        </marker>
+        <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+        </marker>
+      </defs>
+      <!-- 軸 -->
+      <line x1="40" y1="230" x2="330" y2="230" stroke="#9ca3af" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="60" y1="260" x2="60" y2="30"  stroke="#9ca3af" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <text x="335" y="234" font-size="13">x</text>
+      <text x="55"  y="22"  font-size="13">y</text>
+      <!-- 動径 -->
+      <line x1="60" y1="230" x2="240" y2="100" stroke="#4f46e5" stroke-width="2" marker-end="url(#arrowAccent)"/>
+      <text x="140" y="155" font-size="13" fill="#4f46e5">r</text>
+      <!-- 角度 θ の弧 -->
+      <path d="M 110 230 A 50 50 0 0 0 95 197" stroke="#6b7280" fill="none" stroke-width="1.2"/>
+      <text x="115" y="215" font-size="13" fill="#6b7280">θ</text>
+      <!-- e_r -->
+      <line x1="240" y1="100" x2="295" y2="60" stroke="#dc2626" stroke-width="2" marker-end="url(#arrowRed)"/>
+      <text x="295" y="55" font-size="13" fill="#dc2626">e_r</text>
+      <!-- e_θ (e_r に直交) -->
+      <line x1="240" y1="100" x2="200" y2="45" stroke="#059669" stroke-width="2" marker-end="url(#arrowRed)"/>
+      <text x="170" y="40" font-size="13" fill="#059669">e_θ</text>
+      <!-- 質点 -->
+      <circle cx="240" cy="100" r="4" fill="#1f2328"/>
+      <text x="248" y="98" font-size="12">P(r, θ)</text>
+      <!-- 補助：x, y 成分 -->
+      <line x1="240" y1="100" x2="240" y2="230" stroke="#d1d5db" stroke-dasharray="3 3"/>
+      <line x1="60"  y1="100" x2="240" y2="100" stroke="#d1d5db" stroke-dasharray="3 3"/>
+      <text x="245" y="245" font-size="11" fill="#6b7280">x = r cosθ</text>
+      <text x="0"   y="105" font-size="11" fill="#6b7280">y = r sinθ</text>
+    </svg>
+    <figcaption>図 1：2次元極座標の単位ベクトル $\mathbf{e}_r,\mathbf{e}_\theta$。動径に沿うのが $\mathbf{e}_r$、それに直交し $\theta$ が増える向きが $\mathbf{e}_\theta$。</figcaption>
+  </figure>
+
+  <p>座標変換：</p>
+  $$ x = r\cos\theta,\quad y = r\sin\theta,\quad r = \sqrt{x^2+y^2},\quad \theta = \arctan\frac{y}{x} $$
+
+  <p>単位ベクトル：</p>
+  $$ \mathbf{e}_r = \cos\theta\,\mathbf{e}_x + \sin\theta\,\mathbf{e}_y,\qquad \mathbf{e}_\theta = -\sin\theta\,\mathbf{e}_x + \cos\theta\,\mathbf{e}_y $$
+
+  <details>
+    <summary>単位ベクトルの時間微分（方向が変わると単位ベクトルも変化する）</summary>
+    <p>方向が変わるから $\dot{\mathbf{e}}_r \ne 0$。</p>
+    $$ \dot{\mathbf{e}}_r = -\dot\theta\sin\theta\,\mathbf{e}_x + \dot\theta\cos\theta\,\mathbf{e}_y = \dot\theta\,\mathbf{e}_\theta $$
+    $$ \dot{\mathbf{e}}_\theta = -\dot\theta\cos\theta\,\mathbf{e}_x - \dot\theta\sin\theta\,\mathbf{e}_y = -\dot\theta\,\mathbf{e}_r $$
+  </details>
+
+  <h3>2. 位置ベクトル</h3>
+  $$ \mathbf{r} = r\,\mathbf{e}_r $$
+
+  <h3>3. 速度</h3>
+  $$ \mathbf{V} = \dot{r}\,\mathbf{e}_r + r\dot\theta\,\mathbf{e}_\theta,\qquad V_r=\dot{r},\;V_\theta = r\dot\theta $$
+  <details>
+    <summary>導出</summary>
+    <p>位置ベクトル $\mathbf{r} = r\mathbf{e}_r$ を時間微分：</p>
+    $$ \mathbf{V} = \frac{d}{dt}(r\mathbf{e}_r) = \dot r\,\mathbf{e}_r + r\dot{\mathbf{e}}_r = \dot r\,\mathbf{e}_r + r\dot\theta\,\mathbf{e}_\theta $$
+  </details>
+
+  <h3>4. 加速度</h3>
+  $$ \mathbf{a} = (\ddot r - r\dot\theta^2)\,\mathbf{e}_r + (2\dot r\dot\theta + r\ddot\theta)\,\mathbf{e}_\theta $$
+  $$ a_r = \ddot r - r\dot\theta^2,\qquad a_\theta = 2\dot r\dot\theta + r\ddot\theta = \frac{1}{r}\frac{d}{dt}(r^2\dot\theta) $$
+  <details>
+    <summary>導出</summary>
+    $$ \mathbf{a} = \dot{\mathbf{V}} = \ddot r\,\mathbf{e}_r + \dot r\,\dot{\mathbf{e}}_r + \dot r\dot\theta\,\mathbf{e}_\theta + r\ddot\theta\,\mathbf{e}_\theta + r\dot\theta\,\dot{\mathbf{e}}_\theta $$
+    <p>$\dot{\mathbf{e}}_r = \dot\theta\,\mathbf{e}_\theta$、$\dot{\mathbf{e}}_\theta = -\dot\theta\,\mathbf{e}_r$ を代入して整理。<br>$a_\theta$ は角運動量保存と結びつく：$\dfrac{d}{dt}(r^2\dot\theta) = r\,a_\theta$。</p>
+  </details>
+
+  <h3>5. 物理量の座標変換（行列表示）</h3>
+  $$ \begin{pmatrix} W_r \\ W_\theta \end{pmatrix} = \begin{pmatrix} \cos\theta & \sin\theta \\ -\sin\theta & \cos\theta \end{pmatrix} \begin{pmatrix} W_x \\ W_y \end{pmatrix} $$
+  <details>
+    <summary>逆変換</summary>
+    $$ \begin{pmatrix} W_x \\ W_y \end{pmatrix} = \begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix} \begin{pmatrix} W_r \\ W_\theta \end{pmatrix} $$
+  </details>
+
+  <h3>6. 等速円運動</h3>
+  <figure>
+    <svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="等速円運動">
+      <defs>
+        <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4f46e5"/>
+        </marker>
+        <marker id="arr2r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+        </marker>
+      </defs>
+      <circle cx="160" cy="130" r="85" fill="none" stroke="#9ca3af" stroke-dasharray="4 4"/>
+      <circle cx="160" cy="130" r="3" fill="#1f2328"/>
+      <text x="166" y="125" font-size="11">O</text>
+      <!-- 質点位置 -->
+      <line x1="160" y1="130" x2="241" y2="98" stroke="#6b7280" stroke-width="1.4"/>
+      <circle cx="241" cy="98" r="5" fill="#1f2328"/>
+      <text x="248" y="95" font-size="11">P</text>
+      <!-- 速度 V_θ (接線方向、反時計回り) -->
+      <line x1="241" y1="98" x2="270" y2="170" stroke="#4f46e5" stroke-width="2" marker-end="url(#arr2)"/>
+      <text x="275" y="170" font-size="12" fill="#4f46e5">V = Rω</text>
+      <!-- 向心加速度 -->
+      <line x1="241" y1="98" x2="195" y2="116" stroke="#dc2626" stroke-width="2" marker-end="url(#arr2r)"/>
+      <text x="155" y="110" font-size="12" fill="#dc2626">a_r = −Rω²</text>
+      <text x="195" y="220" font-size="12" fill="#6b7280">半径 r = R（一定）</text>
+    </svg>
+    <figcaption>図 2：等速円運動。速度は接線方向、加速度は中心向き（向心加速度）。</figcaption>
+  </figure>
+
+  <p>条件：$r = R$（定数）、$\dot r = 0$、$\dot\theta = \omega$（一定）、$\ddot\theta = 0$。</p>
+  $$ V_r = 0,\quad V_\theta = R\omega $$
+  $$ a_r = -R\omega^2\ (\text{向心加速度}),\quad a_\theta = 0 $$
+
+  <h2>3次元極座標（球座標）</h2>
+
+  <h3>1. 座標変換・単位ベクトル</h3>
+  <figure>
+    <svg viewBox="0 0 360 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="球座標">
+      <defs>
+        <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2328"/>
+        </marker>
+      </defs>
+      <!-- z軸 (上) -->
+      <line x1="160" y1="250" x2="160" y2="30" stroke="#9ca3af" marker-end="url(#arr3)"/>
+      <text x="166" y="30" font-size="12">z</text>
+      <!-- x軸 -->
+      <line x1="160" y1="250" x2="300" y2="230" stroke="#9ca3af" marker-end="url(#arr3)"/>
+      <text x="302" y="234" font-size="12">x</text>
+      <!-- y軸 -->
+      <line x1="160" y1="250" x2="60"  y2="220" stroke="#9ca3af" marker-end="url(#arr3)"/>
+      <text x="44"  y="222" font-size="12">y</text>
+      <!-- 動径 -->
+      <line x1="160" y1="250" x2="230" y2="100" stroke="#4f46e5" stroke-width="2"/>
+      <text x="190" y="170" font-size="13" fill="#4f46e5">r</text>
+      <!-- φ 弧 (xy平面) -->
+      <path d="M 200 244 A 40 14 0 0 0 175 233" stroke="#6b7280" fill="none"/>
+      <text x="200" y="236" font-size="12" fill="#6b7280">φ</text>
+      <!-- θ 弧 (z軸と動径の間) -->
+      <path d="M 160 200 A 50 50 0 0 0 195 175" stroke="#6b7280" fill="none"/>
+      <text x="165" y="195" font-size="12" fill="#6b7280">θ</text>
+      <!-- xy平面への射影 -->
+      <line x1="160" y1="250" x2="220" y2="200" stroke="#d1d5db" stroke-dasharray="3 3"/>
+      <line x1="220" y1="200" x2="230" y2="100" stroke="#d1d5db" stroke-dasharray="3 3"/>
+      <circle cx="230" cy="100" r="4" fill="#1f2328"/>
+      <text x="236" y="100" font-size="11">P</text>
+    </svg>
+    <figcaption>図 3：球座標 $(r,\theta,\varphi)$。$\theta$ は $z$ 軸からの角、$\varphi$ は $x$ 軸まわりの方位角。</figcaption>
+  </figure>
+
+  $$ x = r\sin\theta\cos\varphi,\quad y = r\sin\theta\sin\varphi,\quad z = r\cos\theta,\quad r = \sqrt{x^2+y^2+z^2} $$
+
+  $$ \begin{cases} \mathbf{e}_r = \sin\theta\cos\varphi\,\mathbf{e}_x + \sin\theta\sin\varphi\,\mathbf{e}_y + \cos\theta\,\mathbf{e}_z \\ \mathbf{e}_\theta = \cos\theta\cos\varphi\,\mathbf{e}_x + \cos\theta\sin\varphi\,\mathbf{e}_y - \sin\theta\,\mathbf{e}_z \\ \mathbf{e}_\varphi = -\sin\varphi\,\mathbf{e}_x + \cos\varphi\,\mathbf{e}_y \end{cases} $$
+
+  <details>
+    <summary>単位ベクトルの時間微分</summary>
+    $$ \begin{cases} \dot{\mathbf{e}}_r = \dot\theta\,\mathbf{e}_\theta + \dot\varphi\sin\theta\,\mathbf{e}_\varphi \\ \dot{\mathbf{e}}_\theta = -\dot\theta\,\mathbf{e}_r + \dot\varphi\cos\theta\,\mathbf{e}_\varphi \\ \dot{\mathbf{e}}_\varphi = -\dot\varphi(\sin\theta\,\mathbf{e}_r + \cos\theta\,\mathbf{e}_\theta) \end{cases} $$
+  </details>
+
+  <h3>2. 位置・速度</h3>
+  $$ \mathbf{r} = r\,\mathbf{e}_r $$
+  $$ \mathbf{V} = \dot r\,\mathbf{e}_r + r\dot\theta\,\mathbf{e}_\theta + r\dot\varphi\sin\theta\,\mathbf{e}_\varphi $$
+  $$ V_r = \dot r,\quad V_\theta = r\dot\theta,\quad V_\varphi = r\dot\varphi\sin\theta $$
+
+  <h3>3. 加速度</h3>
+  $$ \begin{cases} a_r = \ddot r - r\dot\theta^2 - r\dot\varphi^2\sin^2\theta \\ a_\theta = 2\dot r\dot\theta + r\ddot\theta - r\dot\varphi^2\sin\theta\cos\theta \\ a_\varphi = 2\dot r\dot\varphi\sin\theta + r\ddot\varphi\sin\theta + 2r\dot\theta\dot\varphi\cos\theta \end{cases} $$
+
+  <details>
+    <summary>導出スケッチ</summary>
+    $$ \mathbf{a} = \frac{d}{dt}\left(\dot r\,\mathbf{e}_r + r\dot\theta\,\mathbf{e}_\theta + r\dot\varphi\sin\theta\,\mathbf{e}_\varphi\right) $$
+    <p>各単位ベクトルの時間微分を代入して整理すると各成分が得られる。</p>
+  </details>
+
+  <nav class="pager">
+    <a href="01.html" class="prev">第1回 イントロ</a>
+    <a href="03.html" class="next">第3回 ニュートン3法則</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

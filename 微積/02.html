@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第2回 実数の連続性 ｜ 微積</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">微積</a> ／ 第2回</div>
+</header>
+
+<main>
+  <h1>第2回 実数の連続性</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>大きな絵：実数には「隙間がない」</h2>
+  <p>有理数 $\mathbb{Q}$ で「$x^2 = 2$ を満たす数」を探しても、$\sqrt{2}$ は穴のように欠けている。$\mathbb{R}$ ではこの種の穴が一切ない、というのが <strong>実数の連続性</strong> の正体です。この回では、「隙間がない」を以下の4つの同値な命題で定式化します：</p>
+
+  <figure>
+    <svg viewBox="0 0 540 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="連続性4命題の等価関係">
+      <g font-size="12">
+        <rect x="20"  y="20" width="160" height="44" rx="8" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="100" y="48" text-anchor="middle">公理 2.1（Dedekind）</text>
+        <rect x="370" y="20" width="160" height="44" rx="8" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="450" y="48" text-anchor="middle">定理 2.3（Weierstrass）</text>
+        <rect x="20"  y="130" width="160" height="44" rx="8" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="100" y="158" text-anchor="middle">定理 1.1（単調収束）</text>
+        <rect x="370" y="130" width="160" height="44" rx="8" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="450" y="158" text-anchor="middle">区間縮小法</text>
+      </g>
+      <g stroke="#6b7280" stroke-width="1.4" fill="none">
+        <line x1="180" y1="42"  x2="370" y2="42"/>
+        <line x1="180" y1="152" x2="370" y2="152"/>
+        <line x1="100" y1="64"  x2="100" y2="130"/>
+        <line x1="450" y1="64"  x2="450" y2="130"/>
+        <line x1="180" y1="64" x2="370" y2="130"/>
+        <line x1="370" y1="64" x2="180" y2="130"/>
+      </g>
+      <text x="270" y="100" text-anchor="middle" font-size="13" fill="#6b7280">すべて同値</text>
+    </svg>
+    <figcaption>図 1：どれを公理に取っても残り3つは定理として導ける。</figcaption>
+  </figure>
+
+  <h2>公理 2.1（Dedekind の半直線公理）</h2>
+
+  <div class="callout">
+    <strong>公理 2.1.</strong> 集合 $A \subset \mathbb{R}$ が
+    <ul style="margin:6px 0 0;">
+      <li><strong>(D1)</strong> $A \ne \emptyset$ かつ $A \ne \mathbb{R}$</li>
+      <li><strong>(D2)</strong> $a \in A,\ b > a \;\Rightarrow\; b \in A$</li>
+    </ul>
+    を満たすならば、ある $\alpha \in \mathbb{R}$ が存在して $A = [\alpha, +\infty)$ または $A = (\alpha, +\infty)$。
+  </div>
+
+  <p><strong>気持ち</strong>。「右に閉じている」非自明な集合は、必ず「ある点から右側全部」の形をしている。<em>左端</em>がきれいに $\alpha$ という1点で決まる、というのが「隙間がない」の数学的表現です。</p>
+
+  <figure>
+    <svg viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dedekindの公理">
+      <defs>
+        <marker id="arD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2328"/>
+        </marker>
+      </defs>
+      <line x1="20" y1="50" x2="480" y2="50" stroke="#1f2328" marker-end="url(#arD)"/>
+      <text x="20" y="40" font-size="11">a ∈ A なら、b &gt; a もすべて A の元</text>
+      <circle cx="180" cy="50" r="4" fill="#1f2328"/>
+      <text x="175" y="68" font-size="11">a</text>
+      <line x1="180" y1="50" x2="470" y2="50" stroke="#4f46e5" stroke-width="3.5"/>
+      <text x="320" y="44" font-size="11" fill="#4f46e5">b ∈ A</text>
+
+      <line x1="20" y1="120" x2="480" y2="120" stroke="#1f2328" marker-end="url(#arD)"/>
+      <text x="20" y="110" font-size="11">結論：A の左端が必ず1点 α に決まる</text>
+      <circle cx="220" cy="120" r="4" fill="#dc2626"/>
+      <text x="216" y="140" font-size="11" fill="#dc2626">α</text>
+      <line x1="220" y1="120" x2="470" y2="120" stroke="#4f46e5" stroke-width="3.5"/>
+    </svg>
+    <figcaption>図 2：「右に閉じた集合」＝「半直線」。$\alpha$ が含まれるか否かで $[\alpha,\infty)$／$(\alpha,\infty)$ の2通り。</figcaption>
+  </figure>
+
+  <h2>定理 1.1（単調収束定理）の証明</h2>
+
+  <p>第1回で述べた定理を、公理 2.1 から厳密に証明します。</p>
+
+  <p><strong>主張</strong>。単調非減少（$a_n \le a_{n+1}$）かつ上に有界（$a_n \le M$）な数列 $\{a_n\}$ は収束し、$\lim a_n \le M$。</p>
+
+  <p><strong>証明の流れ</strong>。① 上界全体 $A$ を作り公理 2.1 で半直線化する → ② 半直線が $[\alpha,+\infty)$ の形（閉端）になることを背理法で詰める → ③ $\alpha$ が極限値であることを $\varepsilon$-$N$ で示す。</p>
+
+  <details>
+    <summary>証明</summary>
+    <p><strong>Step 1：公理 2.1 を適用。</strong>$ A := \{ x \in \mathbb{R} \mid \forall n,\ a_n \le x\}$ とおく（$\{a_n\}$ の上界全体）。<br>
+    (D1)：$M \in A$ ゆえ $A \ne \emptyset$。$a_1 - 1 \notin A$ ゆえ $A \ne \mathbb{R}$。<br>
+    (D2)：$a \in A,\ b > a$ なら、任意の $n$ で $a_n \le a < b$ ゆえ $b \in A$。<br>
+    公理 2.1 より $\exists\alpha$ s.t. $A = [\alpha,+\infty)$ or $(\alpha,+\infty)$。</p>
+
+    <p><strong>Step 2：$A = [\alpha,+\infty)$（背理法）。</strong>$A = (\alpha,+\infty)$ と仮定すると $\alpha \notin A$、ある $m$ で $a_m > \alpha$。$\alpha < \beta < a_m$ を取れば $\beta$ も上界でない（$a_m \le \beta$ が破れる）から $\beta \notin A$。だが $\beta > \alpha$ より $A = (\alpha,+\infty)$ から $\beta \in A$。矛盾。</p>
+
+    <p><strong>Step 3：$\lim a_n = \alpha$。</strong>$\varepsilon > 0$ を任意に固定。<br>
+    ($\ast$) $\alpha \in A$ より $a_n \le \alpha < \alpha + \varepsilon$（全 $n$）。<br>
+    ($\ast\ast$) $\alpha - \varepsilon \notin A$（$A = [\alpha,+\infty)$）。つまり「$\alpha - \varepsilon$ は上界でない」ので、ある $n_0$ で $a_{n_0} > \alpha - \varepsilon$。単調性より $n \ge n_0 \Rightarrow a_n \ge a_{n_0} > \alpha - \varepsilon$。</p>
+    <p>合わせて $|a_n - \alpha| < \varepsilon$（$n \ge n_0$）。よって $\lim a_n = \alpha$。$M \in A$ より $\alpha \le M$。$\quad\square$</p>
+  </details>
+
+  <h2>定義 2.2：上界・下界・有界性</h2>
+  <p>$X \subset \mathbb{R}$ とする。</p>
+  <ul>
+    <li>$a \in \mathbb{R}$ が $X$ の <strong>上界</strong>：$\forall x \in X,\ x \le a$（i.e. $X \subset (-\infty, a]$）</li>
+    <li>$a$ が $X$ の <strong>下界</strong>：$\forall x \in X,\ x \ge a$</li>
+    <li>$X$ が <strong>上に有界</strong>：上界 $M$ が存在する</li>
+    <li>$X$ が <strong>下に有界</strong>：下界が存在する</li>
+  </ul>
+
+  <figure>
+    <svg viewBox="0 0 540 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="上界と上限のイメージ">
+      <line x1="20" y1="80" x2="520" y2="80" stroke="#1f2328"/>
+      <circle cx="80"  cy="80" r="3.5"/><circle cx="120" cy="80" r="3.5"/>
+      <circle cx="160" cy="80" r="3.5"/><circle cx="200" cy="80" r="3.5"/>
+      <circle cx="230" cy="80" r="3.5"/>
+      <text x="80" y="105" font-size="11" fill="#4f46e5">X の元たち</text>
+      <line x1="280" y1="50" x2="280" y2="110" stroke="#dc2626" stroke-width="2"/>
+      <text x="270" y="40" font-size="12" fill="#dc2626">α = sup X</text>
+      <line x1="280" y1="80" x2="350" y2="80" stroke="#d97706" stroke-width="3"/>
+      <text x="290" y="135" font-size="11" fill="#d97706">α より右はすべて上界</text>
+      <line x1="350" y1="50" x2="350" y2="110" stroke="#d97706"/>
+      <line x1="420" y1="50" x2="420" y2="110" stroke="#d97706"/>
+    </svg>
+    <figcaption>図 3：上界の集合は半直線 $[\alpha,+\infty)$。その左端 $\alpha$ が <strong>上限 $\sup X$</strong>。</figcaption>
+  </figure>
+
+  <h2>定理 2.3（Weierstrass の上限定理）</h2>
+
+  <div class="callout">
+    <strong>定理 2.3.</strong> $X \subset \mathbb{R}$、$X \ne \emptyset$ で上に有界ならば、$X$ の上界全体の集合は半直線 $[\alpha,+\infty)$ の形をしている。この $\alpha$ を <strong>上限</strong> $\sup X$ と呼ぶ。下界・下限についても同様。
+  </div>
+
+  <p><strong>注意</strong>：$X$ が <strong>最大値</strong>を持たなくても、上限は持つ。例：$X = \{1 - 1/n \mid n \in \mathbb{N}\}$ は $\max$ をもたないが $\sup X = 1$。</p>
+
+  <p><strong>気持ち</strong>。定理 1.1 と同じ筋書き：上界全体 $A$ を作って公理 2.1 で半直線化、その左端が上限。</p>
+  <details>
+    <summary>証明</summary>
+    <p>$A := \{ a \in \mathbb{R} \mid a \text{ は } X \text{ の上界}\}$ とおく。<br>
+    (D1)：$X$ が上に有界より $A \ne \emptyset$。$x_0 \in X$ を取ると $x_0 - 1$ は上界でないので $A \ne \mathbb{R}$。<br>
+    (D2)：$a \in A,\ b > a$ なら $\forall x \in X,\ x \le a < b$ ゆえ $b \in A$。<br>
+    公理 2.1 より $A = [\alpha,+\infty)$ または $(\alpha,+\infty)$。$\alpha$ が上界でないと仮定すると、$\alpha < $（ある $x \in X$） で $\alpha < \beta < x$ を取って $\beta$ も上界でないから矛盾。よって $A = [\alpha,+\infty)$。$\quad\square$</p>
+  </details>
+
+  <h2>上限の $\varepsilon$ 言い換え（極めて重要）</h2>
+
+  <p>「$\alpha = \sup X$」の論理式表現を覚えておくと、後の解析がぐっと楽になる。</p>
+
+  <div class="callout">
+    $\alpha = \sup X \iff$ 次の2条件が同時に成り立つ：
+    <ol style="margin:6px 0 0;">
+      <li>$\forall x \in X,\ x \le \alpha$（$\alpha$ は上界）</li>
+      <li>$\forall \varepsilon > 0,\ \exists x \in X\ \text{s.t.}\ x > \alpha - \varepsilon$（$\alpha - \varepsilon$ より右に必ず $X$ の元がある）</li>
+    </ol>
+  </div>
+
+  <details>
+    <summary>同値性の証明</summary>
+    <p>($\Rightarrow$)。1 は定義。2：もし $\exists\varepsilon > 0,\ \forall x \in X,\ x \le \alpha - \varepsilon$ なら $\alpha - \varepsilon$ は上界、よって $\alpha$ は最小の上界でない。矛盾。</p>
+    <p>($\Leftarrow$)。1 より $\alpha$ は上界。$\alpha$ が最小の上界であることを示す：$\beta < \alpha$ なら $\varepsilon := \alpha - \beta > 0$。2 より $\exists x > \alpha - \varepsilon = \beta$、よって $\beta$ は上界でない。$\quad\square$</p>
+  </details>
+
+  <h2>4 命題の同値性</h2>
+
+  <p>これまでに「公理 2.1 ⇒ 定理 1.1」「公理 2.1 ⇒ 定理 2.3」を示した。残りの方向も埋めて 4 命題（公理 2.1、定理 1.1、定理 2.3、区間縮小法）の同値性を完成させる。</p>
+
+  <h3>定理 2.3 ⇒ 定理 1.1</h3>
+  <details>
+    <summary>証明</summary>
+    <p>定理 1.1 と同じく $A := \{x \mid \forall n,\ a_n \le x\}$ を取る。これは上に有界（$M$）で非空（$M\in A$）。$\alpha := \inf A$ を取り、下限の $\varepsilon$ 言い換えから「$\alpha - \varepsilon$ は上界でない」⇔「ある $a_{n_0} > \alpha - \varepsilon$」と「全 $n$ で $a_n \le \alpha$」が得られ、定理 1.1 と同じ議論で $a_n \to \alpha$。$\quad\square$</p>
+  </details>
+
+  <h3>定理 1.1 ⇒ 公理 2.1</h3>
+  <p><strong>気持ち</strong>。$A$ の左端を <strong>区間二分法</strong> で挟みうちに構成する。「中点が $A$ に入るかどうか」で半分ずつ区間を狭めれば、極限で $A$ の左端 $\alpha$ が現れる。</p>
+  <details>
+    <summary>証明（区間二分法）</summary>
+    <p>$A$ が (D1)(D2) を満たすとする。$x_1 \notin A,\ y_1 \in A$（$x_1 < y_1$）を取り、</p>
+    $$ m_n := \frac{x_n + y_n}{2},\quad (x_{n+1}, y_{n+1}) := \begin{cases}(x_n,\,m_n) & (m_n \in A) \\ (m_n,\,y_n) & (m_n \notin A)\end{cases} $$
+    <p>構成より $\forall n$：</p>
+    $$ x_n \notin A,\ y_n \in A,\ x_n \le x_{n+1},\ y_n \ge y_{n+1},\ |y_n - x_n| = \frac{|y_1 - x_1|}{2^{n-1}}. \tag{$*$} $$
+    <p>$\{x_n\}$ は単調非減少で $y_1$ により上有界、$\{y_n\}$ は単調非増加で $x_1$ により下有界。定理 1.1（と上下反転版）で $\alpha = \lim x_n,\ \beta = \lim y_n$ が存在。$(*)$ から $|\alpha - \beta| \to 0$ ゆえ $\alpha = \beta$。</p>
+    <p><em>(p) $\alpha < x \Rightarrow x \in A$</em>：$y_n \to \alpha$ より、十分大きな $n$ で $\alpha \le y_n < x$。$y_n \in A$ かつ (D2) より $x \in A$。</p>
+    <p><em>(q) $x < \alpha \Rightarrow x \notin A$</em>：背理法で $x \in A$ と仮定。$x_n \to \alpha$ より十分大きな $m$ で $x \le x_m < \alpha$。$\{x_n\}$ の作り方から $x_m \notin A$。しかし $x \in A$ と $x \le x_m$ から (D2) で $x_m \in A$。矛盾。</p>
+    <p>(p)(q) より $A = [\alpha,+\infty)$ または $(\alpha,+\infty)$。$\quad\square$</p>
+  </details>
+
+  <h3>区間縮小法（区間縮小公理）</h3>
+
+  <div class="callout">
+    閉区間列 $I_n = [a_n, b_n]$ が $I_n \supset I_{n+1}$ かつ $b_n - a_n \to 0$ を満たすならば
+    $$ \bigcap_{n=1}^{\infty} I_n = \{\gamma\}\quad \text{（ただ1点）}. $$
+  </div>
+
+  <details>
+    <summary>証明</summary>
+    <p>$\{a_n\}$ は単調非減少で $b_1$ により上有界、$\{b_n\}$ は単調非増加で $a_1$ により下有界。定理 1.1 より $\alpha = \lim a_n,\ \beta = \lim b_n$ が存在。$b_n - a_n \to 0$ より $\alpha = \beta =: \gamma$。任意の $n$ で $a_n \le \gamma \le b_n$ より $\gamma \in I_n$。一方、$x \in \bigcap I_n$ なら全 $n$ で $a_n \le x \le b_n$、$n\to\infty$ で $\alpha \le x \le \beta$、ゆえ $x = \gamma$。$\quad\square$</p>
+  </details>
+
+  <h2>Dedekind の元々の公理（切断）</h2>
+
+  <p>$A, B \subset \mathbb{R}$ が次を満たすとき、対 $(A, B)$ を $\mathbb{R}$ の <strong>切断</strong> という：</p>
+  $$ \mathbb{R} = A \cup B,\ A \ne \emptyset,\ B \ne \emptyset,\ A \cap B = \emptyset,\ (a \in A,\ b \in B \Rightarrow a < b). $$
+
+  <p><strong>Dedekind の公理（切断版）</strong>：任意の切断について</p>
+  <ol>
+    <li>$A$ の最大元が存在せず、$B$ の最小元が存在する、または</li>
+    <li>$A$ の最大元が存在し、$B$ の最小元が存在しない</li>
+  </ol>
+  <p>のいずれかが成立する。</p>
+
+  <p>これは公理 2.1 の言い換え：$B := \{ x \in \mathbb{R} \mid x \notin A\}$ と取れば、公理 2.1 の (D1)(D2) は切断の条件と一致する。半直線の形 $[\alpha,+\infty)$ ／$(\alpha,+\infty)$ がそれぞれ (i) ／ (ii) に対応する。</p>
+
+  <h3>$\mathbb{Q}$ ではなぜ成立しないか</h3>
+  <p>$A = \{q \in \mathbb{Q} \mid q^2 < 2 \text{ または } q \le 0\},\ B = \{q \in \mathbb{Q} \mid q > 0 \text{ かつ } q^2 \ge 2\}$ という切断を考えると、$A$ には最大元がなく $B$ にも最小元がない（あれば $\sqrt{2} \in \mathbb{Q}$ となり矛盾）。したがって $\mathbb{Q}$ では切断の公理は <strong>破れる</strong>。これが「$\mathbb{Q}$ には穴がある」「$\mathbb{R}$ には穴がない」の正確な意味です。</p>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li>「実数に隙間がない」を 4 つの同値命題（Dedekind 公理 2.1 / 単調収束定理 1.1 / Weierstrass 上限定理 2.3 / 区間縮小法）で定式化</li>
+    <li>定理 1.1 の証明：$\{a_n\}$ の上界全体 $A$ を作り、公理 2.1 で半直線化 $A = [\alpha,+\infty)$、$\alpha$ が極限値</li>
+    <li>$\sup X$ の $\varepsilon$ 言い換え：「上界」かつ「$\alpha - \varepsilon$ より右に $X$ の元あり」</li>
+    <li>定理 1.1 ⇒ 公理 2.1 は <strong>区間二分法</strong> で示す（公理を仮定しないで連続性を移送する技）</li>
+    <li>$\mathbb{Q}$ では Dedekind の切断が破れるのが「穴がある」の正体</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="01.html" class="prev">第1回 ε-N 論法</a>
+    <a href="03.html" class="next">第3回 集積点・上下極限・コーシー列</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

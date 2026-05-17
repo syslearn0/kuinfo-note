@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第3回 ハミング符号と論理回路 ｜ 情報AI基礎</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">情報AI基礎</a> ／ 第3回</div>
+</header>
+
+<main>
+  <h1>第3回 ハミング符号と論理回路</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>大きな絵</h2>
+  <p>前半は <strong>パリティ／ハミング符号</strong>（第2回の続き）で、誤りをどう「検出」し「位置特定」するか。後半は <strong>論理関数・論理回路</strong>。これまで「ビット列でデータを表す」話だったが、ここから「ビットを <strong>処理する</strong>」回路の世界に踏み込む。AND・OR・NOT の 3 つの部品だけで、原理的にどんな計算もできる。</p>
+
+  <figure>
+    <svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="第3回の俯瞰">
+      <g font-size="12">
+        <rect x="20"  y="40" width="320" height="140" rx="8" fill="#dcfce7" stroke="#059669"/>
+        <text x="180" y="64" text-anchor="middle" font-weight="600" fill="#059669">前半：誤り検出・訂正</text>
+        <text x="180" y="94" text-anchor="middle">パリティ検査</text>
+        <text x="180" y="114" text-anchor="middle">ハミング符号（7,4）</text>
+        <text x="180" y="134" text-anchor="middle">シンドロームによる位置特定</text>
+        <text x="180" y="160" text-anchor="middle" fill="#6b7280">→ どこまで検出／訂正できるか</text>
+
+        <rect x="360" y="40" width="340" height="140" rx="8" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="530" y="64" text-anchor="middle" font-weight="600" fill="#4f46e5">後半：論理関数・論理回路</text>
+        <text x="530" y="94" text-anchor="middle">AND・OR・NOT</text>
+        <text x="530" y="114" text-anchor="middle">ブール代数の法則</text>
+        <text x="530" y="134" text-anchor="middle">論理ゲート → 全加算器 → 順序回路</text>
+        <text x="530" y="160" text-anchor="middle" fill="#6b7280">→ CPU を作る部品が揃う</text>
+      </g>
+    </svg>
+    <figcaption>図 1：誤り訂正は第2回の続き、論理回路はこれから CPU を組むための部品箱。</figcaption>
+  </figure>
+
+  <h2>パリティ検査符号</h2>
+  <p>データ $k$ ビットに <strong>パリティ検査ビット</strong> 1 つを足し、全体の 1 の個数を <strong>偶数</strong> に揃える。受信側で 1 の個数を数えて奇数なら誤りあり。</p>
+
+  <table>
+    <thead><tr><th>受信ビット列</th><th>1 の個数</th><th>判定</th></tr></thead>
+    <tbody>
+      <tr><td>0110 0（正常）</td><td>2（偶）</td><td>OK</td></tr>
+      <tr><td>0010 0（1 ビット誤り）</td><td>1（奇）</td><td>誤り検出</td></tr>
+      <tr><td>0110 1（検査ビット誤り）</td><td>3（奇）</td><td>誤り検出</td></tr>
+      <tr><td>0011 0（2 ビット同時誤り）</td><td>2（偶）</td><td>検出不可</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">1 ビットしか検出できず、2 ビット同時に化けると見逃す。</div>
+
+  <h2>ハミング符号（7,4）の構成</h2>
+
+  <p>情報 4 ビットに <strong>3 つの検査ビット</strong> を付け、計 7 ビットにする。各検査ビットは <strong>異なる情報ビットの組合せ</strong> のパリティ：</p>
+
+  <figure>
+    <svg viewBox="0 0 540 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ハミング符号の検査範囲">
+      <g font-family="monospace" font-size="14">
+        <rect x="40"  y="30" width="40" height="30" fill="#eef2ff" stroke="#4f46e5"/><text x="60"  y="51" text-anchor="middle">d1</text>
+        <rect x="80"  y="30" width="40" height="30" fill="#eef2ff" stroke="#4f46e5"/><text x="100" y="51" text-anchor="middle">d2</text>
+        <rect x="120" y="30" width="40" height="30" fill="#eef2ff" stroke="#4f46e5"/><text x="140" y="51" text-anchor="middle">d3</text>
+        <rect x="160" y="30" width="40" height="30" fill="#eef2ff" stroke="#4f46e5"/><text x="180" y="51" text-anchor="middle">d4</text>
+        <rect x="220" y="30" width="40" height="30" fill="#fef3c7" stroke="#d97706"/><text x="240" y="51" text-anchor="middle">p1</text>
+        <rect x="260" y="30" width="40" height="30" fill="#fef3c7" stroke="#d97706"/><text x="280" y="51" text-anchor="middle">p2</text>
+        <rect x="300" y="30" width="40" height="30" fill="#fef3c7" stroke="#d97706"/><text x="320" y="51" text-anchor="middle">p3</text>
+      </g>
+      <text x="120" y="22" text-anchor="middle" font-size="11" fill="#4f46e5">情報 4 ビット</text>
+      <text x="280" y="22" text-anchor="middle" font-size="11" fill="#d97706">検査 3 ビット</text>
+
+      <g font-size="11">
+        <text x="20" y="100">検査①</text>
+        <line x1="60"  y1="95" x2="60"  y2="85" stroke="#4f46e5"/>
+        <line x1="100" y1="95" x2="100" y2="85" stroke="#4f46e5"/>
+        <line x1="140" y1="95" x2="140" y2="85" stroke="#4f46e5"/>
+        <text x="200" y="100" fill="#6b7280">d1, d2, d3 のパリティ → p1</text>
+        <text x="20" y="130">検査②</text>
+        <line x1="100" y1="125" x2="100" y2="115" stroke="#059669"/>
+        <line x1="140" y1="125" x2="140" y2="115" stroke="#059669"/>
+        <line x1="180" y1="125" x2="180" y2="115" stroke="#059669"/>
+        <text x="200" y="130" fill="#6b7280">d2, d3, d4 のパリティ → p2</text>
+        <text x="20" y="160">検査③</text>
+        <line x1="60"  y1="155" x2="60"  y2="145" stroke="#dc2626"/>
+        <line x1="100" y1="155" x2="100" y2="145" stroke="#dc2626"/>
+        <line x1="180" y1="155" x2="180" y2="145" stroke="#dc2626"/>
+        <text x="200" y="160" fill="#6b7280">d1, d2, d4 のパリティ → p3</text>
+      </g>
+    </svg>
+    <figcaption>図 2：3 つの検査ビットがカバーする情報ビットの範囲を変えてある。これが「誤り位置が一意に特定できる」秘密。</figcaption>
+  </figure>
+
+  <h3>例：$[0110]$ を符号化</h3>
+  <ul>
+    <li>検査①（d1, d2, d3 = 0, 1, 1）→ 1 が 2 個（偶）→ p1 = 0</li>
+    <li>検査②（d2, d3, d4 = 1, 1, 0）→ 1 が 2 個（偶）→ p2 = 0</li>
+    <li>検査③（d1, d2, d4 = 0, 1, 0）→ 1 が 1 個（奇）→ p3 = 1</li>
+  </ul>
+  <p>符号語：<code>0110 001</code></p>
+
+  <h2>ハミング符号による誤り訂正</h2>
+
+  <p>受信側で 3 つの「拡張パリティ検査」を再計算する。各検査の値を並べた 3 ビットを <strong>シンドローム</strong> と呼ぶ。</p>
+
+  <div class="callout">
+    <strong>核心。</strong>「誤り位置」と「シンドローム」が <strong>一対一対応</strong> するよう検査範囲を設計してある。受信側はシンドロームを見るだけで、どのビットが化けたかを特定し、反転すれば直る。
+  </div>
+
+  <table>
+    <thead><tr><th>シンドローム [C1 C2 C3]</th><th>エラー位置</th></tr></thead>
+    <tbody>
+      <tr><td><code>000</code></td><td>エラーなし</td></tr>
+      <tr><td><code>101</code></td><td>d1（1 ビット目）</td></tr>
+      <tr><td><code>111</code></td><td>d2（2 ビット目）</td></tr>
+      <tr><td><code>110</code></td><td>d3（3 ビット目）</td></tr>
+      <tr><td><code>011</code></td><td>d4（4 ビット目）</td></tr>
+      <tr><td><code>100</code></td><td>p1（5 ビット目）</td></tr>
+      <tr><td><code>010</code></td><td>p2（6 ビット目）</td></tr>
+      <tr><td><code>001</code></td><td>p3（7 ビット目）</td></tr>
+    </tbody>
+  </table>
+
+  <details>
+    <summary>なぜ位置が特定できるのか（設計の直感）</summary>
+    <p>3 ビットのシンドロームには $2^3 = 8$ 通りのパターンがある。「エラーなし（1 通り）」＋「7 ビット中どこか 1 ビット誤り（7 通り）」＝ ちょうど 8 通り。これに <strong>ぴったり一対一</strong> 対応するように、各検査の担当範囲が選ばれている。</p>
+  </details>
+
+  <details>
+    <summary>例：$[0110\,001]$ の 1 ビット目が化けて $[0010\,001]$ になった場合</summary>
+    <p>3 つの検査を計算するとシンドロームは <code>101</code>、表より 1 ビット目が誤り。反転して復元 → $[0110\,001]$。</p>
+  </details>
+
+  <h2>能力の限界</h2>
+
+  <table>
+    <thead><tr><th>誤りビット数</th><th>「誤りあり」と気付ける？</th><th>「どこか」まで特定？</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>—</td><td>—（正常）</td></tr>
+      <tr><td>1</td><td>○ 検出</td><td>○ 訂正可能</td></tr>
+      <tr><td>2</td><td>○ 検出（シンドローム ≠ 000）</td><td>× 誤訂正してしまう</td></tr>
+      <tr><td>3 以上</td><td>×（検出できない場合あり）</td><td>×</td></tr>
+    </tbody>
+  </table>
+
+  <p>つまり <strong>検出だけなら 2 ビットまで、訂正なら 1 ビットまで</strong>。場面に応じて使い分ける：</p>
+
+  <table>
+    <thead><tr><th>場面</th><th>必要な能力</th></tr></thead>
+    <tbody>
+      <tr><td>インターネット（TCP/IP）</td><td>検出のみ（再送できる）→ CRC</td></tr>
+      <tr><td>HDD・CD・ECC メモリ</td><td>訂正（再送できない）→ ハミング系</td></tr>
+      <tr><td>宇宙探査機・放送</td><td>訂正（往復遅延／一方向）→ より強力な符号</td></tr>
+    </tbody>
+  </table>
+
+  <h2>論理変数と論理関数</h2>
+
+  <p><strong>論理変数</strong>：0 か 1 のどちらかをとる変数。<br>
+  <strong>論理関数</strong>：複数の論理変数を入力して 0/1 を出力する関数：</p>
+  $$ f: \{0, 1\}^n \to \{0, 1\} $$
+  <p>コンピュータの計算は <strong>すべて</strong> 論理関数として表現できる。</p>
+
+  <h3>例：1 桁の 2 進加算（全加算器）</h3>
+  <p>入力 3 ビット $x_i, y_i, c_i$（加数・被加数・下からの桁上げ）、出力 2 ビット $s_i, c_{i+1}$（和・上への桁上げ）。</p>
+
+  <table>
+    <thead><tr><th>$x_i$</th><th>$y_i$</th><th>$c_i$</th><th>$s_i$</th><th>$c_{i+1}$</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+      <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+      <tr><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+      <tr><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+      <tr><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+      <tr><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+      <tr><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+      <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+    </tbody>
+  </table>
+
+  <p>真理値表が <strong>1 桁加算という関数を完全に定義</strong> している。</p>
+
+  <h2>基本論理演算（AND・OR・NOT）</h2>
+
+  <p>任意の論理関数は <strong>AND・OR・NOT の 3 つだけ</strong> で組み立てられる（関数完全性）。</p>
+
+  <figure>
+    <svg viewBox="0 0 540 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AND OR NOT ゲート記号">
+      <g font-size="13">
+        <text x="60" y="20" text-anchor="middle" font-weight="600">AND</text>
+        <path d="M 30 40 L 30 90 L 60 90 A 25 25 0 0 0 60 40 Z" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.5"/>
+        <line x1="10" y1="55" x2="30" y2="55" stroke="#1f2328"/>
+        <line x1="10" y1="75" x2="30" y2="75" stroke="#1f2328"/>
+        <line x1="85" y1="65" x2="110" y2="65" stroke="#1f2328"/>
+        <text x="0" y="58" font-size="11">x</text>
+        <text x="0" y="78" font-size="11">y</text>
+        <text x="113" y="68" font-size="11">x·y</text>
+
+        <text x="220" y="20" text-anchor="middle" font-weight="600">OR</text>
+        <path d="M 180 40 Q 200 65 180 90 Q 215 90 240 65 Q 215 40 180 40 Z" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+        <line x1="160" y1="55" x2="188" y2="55" stroke="#1f2328"/>
+        <line x1="160" y1="75" x2="188" y2="75" stroke="#1f2328"/>
+        <line x1="240" y1="65" x2="270" y2="65" stroke="#1f2328"/>
+        <text x="150" y="58" font-size="11">x</text>
+        <text x="150" y="78" font-size="11">y</text>
+        <text x="275" y="68" font-size="11">x+y</text>
+
+        <text x="380" y="20" text-anchor="middle" font-weight="600">NOT</text>
+        <polygon points="350,40 350,90 395,65" fill="#dcfce7" stroke="#059669" stroke-width="1.5"/>
+        <circle cx="402" cy="65" r="6" fill="#fff" stroke="#059669" stroke-width="1.5"/>
+        <line x1="330" y1="65" x2="350" y2="65" stroke="#1f2328"/>
+        <line x1="408" y1="65" x2="438" y2="65" stroke="#1f2328"/>
+        <text x="320" y="68" font-size="11">x</text>
+        <text x="442" y="68" font-size="11">x̄</text>
+      </g>
+      <g font-family="monospace" font-size="11" fill="#6b7280">
+        <text x="20" y="135">両方 1 のとき 1</text>
+        <text x="170" y="135">片方でも 1 で 1</text>
+        <text x="340" y="135">入力を反転</text>
+      </g>
+    </svg>
+    <figcaption>図 3：基本論理ゲートの MIL 記号。AND は「両方」、OR は「どちらか」、NOT は「反転」。</figcaption>
+  </figure>
+
+  <h2>加算の論理式表現</h2>
+
+  <p>真理値表で「出力が 1 になる入力パターン」を AND で表し、それらを OR でつなぐ（<strong>主加法標準形</strong>）：</p>
+
+  $$ s_i = \bar{x}_i\bar{y}_i c_i + \bar{x}_i y_i \bar{c}_i + x_i\bar{y}_i\bar{c}_i + x_i y_i c_i $$
+  $$ c_{i+1} = x_i y_i + x_i c_i + y_i c_i $$
+
+  <p>この式から直接、AND・OR・NOT ゲートで回路を組める。</p>
+
+  <h2>ブール代数の主要法則</h2>
+
+  <table>
+    <thead><tr><th>名前</th><th>OR 側</th><th>AND 側</th></tr></thead>
+    <tbody>
+      <tr><td>べき等律</td><td>$x + x = x$</td><td>$x \cdot x = x$</td></tr>
+      <tr><td>単位元</td><td>$x + 0 = x$</td><td>$x \cdot 1 = x$</td></tr>
+      <tr><td>零元</td><td>$x + 1 = 1$</td><td>$x \cdot 0 = 0$</td></tr>
+      <tr><td>交換律</td><td>$x + y = y + x$</td><td>$x \cdot y = y \cdot x$</td></tr>
+      <tr><td>相補律</td><td>$x + \bar{x} = 1$</td><td>$x \cdot \bar{x} = 0$</td></tr>
+      <tr><td>分配律</td><td>$x + (yz) = (x+y)(x+z)$</td><td>$x(y + z) = xy + xz$</td></tr>
+      <tr><td>吸収律</td><td>$x + xy = x$</td><td>$x(x + y) = x$</td></tr>
+      <tr><td>復元律</td><td colspan="2">$\bar{\bar{x}} = x$</td></tr>
+      <tr><td>ド・モルガン</td><td>$\overline{x + y} = \bar{x}\cdot\bar{y}$</td><td>$\overline{x \cdot y} = \bar{x} + \bar{y}$</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>普通の算術と違うところ。</strong>$x + 1 = 1$（零元）と分配律の OR 側 $x + (yz) = (x+y)(x+z)$。普通の数では成立しない。「論理は集合の包含だ」と思うと納得しやすい（$+$ は和集合、$\cdot$ は共通部分）。
+  </div>
+
+  <details>
+    <summary>ド・モルガンの法則：真理値表で確認</summary>
+    <table>
+      <thead><tr><th>x</th><th>y</th><th>x+y</th><th>$\overline{x+y}$</th><th>$\bar{x}\cdot\bar{y}$</th></tr></thead>
+      <tbody>
+        <tr><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+        <tr><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+        <tr><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td></tr>
+        <tr><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+      </tbody>
+    </table>
+    <p>2 列が完全一致 → 同値。直感的には「A または B でない ＝ A でないかつ B でない」。</p>
+  </details>
+
+  <details>
+    <summary>コンセンサスの法則：$xy + \bar{x}z + yz = xy + \bar{x}z$</summary>
+    <p>$yz$ という項は冗長：$x = 1$ なら $yz$ が成り立つときは $xy$ も成り立つ。$x = 0$ なら $yz$ が成り立つときは $\bar{x}z$ も成り立つ。どちらの場合も $yz$ は他に吸収される。<br>
+    <strong>用途</strong>：論理式の簡略化＝ゲート数の削減（回路設計の最適化）。</p>
+  </details>
+
+  <h2>命題論理とプログラムの条件式</h2>
+
+  <p>C 言語の論理演算子は、ブール代数の演算と <strong>同じもの</strong> です：</p>
+  <table>
+    <thead><tr><th>数学</th><th>C 言語</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td>$\land$</td><td><code>&amp;&amp;</code></td><td>AND（両方）</td></tr>
+      <tr><td>$\lor$</td><td><code>||</code></td><td>OR（どちらか）</td></tr>
+      <tr><td>$\lnot$</td><td><code>!</code></td><td>NOT（反転）</td></tr>
+    </tbody>
+  </table>
+  <p>つまり <code>if</code> 文の条件式はそのままブール代数の計算で、回路に翻訳できる。</p>
+
+  <h2>論理ゲートと CMOS</h2>
+
+  <p>論理演算を電子回路で実現したのが <strong>論理ゲート</strong>。現代の半導体は <strong>CMOS</strong>（相補型 MOS）方式で、PMOS と NMOS のトランジスタを組み合わせる：</p>
+  <ul>
+    <li>NOT ゲート：トランジスタ 2 個</li>
+    <li>2 入力 NAND：トランジスタ 4 個</li>
+  </ul>
+  <p>CPU の中身は、究極的にはこの <strong>数十億個</strong> のトランジスタからできている。</p>
+
+  <h2>組合せ回路：全加算器</h2>
+
+  <p>論理ゲートを <strong>記憶を持たず</strong> 配線でつないだ回路を <strong>組合せ回路</strong> と呼ぶ。出力は現在の入力だけで決まる。先ほどの式を素直に回路化する：</p>
+
+  <figure>
+    <svg viewBox="0 0 540 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="全加算器の概念図">
+      <g>
+        <rect x="180" y="60" width="180" height="100" rx="8" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.5"/>
+        <text x="270" y="115" text-anchor="middle" font-size="14" font-weight="600">全加算器</text>
+        <text x="270" y="135" text-anchor="middle" font-size="11" fill="#6b7280">（AND/OR/NOT の組合せ）</text>
+
+        <line x1="80"  y1="80"  x2="180" y2="80"  stroke="#1f2328"/>
+        <text x="60"  y="84" font-size="13">xᵢ</text>
+        <line x1="80"  y1="110" x2="180" y2="110" stroke="#1f2328"/>
+        <text x="60"  y="114" font-size="13">yᵢ</text>
+        <line x1="80"  y1="140" x2="180" y2="140" stroke="#1f2328"/>
+        <text x="60"  y="144" font-size="13">cᵢ</text>
+
+        <line x1="360" y1="90"  x2="460" y2="90"  stroke="#1f2328"/>
+        <text x="470" y="94" font-size="13">sᵢ</text>
+        <line x1="360" y1="130" x2="460" y2="130" stroke="#1f2328"/>
+        <text x="470" y="134" font-size="13">cᵢ₊₁</text>
+      </g>
+    </svg>
+    <figcaption>図 4：1 桁の加算を行うブラックボックス。内部は AND・OR ゲート 5〜6 個程度で実装できる。</figcaption>
+  </figure>
+
+  <h2>順次桁上げ加算器（n 桁）</h2>
+
+  <p>全加算器を <strong>n 個直列</strong> につなぐと n ビット加算器ができる。下の桁の桁上げが確定してから次の桁が計算できる：</p>
+
+  <figure>
+    <svg viewBox="0 0 720 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="順次桁上げ加算器">
+      <defs>
+        <marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+        </marker>
+      </defs>
+      <g>
+        <rect x="40"  y="50" width="100" height="60" rx="6" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="90"  y="85" text-anchor="middle" font-size="11">FA₀</text>
+        <rect x="180" y="50" width="100" height="60" rx="6" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="230" y="85" text-anchor="middle" font-size="11">FA₁</text>
+        <rect x="320" y="50" width="100" height="60" rx="6" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="370" y="85" text-anchor="middle" font-size="11">FA₂</text>
+        <text x="490" y="85" font-size="14">⋯</text>
+        <rect x="540" y="50" width="100" height="60" rx="6" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="590" y="85" text-anchor="middle" font-size="11">FAₙ₋₁</text>
+
+        <line x1="140" y1="80" x2="180" y2="80" stroke="#dc2626" stroke-width="2" marker-end="url(#ar3)"/>
+        <line x1="280" y1="80" x2="320" y2="80" stroke="#dc2626" stroke-width="2" marker-end="url(#ar3)"/>
+        <line x1="420" y1="80" x2="470" y2="80" stroke="#dc2626" stroke-width="2" marker-end="url(#ar3)"/>
+        <line x1="510" y1="80" x2="540" y2="80" stroke="#dc2626" stroke-width="2" marker-end="url(#ar3)"/>
+        <text x="160" y="70" font-size="10" fill="#dc2626">c₁</text>
+        <text x="300" y="70" font-size="10" fill="#dc2626">c₂</text>
+
+        <text x="20"  y="30" font-size="11">x₀ y₀</text>
+        <text x="160" y="30" font-size="11">x₁ y₁</text>
+        <text x="300" y="30" font-size="11">x₂ y₂</text>
+        <text x="540" y="30" font-size="11">xₙ₋₁ yₙ₋₁</text>
+
+        <text x="90"  y="135" font-size="11" text-anchor="middle">s₀</text>
+        <text x="230" y="135" font-size="11" text-anchor="middle">s₁</text>
+        <text x="370" y="135" font-size="11" text-anchor="middle">s₂</text>
+        <text x="590" y="135" font-size="11" text-anchor="middle">sₙ₋₁</text>
+
+        <line x1="90"  y1="110" x2="90"  y2="125" stroke="#1f2328"/>
+        <line x1="230" y1="110" x2="230" y2="125" stroke="#1f2328"/>
+        <line x1="370" y1="110" x2="370" y2="125" stroke="#1f2328"/>
+        <line x1="590" y1="110" x2="590" y2="125" stroke="#1f2328"/>
+      </g>
+    </svg>
+    <figcaption>図 5：桁上げ $c_i$ が左から右へリレーされる。計算時間は <strong>n に比例</strong>。</figcaption>
+  </figure>
+
+  <h3>桁上げ選択加算器（高速化アルゴリズム）</h3>
+  <p>「桁上げ = 0 のとき」「桁上げ = 1 のとき」の <strong>両方を並列に計算</strong> しておき、前段から桁上げが届いたら正しい方を <strong>選ぶ</strong>。これで計算時間が約半分に。<strong>ハードウェアの並列性を活かした計算法</strong>＝ ハードウェアアルゴリズム。</p>
+
+  <h2>順序回路（記憶を持つ回路）</h2>
+
+  <table>
+    <thead><tr><th>種類</th><th>出力を決める要因</th></tr></thead>
+    <tbody>
+      <tr><td>組合せ回路</td><td>現在の入力だけ</td></tr>
+      <tr><td><strong>順序回路</strong></td><td>現在の入力 ＋ <strong>内部状態</strong>（過去の記憶）</td></tr>
+    </tbody>
+  </table>
+
+  <p>例：自動販売機。内部状態 = 「これまでに投入された硬貨の合計」。新しい硬貨で状態が更新され、合計が値段に達したら商品を出す。これが <strong>有限オートマトン</strong> の最小例で、CPU の制御部分の基礎。次回は実際に CPU を組み立てる。</p>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li>パリティ検査は 1 ビット誤りの <strong>検出</strong>、ハミング符号は 1 ビット誤りの <strong>訂正</strong></li>
+    <li>シンドロームと誤り位置を <strong>一対一対応</strong> させるのが訂正符号の核心</li>
+    <li>論理関数 $\{0,1\}^n \to \{0,1\}$ が計算の数学的単位。真理値表で定義できる</li>
+    <li>AND・OR・NOT の 3 つで <strong>任意の論理関数</strong> が組める（関数完全性）</li>
+    <li>ブール代数の法則で式を変形 → ゲート数を削減できる</li>
+    <li>組合せ回路（記憶なし）＋順序回路（記憶あり）＝ コンピュータの部品箱</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="02.html" class="prev">第2回 数の表現と演算</a>
+    <a href="04.html" class="next">第4回 コンピュータの仕組み</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

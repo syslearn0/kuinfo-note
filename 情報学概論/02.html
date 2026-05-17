@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第2回 ChatGPT と Transformer ｜ 情報学概論</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">情報学概論</a> ／ 第2回</div>
+</header>
+
+<main>
+  <h1>第2回 ChatGPT と Transformer</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>この回の流れ</h2>
+  <p>「ChatGPT ってすごいけど、なぜ賢いの？」に答える構成。<strong>3 つのパート</strong>に分かれる：① 何かを知る → ② 仕組みを理解する → ③ 応用と社会への影響。</p>
+
+  <figure>
+    <svg viewBox="0 0 720 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="第2回の流れ（11章）">
+      <defs>
+        <marker id="ar02" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4f46e5"/>
+        </marker>
+      </defs>
+      <g font-size="11">
+        <rect x="20"  y="10" width="220" height="40" rx="6" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="130" y="28" text-anchor="middle" font-weight="600" fill="#4f46e5">① 正体を知る</text>
+        <text x="130" y="44" text-anchor="middle" font-size="10" fill="#6b7280">1〜3章：哲学的な問い</text>
+
+        <rect x="260" y="10" width="220" height="40" rx="6" fill="#fef3c7" stroke="#d97706"/>
+        <text x="370" y="28" text-anchor="middle" font-weight="600" fill="#d97706">② 中身を理解する</text>
+        <text x="370" y="44" text-anchor="middle" font-size="10" fill="#6b7280">4〜8章：技術の進化</text>
+
+        <rect x="500" y="10" width="200" height="40" rx="6" fill="#dcfce7" stroke="#059669"/>
+        <text x="600" y="28" text-anchor="middle" font-weight="600" fill="#059669">③ 応用と社会</text>
+        <text x="600" y="44" text-anchor="middle" font-size="10" fill="#6b7280">9〜11章</text>
+
+        <g>
+          <rect x="20"  y="80"  width="220" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="30"  y="103">1. ChatGPT とは（史上最速の AI）</text>
+          <rect x="20"  y="124" width="220" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="30"  y="147">2. チューリングテスト</text>
+          <rect x="20"  y="168" width="220" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="30"  y="191">3. 中国語の部屋・フレーム問題</text>
+        </g>
+
+        <g>
+          <rect x="260" y="80"  width="220" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="270" y="103">4. 言語モデル（次単語予測）</text>
+          <rect x="260" y="124" width="220" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="270" y="147">5. Word2Vec（単語ベクトル）</text>
+          <rect x="260" y="168" width="220" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="270" y="191">6. Seq2Seq + Attention</text>
+          <rect x="260" y="212" width="220" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="270" y="235">7. Transformer / Self-Attention</text>
+          <rect x="260" y="256" width="220" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="270" y="279">7.5. ViT（画像にも適用）</text>
+          <rect x="260" y="300" width="220" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="270" y="323">8. LLM の全体像と RLHF</text>
+        </g>
+
+        <g>
+          <rect x="500" y="80"  width="200" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="510" y="103">9. プロンプトエンジニアリング</text>
+          <rect x="500" y="124" width="200" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="510" y="147">10. LLM エージェント</text>
+          <rect x="500" y="168" width="200" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="510" y="191">10.5. マルチエージェント</text>
+          <rect x="500" y="212" width="200" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="510" y="235">10.6. 遺伝的プログラミング</text>
+          <rect x="500" y="256" width="200" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="510" y="279">11. AI と社会・雇用</text>
+        </g>
+
+        <text x="360" y="380" text-anchor="middle" font-size="12" fill="#4f46e5">②の流れは「古い技術 → 問題発見 → 改良 → さらに改良」という AI 進化の歴史でもある</text>
+      </g>
+    </svg>
+    <figcaption>図 1：11 章の全体構成。「正体 → 仕組み → 社会」の 3 パート。中央の②が技術的に最も濃密。</figcaption>
+  </figure>
+
+  <h2>パート①：ChatGPT の正体を知る</h2>
+
+  <h3>1. ChatGPT とは</h3>
+  <p>OpenAI が 2023 年 1 月に公開した対話型 AI。<strong>2 ヶ月で月間 1 億人</strong> に到達（TikTok 9 ヶ月、Instagram 30 ヶ月）。</p>
+
+  <details>
+    <summary>プロンプト例</summary>
+    <ul>
+      <li>アイデア出し：「一流のアイデアマンとして、名古屋市を活性化する方法を 10 個」</li>
+      <li>謝罪文作成：「個人情報が 3 万人分漏洩した。一流の広報担当者として謝罪文を」</li>
+      <li>要約：「次のページをまとめてください：（URL）」</li>
+    </ul>
+    <p>うまい命令文を書くほど良い回答が返る。これを <strong>プロンプトエンジニアリング</strong> という（9 章で詳述）。</p>
+  </details>
+
+  <h3>2. チューリングテスト：機械は賢いと言えるか</h3>
+  <p>判定者が壁の向こうの A・B と対話し、どちらが人間か見分けられなければ、その AI は <strong>人間と同等の知能</strong> をもつとみなす（Alan Turing, 1950）。</p>
+  <div class="callout">研究（Jones & Bergen）によれば <strong>GPT-4.5 は 50% 以上の確率で「人間」と判定</strong>される。事実上テストに合格。</div>
+
+  <h3>3. 中国語の部屋・フレーム問題・シンボルグランディング</h3>
+
+  <p><strong>中国語の部屋</strong>（John Searle）：マニュアル通りに記号操作するだけで「理解した」と言えるか？ AI が <strong>正しく返せても「理解」とは限らない</strong> という哲学的問いかけ。</p>
+
+  <details>
+    <summary>フレーム問題（McCarthy & Hayes, 1969）</summary>
+    <p>ロボットが「ボールを取れ」と命令されたとき、「壁の色は変わったか？」「天井の高さは？」など <strong>関係ない事実をどう切り捨てるか</strong> という根本問題。古典 AI ではこれを論理で表現するのが極めて困難だった。<br>
+    LLM はこの問題を <strong>明示的には解いていない</strong>。大量のテキストで「常識的に変化しないこと」を暗黙学習し事実上回避している。</p>
+  </details>
+
+  <details>
+    <summary>シンボルグランディング問題（Harnad, 1990）</summary>
+    <p>「りんご」という記号は辞書で「赤くて丸い果物」と定義され、「赤い」は「特定の波長の光」と…記号が記号で定義され続け、<strong>実際の感覚に到達しない</strong>。LLM はテキスト記号は得意だが身体を持たないため、原理的に未解決という批判がある。</p>
+  </details>
+
+  <h2>パート②：ChatGPT の中身を理解する</h2>
+
+  <h3>4. 言語モデル：「次の単語を予測する」だけ</h3>
+  <p>例：「今日は天気が（　）」→「いい」「悪い」「雨」が高確率。</p>
+  $$ P(w_{t+1} \mid w_t, \ldots, w_1) $$
+  <p>語彙の中から最も確率の高い単語を選んで出力 → それを次の入力に足してまた予測 → を繰り返すだけで、文章が生成される。</p>
+
+  <div class="callout">
+    <strong>スケーリング則。</strong>① パラメータ数、② 学習データ量、③ 計算量 — この 3 つを <strong>同時に</strong> 増やすほど性能がべき乗で向上する。
+  </div>
+
+  <h3>5. Word2Vec：単語をベクトルで表す</h3>
+  <p>単語を <strong>数字の配列（ベクトル）</strong> に変換すると、意味の近い単語が近いベクトルになる。有名な例：</p>
+  $$ \mathrm{king} - \mathrm{man} + \mathrm{woman} \;\approx\; \mathrm{queen} $$
+  <p><strong>意味の計算</strong>ができるようになったのが革命。CBOW（周囲から中心を予測）、Skip-gram（中心から周囲を予測）の 2 つの学習法がある。</p>
+
+  <h3>6. Seq2Seq と Attention：翻訳 AI の進化</h3>
+
+  <figure>
+    <svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Encoder-Decoder と Attention">
+      <defs>
+        <marker id="arS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4f46e5"/>
+        </marker>
+      </defs>
+      <g font-size="11">
+        <rect x="20"  y="30" width="120" height="40" rx="6" fill="#fef3c7" stroke="#d97706"/>
+        <text x="80" y="54" text-anchor="middle">I ate an apple</text>
+        <line x1="140" y1="50" x2="180" y2="50" stroke="#4f46e5" stroke-width="2" marker-end="url(#arS)"/>
+        <rect x="180" y="30" width="120" height="40" rx="6" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="240" y="54" text-anchor="middle">Encoder</text>
+        <line x1="300" y1="50" x2="340" y2="50" stroke="#4f46e5" stroke-width="2" marker-end="url(#arS)"/>
+        <rect x="340" y="30" width="160" height="40" rx="6" fill="#fee2e2" stroke="#dc2626"/>
+        <text x="420" y="54" text-anchor="middle">固定長ベクトル（ボトルネック）</text>
+        <line x1="500" y1="50" x2="540" y2="50" stroke="#4f46e5" stroke-width="2" marker-end="url(#arS)"/>
+        <rect x="540" y="30" width="120" height="40" rx="6" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="600" y="54" text-anchor="middle">Decoder</text>
+
+        <text x="360" y="110" text-anchor="middle" fill="#dc2626">↓ 文が長いと前の情報が消える</text>
+
+        <text x="360" y="145" text-anchor="middle" font-weight="600" fill="#059669">Attention：固定長を介さず、出力単語ごとに必要な入力単語だけを参照</text>
+        <text x="360" y="170" text-anchor="middle" font-size="10" fill="#6b7280">「りんごを」を出力するとき → 「apple」に注目度 0.80、他はほぼ無視</text>
+      </g>
+    </svg>
+    <figcaption>図 2：Encoder→Decoder の固定長ボトルネックを Attention が解消した。これが Transformer への道を開いた。</figcaption>
+  </figure>
+
+  <details>
+    <summary>Attention の 4 ステップ</summary>
+    <ol>
+      <li>「今、どの入力単語が関係しているか」をスコア化（Attention Score）</li>
+      <li>スコアを 0〜1 の割合に正規化（Softmax → Attention Distribution、合計は 1）</li>
+      <li>各入力単語の情報を <strong>注目度の割合で加重和</strong>（Attention Output）</li>
+      <li>そのベクトルを使って次の出力単語を決定</li>
+    </ol>
+  </details>
+
+  <h3>7. Transformer：Self-Attention で同じ文の単語どうしを結ぶ</h3>
+
+  <p>Attention が「英語 → 日本語」の <strong>異言語間</strong> の関係だったのに対し、<strong>Self-Attention</strong> は <strong>同じ文の中</strong> の単語どうしの関係を学習する。代名詞解消が典型例：</p>
+
+  <div class="callout">
+    "The bird takes rest at the tree, because <strong>it</strong> was too tired."<br>
+    「it」は何を指す？ → 人間なら瞬時に「bird」と分かる。Self-Attention は <strong>これを数値で学習</strong>する。
+  </div>
+
+  <h3>Q / K / V：検索エンジンのアナロジー</h3>
+  <table>
+    <thead><tr><th>役割</th><th>検索エンジンのたとえ</th><th>Self-Attention での意味</th></tr></thead>
+    <tbody>
+      <tr><td>Query</td><td>検索ワード</td><td>「自分はどんな情報が欲しいか」</td></tr>
+      <tr><td>Key</td><td>記事のタイトル</td><td>「自分はどんな情報を持っているか」</td></tr>
+      <tr><td>Value</td><td>記事の本文</td><td>「実際に渡す情報」</td></tr>
+    </tbody>
+  </table>
+
+  <details>
+    <summary>Self-Attention の数式</summary>
+    <p>各単語から 3 種のベクトルを線形変換で作る：</p>
+    $$ \mathbf{q}_i = Q\mathbf{x}_i,\quad \mathbf{k}_i = K\mathbf{x}_i,\quad \mathbf{v}_i = V\mathbf{x}_i $$
+    <p>Q・K の内積で類似度 → Softmax で 0〜1 化 → Value を加重和：</p>
+    $$ e_{ij} = \mathbf{q}_i^T \mathbf{k}_j,\quad \alpha_{ij} = \frac{\exp(e_{ij})}{\sum_{j'}\exp(e_{ij'})},\quad \mathbf{o}_i = \sum_j \alpha_{ij}\mathbf{v}_j $$
+  </details>
+
+  <table>
+    <thead><tr><th>Transformer の特徴</th><th>説明</th></tr></thead>
+    <tbody>
+      <tr><td>Self-Attention</td><td>全単語ペアの関係を同時に学習</td></tr>
+      <tr><td>Position Encoding</td><td>単語の順番情報を付与</td></tr>
+      <tr><td>Multi-Head Attention</td><td>複数の視点から並列に Attention</td></tr>
+      <tr><td>並列処理</td><td>RNN と違い再帰がない → 学習が速い</td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.5. Vision Transformer (ViT)：画像にも適用</h3>
+
+  <p>画像を <strong>16×16 ピクセルのパッチに分割</strong> し、各パッチを「単語」のように扱う。224×224 画像なら 196 個のパッチ。</p>
+
+  <figure>
+    <svg viewBox="0 0 540 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ViT のパッチ分割">
+      <g>
+        <rect x="20" y="20" width="180" height="180" fill="#fff" stroke="#1f2328"/>
+        <g stroke="#4f46e5" stroke-width="0.8" opacity="0.6">
+          <line x1="65"  y1="20" x2="65"  y2="200"/>
+          <line x1="110" y1="20" x2="110" y2="200"/>
+          <line x1="155" y1="20" x2="155" y2="200"/>
+          <line x1="20"  y1="65" x2="200" y2="65"/>
+          <line x1="20"  y1="110" x2="200" y2="110"/>
+          <line x1="20"  y1="155" x2="200" y2="155"/>
+        </g>
+        <text x="110" y="215" text-anchor="middle" font-size="11">画像を 16×16 パッチに分割</text>
+
+        <text x="225" y="110" font-size="20">→</text>
+
+        <g font-family="monospace" font-size="11">
+          <rect x="260" y="30" width="240" height="20" fill="#eef2ff" stroke="#4f46e5"/>
+          <text x="380" y="45" text-anchor="middle">パッチ 1 → ベクトル</text>
+          <rect x="260" y="55" width="240" height="20" fill="#eef2ff" stroke="#4f46e5"/>
+          <text x="380" y="70" text-anchor="middle">パッチ 2 → ベクトル</text>
+          <rect x="260" y="80" width="240" height="20" fill="#eef2ff" stroke="#4f46e5"/>
+          <text x="380" y="95" text-anchor="middle">…</text>
+          <rect x="260" y="105" width="240" height="20" fill="#eef2ff" stroke="#4f46e5"/>
+          <text x="380" y="120" text-anchor="middle">パッチ N → ベクトル</text>
+        </g>
+
+        <rect x="260" y="150" width="240" height="40" rx="6" fill="#dcfce7" stroke="#059669"/>
+        <text x="380" y="175" text-anchor="middle" font-size="12">Transformer Encoder で関係を学習</text>
+      </g>
+    </svg>
+    <figcaption>図 3：ViT はパッチを「単語の列」とみなす。これで画像にも Transformer がそのまま使える。</figcaption>
+  </figure>
+
+  <table>
+    <thead><tr><th>比較</th><th>CNN</th><th>ViT</th></tr></thead>
+    <tbody>
+      <tr><td>見方</td><td>局所的（近いピクセルから）</td><td>大域的（全パッチ同時）</td></tr>
+      <tr><td>帰納バイアス</td><td>「近いピクセルは関係深い」を内蔵</td><td>仮定なし、データから学習</td></tr>
+      <tr><td>少ないデータ</td><td>得意</td><td>苦手</td></tr>
+      <tr><td>大規模学習</td><td>頭打ち</td><td>スケールで CNN を凌駕</td></tr>
+    </tbody>
+  </table>
+
+  <p>ImageNet で <strong>88.55%</strong>、CIFAR-10 で <strong>99.50%</strong>。CNN の常識を覆し、現在のマルチモーダル LLM（GPT-4V, Gemini）の直接の祖先となった。</p>
+
+  <h3>8. LLM の全体像と RLHF</h3>
+
+  <p>ChatGPT は <strong>RLHF（人間のフィードバックによる強化学習）</strong>の 3 ステップで仕上げられている：</p>
+
+  <ol>
+    <li><strong>デモ収集</strong>：人間が良い回答例を作成 → 教師あり学習でモデルを調整</li>
+    <li><strong>比較データ収集</strong>：複数回答を人間がランク付け → <strong>報酬モデル</strong> を学習</li>
+    <li><strong>強化学習（PPO）</strong>：報酬モデルのスコアが高くなるよう方策を改善</li>
+  </ol>
+
+  <details>
+    <summary>LLM の進化年表（2018〜2023）</summary>
+    <table>
+      <thead><tr><th>年</th><th>主なモデル</th></tr></thead>
+      <tbody>
+        <tr><td>2018</td><td>BERT（Google）、GPT-1（OpenAI）</td></tr>
+        <tr><td>2020</td><td>GPT-3（175 億パラメータ）</td></tr>
+        <tr><td>2022</td><td>ChatGPT、LLaMA（Meta）</td></tr>
+        <tr><td>2023</td><td>GPT-4、Claude（Anthropic）、Bard（Google）</td></tr>
+      </tbody>
+    </table>
+  </details>
+
+  <details>
+    <summary>GPT-4 の性能と東大入試 2025</summary>
+    <table>
+      <thead><tr><th>試験</th><th>GPT-4</th><th>GPT-3.5</th></tr></thead>
+      <tbody>
+        <tr><td>MMLU</td><td>86.4%</td><td>70.0%</td></tr>
+        <tr><td>HellaSwag</td><td>95.3%</td><td>85.5%</td></tr>
+        <tr><td>GSM-8K（数学）</td><td>92.0%</td><td>57.1%</td></tr>
+      </tbody>
+    </table>
+    <p>東大入試 2025：ChatGPT o1 が文科 2 類 379 点（合格最低 332）、理科 2 類 374 点（同 313）、DeepSeek R1 が理科 3 類 369 点（同 368）。</p>
+  </details>
+
+  <h2>パート③：応用と社会への影響</h2>
+
+  <h3>9. プロンプトエンジニアリング</h3>
+
+  <p>コンテキストに <strong>例を書いておく</strong> ことで AI の精度が上がる（<strong>In-context Learning</strong>）。</p>
+
+  <table>
+    <thead><tr><th>種類</th><th>説明</th></tr></thead>
+    <tbody>
+      <tr><td>Zero-shot</td><td>例なし、タスクだけ指示</td></tr>
+      <tr><td>One-shot</td><td>例を 1 つ提示</td></tr>
+      <tr><td>Few-shot</td><td>例を複数提示 → 精度が一段上がる</td></tr>
+    </tbody>
+  </table>
+
+  <h3>10. LLM エージェント：自律的に動く AI</h3>
+
+  <p>目標を与えると、自分でタスクを <strong>分解・実行・記憶</strong> しながら動く AI システム。</p>
+
+  <details>
+    <summary>BabyAGI / AutoGen / 生成エージェント</summary>
+    <ul>
+      <li><strong>BabyAGI</strong>：目標 → タスク生成 → 優先順位付け → 実行 → 結果を記憶 → 次タスクへ、のサイクル</li>
+      <li><strong>AutoGen（Microsoft）</strong>：複数エージェントが会話しながら問題解決。コードを書く AI とレビューする AI のペア等</li>
+      <li><strong>生成エージェント（Park et al., 2023）</strong>：25 体の LLM エージェントが Sims 風マップで生活シミュレーション</li>
+    </ul>
+  </details>
+
+  <h3>10.5. マルチエージェントシステム</h3>
+  <p>役割分担した複数 AI が会話しながら大きなタスクを解く。<strong>オーケストレーター＋ワーカー</strong>、<strong>ディベート型</strong>、<strong>専門化エージェント群</strong> などのパターン。得意：分解・並列化・自動検証。苦手：認識のズレが累積、デバッグが難しい、コスト高。</p>
+
+  <h3>10.6. 遺伝的プログラミング</h3>
+  <p>生物進化を模倣して <strong>プログラムそのもの</strong> を自動生成する手法（Koza, 1990s）。「初期化 → 評価（適応度） → 選択 → 交叉・突然変異」を世代を超えて繰り返す。<strong>Google AlphaEvolve</strong> は LLM 生成コードを進化的に改善する現代的な応用。</p>
+
+  <h3>11. AI と社会：仕事はどうなる？</h3>
+
+  <table>
+    <thead><tr><th>リスク</th><th>雇用割合</th><th>例</th></tr></thead>
+    <tbody>
+      <tr><td>高リスク</td><td><strong>47%</strong></td><td>事務・販売・運輸</td></tr>
+      <tr><td>中リスク</td><td>19%</td><td>サービス・建設</td></tr>
+      <tr><td>低リスク</td><td>33%</td><td>教育・医療・芸術</td></tr>
+    </tbody>
+  </table>
+
+  <p>一方で AI 活用で <strong>作業時間 0.83 SD 短縮、成績 0.45 SD 向上</strong> という生産性向上も実証。</p>
+
+  <details>
+    <summary>主要 CEO の発言（2025）</summary>
+    <ul>
+      <li>Amazon CEO：今後数年で管理部門の従業員数が減る</li>
+      <li>Meta CEO：26 年に開発作業の半分を AI が担う</li>
+      <li>Google CEO：新規コードの 1/4 以上は AI 生成（2024）</li>
+      <li>Anthropic CEO：5 年以内に入門レベル職の失業率が 20% に達する可能性</li>
+    </ul>
+  </details>
+
+  <h2>講義のまとめ</h2>
+
+  <table>
+    <thead><tr><th>テーマ</th><th>ポイント</th></tr></thead>
+    <tbody>
+      <tr><td>ChatGPT</td><td>史上最速の 1 億人到達。プロンプト次第で多様な用途</td></tr>
+      <tr><td>チューリングテスト</td><td>LLM はすでに人間と区別困難なレベル</td></tr>
+      <tr><td>中国語の部屋</td><td>正答できても「理解」とは限らない（哲学的問題）</td></tr>
+      <tr><td>言語モデル</td><td>「次の単語予測」を繰り返すだけで文章生成</td></tr>
+      <tr><td>Transformer</td><td>Self-Attention で全単語ペアの関係を同時学習。現代 AI の核心</td></tr>
+      <tr><td>スケーリング則</td><td>パラメータ・データ・計算量を同時に増やすと性能がべき乗で向上</td></tr>
+      <tr><td>RLHF</td><td>人間のフィードバックで「役立つ AI」に仕上げる手法</td></tr>
+      <tr><td>LLM エージェント</td><td>自律的にタスクを分解・実行する応用が拡大</td></tr>
+      <tr><td>社会的影響</td><td>雇用の 47% が高リスク、一方で生産性向上も実証済み</td></tr>
+    </tbody>
+  </table>
+
+  <nav class="pager">
+    <a href="01.html" class="prev">第1回 AI 概観</a>
+    <a href="03.html" class="next">第3回 マルチエージェントとゲーム理論</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第1回 データサイエンスの基礎 ｜ 自然現象と数学</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">自然現象と数学</a> ／ 第1回</div>
+</header>
+
+<main>
+  <h1>第1回 データの種類・代表値・回帰</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>大きな絵</h2>
+  <p>データサイエンスの基本道具を一通り整備する回。<strong>データの種類 → 代表値（平均・中央値・分散）→ 2 変数の関係（共分散・相関）→ 回帰</strong> の流れ。各代表値の「<em>何を最小化するか</em>」を意識すると見通しがよい。</p>
+
+  <h2>データの種類</h2>
+  <table>
+    <thead><tr><th>大分類</th><th>尺度</th><th>例</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="2">質的</td><td>名義尺度</td><td>Yes/No、血液型</td></tr>
+      <tr><td>順序尺度</td><td>好き／普通／嫌い</td></tr>
+      <tr><td rowspan="2">量的</td><td>間隔尺度</td><td>温度（差に意味あり）</td></tr>
+      <tr><td>比例尺度</td><td>身長・体重（比に意味あり、0 が物理的にゼロ）</td></tr>
+    </tbody>
+  </table>
+
+  <h2>量的データの集計</h2>
+  <ul>
+    <li><strong>量子化</strong>：連続値を階級に区切って集計</li>
+    <li><strong>ヒストグラム</strong>：階級ごとの度数を棒で表す</li>
+    <li>階級幅の目安（スタージェス）：$k = \log_2 n + 1$</li>
+  </ul>
+
+  <h2>代表値① 標本平均</h2>
+  $$ \bar{x} = \frac{1}{n}\sum_{i=1}^{n} x^{(i)} $$
+  <p><strong>性質</strong>：2 乗誤差を最小化する／外れ値に敏感。</p>
+
+  <details>
+    <summary>証明：$\bar{x}$ が 2 乗誤差を最小化する</summary>
+    <p>$\mu$ に対する 2 乗誤差の和を $L(\mu)$ と置く：</p>
+    $$ L(\mu) = \sum_{i=1}^{n}\bigl(x^{(i)} - \mu\bigr)^2 $$
+    <p>展開すると</p>
+    $$ L(\mu) = \sum_{i=1}^{n}\bigl(x^{(i)}\bigr)^2 - 2\mu\sum_{i=1}^{n} x^{(i)} + n\mu^2. $$
+    <p>$\mu$ で微分してゼロとおく：</p>
+    $$ \frac{dL}{d\mu} = -2\sum_{i=1}^{n} x^{(i)} + 2n\mu = 0 $$
+    $$ \therefore\ \mu = \frac{1}{n}\sum_{i=1}^{n} x^{(i)} = \bar{x}. $$
+    <p>$L$ は $\mu$ について上に凸でない（$d^2L/d\mu^2 = 2n > 0$）から、これは <strong>最小</strong>。$\quad\square$</p>
+  </details>
+
+  <h2>代表値② 中央値（median）</h2>
+  <p>昇順に並べたデータ $x_{(1)} \le \cdots \le x_{(n)}$ の真ん中の値。</p>
+  <ul>
+    <li>$n = 2m+1$（奇数）：$x_{(m+1)}$</li>
+    <li>$n = 2m$（偶数）：$\dfrac{x_{(m)} + x_{(m+1)}}{2}$</li>
+  </ul>
+  <p><strong>性質</strong>：絶対誤差を最小化する／外れ値に強い。</p>
+
+  <details>
+    <summary>証明：中央値が絶対誤差を最小化する</summary>
+    <p>絶対誤差の和を $A(\mu) = \sum_{i=1}^{n} |x^{(i)} - \mu|$ と置く。</p>
+    <p>昇順に並べたデータを両端からペアにする：$(x_{(1)}, x_{(n)}), (x_{(2)}, x_{(n-1)}), \ldots$。各ペア $(x_{(k)}, x_{(n+1-k)})$ について</p>
+    $$ |x_{(k)} - \mu| + |x_{(n+1-k)} - \mu| \ge x_{(n+1-k)} - x_{(k)} $$
+    <p>が三角不等式から成立し、等号は <strong>$\mu \in [x_{(k)}, x_{(n+1-k)}]$</strong> のときのみ。</p>
+    <p>全ペアで等号を達成する $\mu$ の範囲は、すべての $[x_{(k)}, x_{(n+1-k)}]$ の <strong>共通部分</strong>（最も内側の区間）。</p>
+    <ul>
+      <li>$n = 2m+1$：$k = m+1$ のペアは退化して $[x_{(m+1)}, x_{(m+1)}]$、唯一点 $x_{(m+1)}$ で達成</li>
+      <li>$n = 2m$：共通区間は $[x_{(m)}, x_{(m+1)}]$。中点 $\dfrac{x_{(m)}+x_{(m+1)}}{2}$ は習慣的な選択</li>
+    </ul>
+    <p>$\quad\square$</p>
+  </details>
+
+  <h2>代表値③ 不偏分散</h2>
+  $$ \hat{s}^2 = \frac{1}{n-1}\sum_{i=1}^{n}\bigl(x^{(i)} - \bar{x}\bigr)^2 $$
+
+  <details>
+    <summary>なぜ $n - 1$ で割るか（不偏性の証明）</summary>
+    <p>母集団が平均 $\mu$、分散 $\sigma^2$ の分布から独立に取られたとき、$\hat{s}^2$ の期待値が $\sigma^2$ になることを示す。</p>
+
+    <p>まず偏差を母平均からのズレに分解：</p>
+    $$ x^{(i)} - \bar{x} = (x^{(i)} - \mu) - (\bar{x} - \mu). $$
+    <p>両辺を 2 乗して和をとる：</p>
+    $$ \sum_{i=1}^{n}(x^{(i)} - \bar{x})^2 = \sum_{i=1}^{n}(x^{(i)} - \mu)^2 - 2(\bar{x} - \mu)\underbrace{\sum_{i=1}^{n}(x^{(i)} - \mu)}_{= n(\bar{x} - \mu)} + n(\bar{x} - \mu)^2 $$
+    $$ = \sum_{i=1}^{n}(x^{(i)} - \mu)^2 - n(\bar{x} - \mu)^2. $$
+    <p>期待値をとる。$E[(x^{(i)} - \mu)^2] = \sigma^2$、$E[(\bar{x} - \mu)^2] = \mathrm{Var}(\bar{x}) = \sigma^2/n$ より</p>
+    $$ E\!\left[\sum_{i=1}^{n}(x^{(i)} - \bar{x})^2\right] = n\sigma^2 - n\cdot\frac{\sigma^2}{n} = (n-1)\sigma^2. $$
+    <p>よって $\hat{s}^2 = \dfrac{1}{n-1}\sum(x^{(i)} - \bar{x})^2$ の期待値は $\sigma^2$（不偏）。$n$ で割ると過小評価。$\quad\square$</p>
+
+    <p><strong>直感</strong>：$\bar{x}$ はデータ自身から作られているのでデータに「引き寄せられて」いる。よって偏差は真の母平均からのズレより常に小さくなる。$n - 1$ という補正でちょうど打ち消す。</p>
+  </details>
+
+  <h2>ストリームデータの逐次計算</h2>
+  <p>センサーデータのように時々刻々と到着するデータに対し、毎時刻定数回の演算で平均・分散を更新したい。</p>
+
+  <h3>平均の漸化式</h3>
+  $$ \hat{\mu}^{(t)} = \hat{\mu}^{(t-1)} + \frac{x^{(t)} - \hat{\mu}^{(t-1)}}{t} $$
+
+  <details>
+    <summary>導出</summary>
+    <p>定義から</p>
+    $$ \hat{\mu}^{(t)} = \frac{1}{t}\sum_{i=1}^{t} x^{(i)} = \frac{1}{t}\!\left(\sum_{i=1}^{t-1} x^{(i)} + x^{(t)}\right) = \frac{(t-1)\hat{\mu}^{(t-1)} + x^{(t)}}{t}. $$
+    <p>整理：</p>
+    $$ \hat{\mu}^{(t)} = \hat{\mu}^{(t-1)} \cdot \frac{t-1}{t} + \frac{x^{(t)}}{t} = \hat{\mu}^{(t-1)} - \frac{\hat{\mu}^{(t-1)}}{t} + \frac{x^{(t)}}{t} = \hat{\mu}^{(t-1)} + \frac{x^{(t)} - \hat{\mu}^{(t-1)}}{t}.\quad\square $$
+  </details>
+
+  <h3>分散の漸化式（Welford のオンラインアルゴリズム）</h3>
+  <p>偏差平方和 $S^{(t)} := \sum_{i=1}^{t}(x^{(i)} - \hat{\mu}^{(t)})^2$ について</p>
+  $$ S^{(t)} = S^{(t-1)} + \bigl(x^{(t)} - \hat{\mu}^{(t-1)}\bigr)\bigl(x^{(t)} - \hat{\mu}^{(t)}\bigr) $$
+  <p>$\hat{\sigma}^{(t)2} = \dfrac{S^{(t)}}{t-1}$。</p>
+
+  <details>
+    <summary>導出（少し技巧的）</summary>
+    <p>$S^{(t)} - S^{(t-1)}$ を計算する。$\delta := x^{(t)} - \hat{\mu}^{(t-1)}$ と置くと、上の平均の漸化式より</p>
+    $$ \hat{\mu}^{(t)} = \hat{\mu}^{(t-1)} + \frac{\delta}{t}. $$
+    <p>$i \le t-1$ について</p>
+    $$ (x^{(i)} - \hat{\mu}^{(t)})^2 = \bigl((x^{(i)} - \hat{\mu}^{(t-1)}) - \tfrac{\delta}{t}\bigr)^2 = (x^{(i)} - \hat{\mu}^{(t-1)})^2 - \tfrac{2\delta}{t}(x^{(i)} - \hat{\mu}^{(t-1)}) + \tfrac{\delta^2}{t^2}. $$
+    <p>$i = 1, \ldots, t-1$ で和をとる。$\sum_{i=1}^{t-1}(x^{(i)} - \hat{\mu}^{(t-1)}) = 0$（平均の定義）に注意：</p>
+    $$ \sum_{i=1}^{t-1}(x^{(i)} - \hat{\mu}^{(t)})^2 = S^{(t-1)} + (t-1)\cdot\frac{\delta^2}{t^2}. $$
+    <p>$i = t$ の項は $(x^{(t)} - \hat{\mu}^{(t)})^2 = (\delta - \tfrac{\delta}{t})^2 = \delta^2\left(\tfrac{t-1}{t}\right)^2$。両者を合わせて</p>
+    $$ S^{(t)} = S^{(t-1)} + (t-1)\frac{\delta^2}{t^2} + \delta^2\frac{(t-1)^2}{t^2} = S^{(t-1)} + \frac{\delta^2(t-1)}{t^2}\bigl(1 + (t-1)\bigr) = S^{(t-1)} + \frac{\delta^2(t-1)}{t}. $$
+    <p>一方、定義から</p>
+    $$ \delta \cdot (x^{(t)} - \hat{\mu}^{(t)}) = \delta\!\left(\delta - \frac{\delta}{t}\right) = \delta^2\cdot\frac{t-1}{t}. $$
+    <p>よって</p>
+    $$ S^{(t)} - S^{(t-1)} = (x^{(t)} - \hat{\mu}^{(t-1)})(x^{(t)} - \hat{\mu}^{(t)}).\quad\square $$
+  </details>
+
+  <h2>2 変数の関係</h2>
+
+  <h3>共分散</h3>
+  $$ \mathrm{Cov}(X, Y) = \frac{1}{n-1}\sum_{i=1}^{n}(x^{(i)} - \bar{x})(y^{(i)} - \bar{y}) $$
+
+  <h3>相関係数</h3>
+  $$ r_{XY} = \frac{\mathrm{Cov}(X, Y)}{s_X \cdot s_Y} \in [-1, +1] $$
+  <p>単位・スケールに依存しない。<strong>相関 ≠ 因果</strong>（背後に共通原因がある場合がある）。</p>
+
+  <h2>線形回帰</h2>
+  <p>説明変数 $x$ で応答変数 $y$ を説明：</p>
+  $$ y = ax + b $$
+  <p>最小二乗法で $\ell(a, b) = \sum_{i=1}^{n}(y^{(i)} - ax^{(i)} - b)^2$ を最小化すると</p>
+  $$ \hat{a} = \frac{\mathrm{Cov}_{XY}}{s_X^2},\qquad \hat{b} = \bar{y} - \hat{a}\bar{x} $$
+  <p>（途中計算は <a href="02.html">第 2 回</a> で詳細に展開）。</p>
+
+  <h2>講義のまとめ</h2>
+  <table>
+    <thead><tr><th>指標</th><th>定義</th><th>最小化する量</th><th>外れ値感度</th></tr></thead>
+    <tbody>
+      <tr><td>標本平均 $\bar{x}$</td><td>$\frac{1}{n}\sum x^{(i)}$</td><td>2 乗誤差</td><td>敏感</td></tr>
+      <tr><td>中央値</td><td>昇順で真ん中</td><td>絶対誤差</td><td>強い</td></tr>
+      <tr><td>不偏分散 $\hat{s}^2$</td><td>$\frac{1}{n-1}\sum(x^{(i)} - \bar{x})^2$</td><td>—</td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <nav class="pager">
+    <a href="index.html" class="prev">科目トップへ</a>
+    <a href="02.html" class="next">第2回 共分散・相関・線形回帰</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

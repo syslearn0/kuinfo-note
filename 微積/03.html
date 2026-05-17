@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第3回 集積点・上下極限・コーシー列 ｜ 微積</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">微積</a> ／ 第3回</div>
+</header>
+
+<main>
+  <h1>第3回 集積点・上下極限・コーシー列</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>大きな絵</h2>
+  <p>収束しない数列でも、<em>部分列を選んでくれば</em>近づき先が見える。その「近づき先候補」が <strong>集積点</strong> です。集積点全体の最大・最小値が <strong>上極限・下極限</strong>。最後に、極限値を知らなくても収束を判定できる <strong>コーシー列</strong> を導入し、$\mathbb{R}$ の <strong>完備性</strong>（コーシー列は必ず収束）を厳密に示します。</p>
+
+  <h2>1. 収束しない数列の例</h2>
+
+  <h3>例 A：$a_n = (-1)^n$</h3>
+  <p>$-1, 1, -1, 1, \ldots$ と振動。偶数番目だけ見れば $1$ に、奇数番目だけ見れば $-1$ に収束する。<strong>近づき先が 2 つある</strong>。</p>
+
+  <h3>例 B：ロジスティック漸化式</h3>
+  $$ a_1 = \tfrac{1}{2},\quad a_{n+1} = \mu\,a_n(1 - a_n)\quad (0 < \mu \le 4) $$
+  <table>
+    <thead><tr><th>$\mu$ の範囲</th><th>$\{a_n\}$ の振る舞い</th></tr></thead>
+    <tbody>
+      <tr><td>$0 < \mu \le 1$</td><td>$a_n \to 0$</td></tr>
+      <tr><td>$1 < \mu \le 3$</td><td>$a_n \to 1 - 1/\mu$</td></tr>
+      <tr><td>$3 < \mu < 4$（増えるほど）</td><td>周期 2・4・8 倍化を経てカオスへ</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2. 集積点</h2>
+
+  <div class="callout">
+    <strong>定義（集積点）。</strong> 数列 $\{a_n\}$ と $\alpha \in \mathbb{R}$ に対し、自然数の <strong>狭義増加列</strong> $n_1 < n_2 < n_3 < \cdots$ で $a_{n_k} \to \alpha\ (k \to \infty)$ となるものが存在するとき、$\alpha$ を $\{a_n\}$ の <strong>集積点</strong> と呼ぶ。集積点全体の集合を $L_\omega(\{a_n\})$ と書く。
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 540 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="集積点のイメージ">
+      <line x1="20" y1="170" x2="520" y2="170" stroke="#9ca3af"/>
+      <text x="525" y="174" font-size="11">n</text>
+      <line x1="20" y1="60"  x2="520" y2="60"  stroke="#4f46e5" stroke-dasharray="4 3"/>
+      <text x="0"  y="64" font-size="11" fill="#4f46e5">1</text>
+      <line x1="20" y1="140" x2="520" y2="140" stroke="#dc2626" stroke-dasharray="4 3"/>
+      <text x="0"  y="144" font-size="11" fill="#dc2626">−1</text>
+      <circle cx="60"  cy="140" r="3.5" fill="#dc2626"/>
+      <circle cx="90"  cy="60"  r="3.5" fill="#4f46e5"/>
+      <circle cx="120" cy="140" r="3.5" fill="#dc2626"/>
+      <circle cx="150" cy="60"  r="3.5" fill="#4f46e5"/>
+      <circle cx="180" cy="140" r="3.5" fill="#dc2626"/>
+      <circle cx="210" cy="60"  r="3.5" fill="#4f46e5"/>
+      <circle cx="240" cy="140" r="3.5" fill="#dc2626"/>
+      <circle cx="270" cy="60"  r="3.5" fill="#4f46e5"/>
+      <circle cx="300" cy="140" r="3.5" fill="#dc2626"/>
+      <circle cx="330" cy="60"  r="3.5" fill="#4f46e5"/>
+      <text x="370" y="40"  font-size="12" fill="#4f46e5">偶数番目の部分列 → 1</text>
+      <text x="370" y="180" font-size="12" fill="#dc2626">奇数番目の部分列 → −1</text>
+    </svg>
+    <figcaption>図 1：$(-1)^n$ の集積点は $\{-1, 1\}$ の 2 つ。</figcaption>
+  </figure>
+
+  <h3>例</h3>
+  <ul>
+    <li><strong>例 1</strong>：$a_n = (-1)^n$ → $L_\omega = \{-1, 1\}$</li>
+    <li><strong>例 2</strong>：$a_n = (-1)^n\bigl(1 + \tfrac{1}{n}\bigr)$ → $L_\omega = \{-1, 1\}$（$\pm 1$ に「ぼやけて」近づく）</li>
+    <li><strong>例 3</strong>：$[0,1]$ の有理数を $\tfrac{1}{2},\tfrac{1}{3},\tfrac{2}{3},\tfrac{1}{4},\tfrac{2}{4},\tfrac{3}{4},\ldots$ と並べると $L_\omega = [0,1]$</li>
+  </ul>
+
+  <details>
+    <summary>例 3 が「区間まるごと」集積点になる理由（厳密版）</summary>
+    <p>$\alpha \in [0,1]$ を任意に取る。任意の $\varepsilon > 0$ に対し、区間 $(\alpha - \varepsilon, \alpha + \varepsilon) \cap [0,1]$ は内点を含む実区間で、有理数の稠密性によりこの区間には無限個の有理数 $\tfrac{p}{q}$ が含まれる。並べ方の構成から、各分母 $q$ ごとに $\tfrac{1}{q}, \tfrac{2}{q}, \ldots, \tfrac{q-1}{q}$ が順に登場するため、$\alpha$ に近い有理数は無限回現れる。よって $\alpha$ に収束する部分列が抽出でき、$\alpha \in L_\omega$。$\quad\square$</p>
+  </details>
+
+  <h2>3. Bolzano-Weierstrass の定理</h2>
+
+  <div class="callout">
+    <strong>定理（有界数列版 BW）。</strong> $a \le a_n \le b$ を満たす数列 $\{a_n\}$ は少なくとも 1 つの集積点をもつ。$L_\omega(\{a_n\}) \ne \emptyset$。
+  </div>
+
+  <p>言い換えれば「<strong>有界な数列は収束する部分列を含む</strong>」。</p>
+
+  <p><strong>気持ち</strong>。「無限に多くの項が入る半区間」を追跡しながら、区間を半分ずつ狭めていく。区間縮小法で 1 点 $\alpha$ に収束し、各区間から項を 1 つずつ拾うと $\alpha$ への部分列ができる。</p>
+
+  <details>
+    <summary>証明（区間二分法）</summary>
+    <p>$I_1 := [a, b]$ とおく。$I_k = [x_k, y_k]$ が「$a_n \in I_k$ となる $n$ が無限個」を満たすと仮定。$I_k$ を中点 $m_k$ で 2 等分すると、少なくとも一方の半区間に $a_n$ が無限個含まれる（鳩の巣）。その半区間を $I_{k+1}$ とする。</p>
+    $$ I_1 \supset I_2 \supset \cdots,\quad |I_k| = \frac{b-a}{2^{k-1}} \to 0. $$
+    <p><a href="02.html">第2回の区間縮小法</a>で $\bigcap_k I_k = \{\alpha\}$。</p>
+    <p>$n_1$ を $a_{n_1} \in I_1$ なる任意の指数として選ぶ。$n_{k+1}$ を $a_{n_{k+1}} \in I_{k+1}$ かつ $n_{k+1} > n_k$ となるように選ぶ。すると</p>
+    $$ |a_{n_k} - \alpha| \le |I_k| \to 0. $$
+    <p>$a_{n_k} \to \alpha$、ゆえ $\alpha$ は集積点。$\quad\square$</p>
+  </details>
+
+  <h2>4. 上極限と下極限</h2>
+
+  <h3>定義（最大・最小としての定義）</h3>
+  $$ \limsup_{n\to\infty} a_n := \max L_\omega(\{a_n\}),\qquad \liminf_{n\to\infty} a_n := \min L_\omega(\{a_n\}) $$
+  <p>（有界の場合。$L_\omega$ が閉集合であることから $\max,\min$ は実際に存在する。）</p>
+
+  <details>
+    <summary>$L_\omega$ が閉集合であることの確認</summary>
+    <p>$\beta_k \in L_\omega$ で $\beta_k \to \beta$ とする。各 $\beta_k$ について「$a_n$ の項が $\beta_k$ にいくらでも近く現れる」ので、$\beta$ にもいくらでも近く現れる。具体的には $|a_{n_k} - \beta_k| < 1/k$ かつ $n_k > k$ となる $n_k$ を順に取れば、三角不等式で $|a_{n_k} - \beta| \le |a_{n_k}-\beta_k| + |\beta_k - \beta| \to 0$。よって $\beta \in L_\omega$、$L_\omega$ は閉。$\quad\square$</p>
+  </details>
+
+  <h3>定義（部分上限・部分下限としての別表現）</h3>
+
+  <p>$b_n := \sup\{a_k \mid k \ge n\}$ とおくと $\{b_n\}$ は単調非増加。$c_n := \inf\{a_k \mid k \ge n\}$ は単調非減少。</p>
+  $$ \limsup_{n\to\infty} a_n = \lim_{n\to\infty} b_n = \inf_{n\ge 1} \sup_{k \ge n} a_k $$
+  $$ \liminf_{n\to\infty} a_n = \lim_{n\to\infty} c_n = \sup_{n\ge 1} \inf_{k \ge n} a_k $$
+
+  <details>
+    <summary>$\limsup$ の 2 つの定義が一致することの証明</summary>
+    <p>$\beta := \lim b_n$（有界数列で単調なので存在）。$\beta = \max L_\omega$ を示す。</p>
+    <p><strong>(i) $\beta \in L_\omega$。</strong>各 $n$ で $b_n = \sup_{k\ge n} a_k$ の言い換えから、$\exists k_n \ge n$ s.t. $b_n - 1/n < a_{k_n} \le b_n$。$n_k$ を $k_n$ の中で狭義増加に選び直すと（必要なら添字を間引く）$a_{n_k} \to \beta$。よって $\beta$ は集積点。</p>
+    <p><strong>(ii) $\beta$ より大きい集積点はない。</strong>$\gamma > \beta$ を集積点と仮定。$\varepsilon := (\gamma - \beta)/2$ を取ると、ある $N$ で $b_N < \beta + \varepsilon = \gamma - \varepsilon$。すなわち $\forall k \ge N,\ a_k \le b_N < \gamma - \varepsilon$。これは「$a_n$ が $\gamma$ の $\varepsilon$ 近傍に無限回入る」と矛盾。$\quad\square$</p>
+  </details>
+
+  <h2>5. 収束と上下極限の同値性</h2>
+
+  <div class="callout">
+    <strong>定理。</strong> 有界数列 $\{a_n\}$ について次は同値：
+    <ol>
+      <li>$\{a_n\}$ は収束する</li>
+      <li>$\liminf a_n = \limsup a_n$</li>
+      <li>$\{a_n\}$ はちょうど 1 つの集積点をもつ</li>
+    </ol>
+  </div>
+
+  <details>
+    <summary>証明（(1)⇒(3)⇒(2)⇒(1) の3手）</summary>
+    <p><strong>(1) ⇒ (3)。</strong>$a_n \to \alpha$ なら任意の部分列も $\alpha$ に収束（部分列の極限保存）。よって集積点は $\alpha$ のみ。</p>
+    <p><strong>(3) ⇒ (2)。</strong>$L_\omega = \{\alpha\}$ なら $\max = \min = \alpha$。</p>
+    <p><strong>(2) ⇒ (1)。</strong>$\liminf a_n = \limsup a_n = \alpha$ とする。別表現で $\inf_n b_n = \sup_n c_n = \alpha$。$\varepsilon > 0$ に対し、$b_n \to \alpha$ よりある $N_1$ で $b_{N_1} < \alpha + \varepsilon$、$c_n \to \alpha$ よりある $N_2$ で $c_{N_2} > \alpha - \varepsilon$。$n_0 := \max(N_1, N_2)$ で $n \ge n_0$ なら</p>
+    $$ \alpha - \varepsilon < c_{n_0} \le a_n \le b_{n_0} < \alpha + \varepsilon. $$
+    <p>よって $a_n \to \alpha$。$\quad\square$</p>
+  </details>
+
+  <h2>6. コーシー列</h2>
+
+  <div class="callout">
+    <strong>定義（コーシー列）。</strong> 数列 $\{a_n\}$ が <strong>コーシー列</strong> であるとは
+    $$ \forall \varepsilon > 0,\ \exists n_0 \in \mathbb{N},\ \forall m, n \ge n_0,\ |a_m - a_n| < \varepsilon $$
+    が成り立つこと。
+  </div>
+
+  <p><strong>気持ち</strong>。「項どうしの距離」だけで収束を判定できる強力な道具。極限値 $\alpha$ をあらかじめ知っている必要がない。</p>
+
+  <figure>
+    <svg viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="コーシー列のイメージ">
+      <line x1="20" y1="110" x2="460" y2="110" stroke="#9ca3af"/>
+      <text x="465" y="115" font-size="11">n</text>
+      <line x1="220" y1="40" x2="220" y2="135" stroke="#dc2626" stroke-dasharray="4 3"/>
+      <text x="215" y="150" font-size="11" fill="#dc2626">n₀</text>
+      <circle cx="50"  cy="40"  r="3.5"/><circle cx="80"  cy="85"  r="3.5"/>
+      <circle cx="110" cy="60"  r="3.5"/><circle cx="140" cy="95"  r="3.5"/>
+      <circle cx="170" cy="55"  r="3.5"/><circle cx="200" cy="80"  r="3.5"/>
+      <rect x="220" y="68" width="240" height="22" fill="#4f46e5" opacity="0.15"/>
+      <text x="232" y="64" font-size="11" fill="#4f46e5">この帯の高さが ε 以下</text>
+      <circle cx="240" cy="78" r="3.5" fill="#059669"/>
+      <circle cx="270" cy="83" r="3.5" fill="#059669"/>
+      <circle cx="300" cy="76" r="3.5" fill="#059669"/>
+      <circle cx="330" cy="81" r="3.5" fill="#059669"/>
+      <circle cx="360" cy="79" r="3.5" fill="#059669"/>
+      <circle cx="390" cy="80" r="3.5" fill="#059669"/>
+      <circle cx="420" cy="79" r="3.5" fill="#059669"/>
+    </svg>
+    <figcaption>図 2：コーシー列は「ある番号から先、項どうしが密集する」。極限値の位置は問わない。</figcaption>
+  </figure>
+
+  <h2>7. 完備性：収束 ⇔ コーシー列</h2>
+
+  <div class="callout">
+    <strong>定理（$\mathbb{R}$ の完備性）。</strong> 実数列 $\{a_n\}$ について次は同値：
+    <ol>
+      <li>$\{a_n\}$ は収束する</li>
+      <li>$\{a_n\}$ は有界かつちょうど 1 つの集積点をもつ</li>
+      <li>$\{a_n\}$ はコーシー列</li>
+    </ol>
+  </div>
+
+  <p><strong>気持ち</strong>。(1)⇒(3) は三角不等式で「項どうしの近さ」へ翻訳。(3)⇒(2) は「コーシーなら有界」と「集積点 2 つあれば離れた 2 項が見つかる」で矛盾。(2)⇒(1) は BW＋上下極限の同値で結ぶ。</p>
+  <details>
+    <summary>証明（3 ステップ）</summary>
+    <p><strong>(1) ⇒ (3)。</strong>$a_n \to \alpha$ なら $\varepsilon > 0$ に対し $\exists n_0,\ n \ge n_0 \Rightarrow |a_n - \alpha| < \varepsilon/2$。三角不等式で</p>
+    $$ |a_m - a_n| \le |a_m - \alpha| + |\alpha - a_n| < \varepsilon\quad (m, n \ge n_0). $$
+    <p><strong>(3) ⇒ (2) 前半（有界）。</strong>$\varepsilon = 1$ で $n_0$ を取る。$n \ge n_0$ で $|a_n| \le |a_n - a_{n_0}| + |a_{n_0}| < 1 + |a_{n_0}|$。$n < n_0$ は有限個なので、全体は $M := \max\{|a_1|, \ldots, |a_{n_0-1}|,\ 1+|a_{n_0}|\}$ で有界。</p>
+    <p><strong>(3) ⇒ (2) 後半（集積点 1 つ）。</strong>集積点 $\alpha < \beta$ が 2 つあると仮定。$\varepsilon := (\beta-\alpha)/3 > 0$ でコーシー条件から $n_0$ を取り、$\alpha,\beta$ への部分列から $n_k, m_j \ge n_0$ かつ $|a_{n_k}-\alpha|, |a_{m_j}-\beta| < \varepsilon$ となる $k, j$ を選ぶと</p>
+    $$ |a_{n_k} - a_{m_j}| \ge |\alpha - \beta| - 2\varepsilon = 3\varepsilon - 2\varepsilon = \varepsilon. $$
+    <p>コーシー条件 $|a_{n_k} - a_{m_j}| < \varepsilon$ に反する。よって集積点は 1 つ。</p>
+    <p><strong>(2) ⇒ (1)。</strong>有界＋BW で集積点をもち、1 つなら $\liminf = \limsup$、5 節 (2)⇒(1) で収束。$\quad\square$</p>
+  </details>
+
+  <div class="callout">
+    <strong>系（$\mathbb{R}$ の完備性）。</strong> $\mathbb{R}$ におけるコーシー列は必ず収束する。これは $\mathbb{R}$ が「数列の意味で穴がない」ことを表す。$\mathbb{Q}$ ではこの性質が成立しない（例：$a_n = (1+1/n)^n$ は $\mathbb{Q}$ 内のコーシー列だが $e \notin \mathbb{Q}$ なので $\mathbb{Q}$ では収束先がない）。
+  </div>
+
+  <h2>記号のまとめ</h2>
+  <table>
+    <thead><tr><th>記号</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td>$L_\omega(\{a_n\})$</td><td>$\{a_n\}$ の集積点全体（閉集合）</td></tr>
+      <tr><td>$\limsup a_n$</td><td>上極限 $= \max L_\omega = \displaystyle\lim_{n\to\infty}\sup_{k\ge n} a_k$</td></tr>
+      <tr><td>$\liminf a_n$</td><td>下極限 $= \min L_\omega = \displaystyle\lim_{n\to\infty}\inf_{k\ge n} a_k$</td></tr>
+      <tr><td>$\sup X,\ \inf X$</td><td>集合 $X$ の上限・下限</td></tr>
+    </tbody>
+  </table>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li>収束しない数列でも、<strong>部分列の極限＝集積点</strong>で「近づき先」を捉えられる</li>
+    <li><strong>Bolzano-Weierstrass</strong>：有界なら収束する部分列が必ず取れる。証明は区間二分法（無限個の項が入る半区間を追跡）</li>
+    <li><strong>上極限・下極限</strong>は「最大・最小の集積点」、別表現は $\lim \sup_{k\ge n}$・$\lim \inf_{k\ge n}$。これらが等しい ⇔ 収束</li>
+    <li><strong>コーシー列</strong>：極限値を知らずに収束判定できる。$\mathbb{R}$ ではコーシー列⇔収束（<strong>完備性</strong>）</li>
+    <li>$\mathbb{Q}$ ではコーシー列が収束するとは限らない。実数の連続性と完備性は密接に対応</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="02.html" class="prev">第2回 実数の連続性</a>
+    <a href="04.html" class="next">第4回 無限級数</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

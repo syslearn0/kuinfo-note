@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第1回 行列の積と回転行列 ｜ 線形代数</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">線形代数</a> ／ 第1回</div>
+</header>
+
+<main>
+  <h1>第1回 行列の積と回転行列</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>セクション・教材</h2>
+  <ul>
+    <li>セクション：0〜3</li>
+    <li>教材：緑のテキスト</li>
+  </ul>
+
+  <h2>行列の掛け算</h2>
+  <p>$A \in \mathbb{R}^{m\times n}$ と $B \in \mathbb{R}^{n\times p}$ の積 $AB$ は、<strong>行ごと × 列ごとの内積</strong>で定義される（サイズは $m\times p$）。</p>
+  <p>一般に $AB \ne BA$（<strong>可換ではない</strong>）。</p>
+
+  <figure>
+    <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="行列積のイメージ">
+      <!-- A (m×n) -->
+      <rect x="20"  y="50" width="120" height="100" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="68"  y="40"  font-size="13" fill="#4f46e5">A (m×n)</text>
+      <!-- A の i 行を強調 -->
+      <rect x="20"  y="90"  width="120" height="22" fill="#4f46e5" opacity="0.3"/>
+      <text x="-10" y="105" font-size="11" fill="#4f46e5" transform="rotate(-90 0 105)">i 行目</text>
+      <!-- B (n×p) -->
+      <rect x="200" y="20" width="100" height="160" fill="#fef3c7" stroke="#d97706"/>
+      <text x="225" y="14"  font-size="13" fill="#d97706">B (n×p)</text>
+      <!-- B の j 列を強調 -->
+      <rect x="240" y="20" width="22" height="160" fill="#d97706" opacity="0.3"/>
+      <text x="248" y="200" font-size="11" fill="#d97706">j 列目</text>
+      <!-- = AB -->
+      <text x="320" y="105" font-size="18">=</text>
+      <rect x="350" y="50" width="100" height="100" fill="#dcfce7" stroke="#059669"/>
+      <text x="378" y="40"  font-size="13" fill="#059669">AB (m×p)</text>
+      <!-- ターゲット (i,j) -->
+      <rect x="390" y="90" width="22" height="22" fill="#059669" opacity="0.45"/>
+      <text x="395" y="105" font-size="11" fill="#fff">(i,j)</text>
+    </svg>
+    <figcaption>図 1：$AB$ の $(i,j)$ 成分は、$A$ の $i$ 行目と $B$ の $j$ 列目との内積。</figcaption>
+  </figure>
+
+  <h3>2×2 の例（文字）</h3>
+  $$ A = \begin{pmatrix} a & b \\ c & d \end{pmatrix},\quad B = \begin{pmatrix} e & f \\ g & h \end{pmatrix} $$
+  $$ AB = \begin{pmatrix} ae+bg & af+bh \\ ce+dg & cf+dh \end{pmatrix} $$
+
+  <h2>平面ベクトルの回転行列</h2>
+  <p>原点を中心に角度 $\theta$ だけ <strong>反時計回り</strong>に回転する変換は、次の行列で表される：</p>
+  $$ R(\theta) = \begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix} $$
+  $$ \begin{pmatrix} x' \\ y' \end{pmatrix} = R(\theta)\begin{pmatrix} x \\ y \end{pmatrix} $$
+
+  <figure>
+    <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="2次元の回転">
+      <defs>
+        <marker id="ar1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2328"/>
+        </marker>
+        <marker id="ar1a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4f46e5"/>
+        </marker>
+        <marker id="ar1b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+        </marker>
+      </defs>
+      <!-- 軸 -->
+      <line x1="20" y1="200" x2="300" y2="200" stroke="#9ca3af" marker-end="url(#ar1)"/>
+      <line x1="160" y1="270" x2="160" y2="20" stroke="#9ca3af" marker-end="url(#ar1)"/>
+      <text x="300" y="216" font-size="12">x</text>
+      <text x="166" y="22"  font-size="12">y</text>
+      <!-- 元のベクトル (cos0, sin0) = (1,0) スケール100 -->
+      <line x1="160" y1="200" x2="260" y2="200" stroke="#4f46e5" stroke-width="2.2" marker-end="url(#ar1a)"/>
+      <text x="225" y="218" font-size="12" fill="#4f46e5">v</text>
+      <!-- 回転後 θ=50度 -->
+      <line x1="160" y1="200" x2="224" y2="124" stroke="#dc2626" stroke-width="2.2" marker-end="url(#ar1b)"/>
+      <text x="220" y="118" font-size="12" fill="#dc2626">R(θ)v</text>
+      <!-- 弧 -->
+      <path d="M 220 200 A 60 60 0 0 0 197 154" fill="none" stroke="#6b7280"/>
+      <text x="200" y="190" font-size="12" fill="#6b7280">θ</text>
+    </svg>
+    <figcaption>図 2：原点を中心とした反時計回りの回転。長さは保たれ、角度だけ $\theta$ だけ増える。</figcaption>
+  </figure>
+
+  <h3>確認：$R(\theta)$ で単位ベクトルを回す</h3>
+  $$ R(\theta)\begin{pmatrix}1\\0\end{pmatrix} = \begin{pmatrix}\cos\theta\\ \sin\theta\end{pmatrix},\qquad R(\theta)\begin{pmatrix}0\\1\end{pmatrix} = \begin{pmatrix}-\sin\theta\\ \cos\theta\end{pmatrix} $$
+  <p>列ベクトルが「回転後の基底ベクトル」になっている点が <strong>線形写像と行列の関係の本質</strong>。</p>
+
+  <h3>$R(\alpha)R(\beta) = R(\alpha+\beta)$（加法定理）</h3>
+  <p>2回続けて回すと、角度が足し算になる。これを行列で計算すると三角関数の加法定理がそのまま現れる：</p>
+  $$ R(\alpha)R(\beta) = \begin{pmatrix} \cos\alpha\cos\beta - \sin\alpha\sin\beta & -(\cos\alpha\sin\beta + \sin\alpha\cos\beta) \\ \sin\alpha\cos\beta + \cos\alpha\sin\beta & \cos\alpha\cos\beta - \sin\alpha\sin\beta \end{pmatrix} = R(\alpha+\beta) $$
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li>行列積 $AB$ は「行 × 列の内積」で定義。サイズは $(m\times n)(n\times p)=(m\times p)$</li>
+    <li>一般に $AB \ne BA$</li>
+    <li>回転行列 $R(\theta)$ は単位ベクトルを回した先を列に並べたもの</li>
+    <li>$R(\alpha)R(\beta)=R(\alpha+\beta)$ から三角関数の加法定理が得られる</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="index.html" class="prev">科目トップへ</a>
+    <a href="02.html" class="next">第2回 転置と特殊行列</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

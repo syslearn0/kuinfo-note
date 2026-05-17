@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第4回 正規分布と最尤推定 ｜ 自然現象と数学</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">自然現象と数学</a> ／ 第4回</div>
+</header>
+
+<main>
+  <h1>第4回 正規分布とガウス線形モデル</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>大きな絵</h2>
+  <p>第 3 回は離散変数の確率モデル（ベルヌイ／ポアソン）だった。今回は <strong>連続量的データ</strong> の代表的モデルとして <strong>正規分布</strong> を導入し、最尤推定で平均・分散を求めると <strong>標本平均・分散</strong> と一致することを示す。さらに線形回帰を確率モデル化した <strong>ガウス線形モデル</strong> の最尤推定が <strong>最小二乗法と等価</strong> であることを確認する。</p>
+
+  <h2>1. データの種類（復習）</h2>
+
+  <details>
+    <summary>質的データと量的データ</summary>
+    <p><strong>質的データ</strong>：記号・ラベル（名義尺度・順序尺度）<br>
+    <strong>量的データ</strong>：数値（間隔尺度・比例尺度）。今回は量的データの確率モデルが主題。</p>
+  </details>
+
+  <h2>2. 量的データの初等分析（復習）</h2>
+
+  <ul>
+    <li><strong>ヒストグラム</strong>：分布の概形を可視化</li>
+    <li><strong>標本平均</strong>：$\bar{x} = \dfrac{1}{n}\sum x^{(i)}$</li>
+    <li><strong>不偏分散</strong>：$\hat{\sigma}^2 = \dfrac{1}{n-1}\sum (x^{(i)} - \bar{x})^2$（$n - 1$ で不偏）</li>
+  </ul>
+
+  <h2>3. 記述統計と推測統計</h2>
+
+  <ul>
+    <li><strong>母集団</strong>：本当に興味のある対象の全体</li>
+    <li><strong>標本</strong>：実際に観測できる一部</li>
+  </ul>
+
+  <p>標本から母集団を <strong>確率的に</strong> 推測するのが推測統計。確率モデル（データの生成器）のパラメータを推定する。</p>
+
+  <h2>4. 正規分布</h2>
+
+  $$ X \sim N(\mu, \sigma^2) $$
+
+  <p>確率密度関数：</p>
+  $$ f(x) = \frac{1}{\sqrt{2\pi}\,\sigma}\exp\!\left(-\frac{(x - \mu)^2}{2\sigma^2}\right) $$
+
+  <ul>
+    <li><strong>$\mu$</strong>：平均（分布の中心、変えるとグラフが左右にスライド）</li>
+    <li><strong>$\sigma^2$</strong>（または $\sigma$）：分散（変えると裾の広がりが変わる）</li>
+  </ul>
+
+  <details>
+    <summary>連続分布における「確率」の取り扱い</summary>
+    <p>連続な確率変数では <strong>1 点の確率はゼロ</strong>。区間の確率は密度の積分：</p>
+    $$ P(a \le X \le b) = \int_a^b f(x)\,dx. $$
+    <p>全区間の積分は必ず 1：</p>
+    $$ \int_{-\infty}^{\infty} f(x)\,dx = 1. $$
+    <p>正規分布の前の定数 $\dfrac{1}{\sqrt{2\pi}\sigma}$ はこの規格化条件を満たすために必要。</p>
+    <p>微小区間では密度 × 幅で近似：</p>
+    $$ P(x \le X \le x + \Delta) \approx f(x)\cdot \Delta. $$
+  </details>
+
+  <details>
+    <summary>正規化定数 $\dfrac{1}{\sqrt{2\pi}\sigma}$ の由来（ガウス積分）</summary>
+    <p>$\int_{-\infty}^{\infty} e^{-(x-\mu)^2/(2\sigma^2)}dx$ を計算する。$u = (x - \mu)/(\sigma\sqrt{2})$ と置換、$dx = \sigma\sqrt{2}\,du$：</p>
+    $$ I = \sigma\sqrt{2}\int_{-\infty}^{\infty} e^{-u^2}du = \sigma\sqrt{2}\cdot\sqrt{\pi} = \sigma\sqrt{2\pi}. $$
+    <p>ここで $\int_{-\infty}^{\infty}e^{-u^2}du = \sqrt{\pi}$ は <strong>2 次元極座標</strong>に持ち込んで示す古典的結果。よって $f$ を $1/(\sigma\sqrt{2\pi})$ で割れば全積分が 1。$\quad\square$</p>
+  </details>
+
+  <h3>μ ± kσ 区間の確率</h3>
+  <table>
+    <thead><tr><th>範囲</th><th>確率</th></tr></thead>
+    <tbody>
+      <tr><td>$\mu \pm \sigma$</td><td>約 68.3%</td></tr>
+      <tr><td>$\mu \pm 2\sigma$</td><td>約 95.4%</td></tr>
+      <tr><td>$\mu \pm 3\sigma$</td><td>約 99.7%</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    金融データのように <strong>外れ値が多い</strong> 分布には正規分布が合わないことがある（裾が薄すぎる）。そういう場合は $t$ 分布など <strong>裾の厚い分布</strong> を使う。
+  </div>
+
+  <h2>5. 中心極限定理（なぜ正規分布が現れるか）</h2>
+
+  <p><strong>多数の独立な小さな要因の和は正規分布に近づく</strong>。これが自然界で正規分布が頻出する理由。</p>
+
+  <details>
+    <summary>身長測定でのイメージ</summary>
+    <p>観測値 ＝ 真値 ＋ {姿勢・靴・測定器のズレ・読み取り誤差・…} の合計。</p>
+    <p>単純化して「各誤差が確率 1/2 で +1、確率 1/2 で −1」と置くと、合計のずれは <strong>二項分布</strong>。要因数 $n$ を大きくすると二項分布の形は正規分布に収束する（de Moivre–Laplace の定理）。</p>
+  </details>
+
+  <h2>6. 最尤推定（MLE）</h2>
+
+  <p>「データを最もよく説明するパラメータ」を系統的に求める方法。</p>
+
+  <p><strong>尤度</strong> $L(\theta) = P(\text{データ} \mid \theta)$（独立観測なら積）。<br>
+  <strong>対数尤度</strong> $\ell(\theta) = \log L(\theta)$（積 → 和に変わって扱いやすい）を最大化。</p>
+
+  <h2>7. 正規分布の最尤推定</h2>
+
+  <p>独立観測 $x^{(1)}, \ldots, x^{(n)}$ が $N(\mu, \sigma^2)$ に従うとする。<strong>尤度</strong>：</p>
+  $$ L(\mu, \sigma^2) = \prod_{i=1}^{n}\frac{1}{\sqrt{2\pi}\,\sigma}\exp\!\left(-\frac{(x^{(i)} - \mu)^2}{2\sigma^2}\right) $$
+
+  <p>対数をとって <strong>対数尤度</strong>：</p>
+  $$ \ell(\mu, \sigma^2) = -\frac{n}{2}\log(2\pi) - n\log\sigma - \frac{1}{2\sigma^2}\sum_{i=1}^{n}(x^{(i)} - \mu)^2 $$
+
+  <details>
+    <summary>対数尤度の導出</summary>
+    <p>$L$ に $\log$ をとると積 → 和：</p>
+    $$ \ell = \sum_{i=1}^{n}\log\!\left[\frac{1}{\sqrt{2\pi}\sigma}\exp\!\left(-\frac{(x^{(i)} - \mu)^2}{2\sigma^2}\right)\right]. $$
+    <p>各項を分けて：</p>
+    $$ \log\frac{1}{\sqrt{2\pi}\sigma} = -\tfrac{1}{2}\log(2\pi) - \log\sigma, $$
+    $$ \log\exp(\cdot) = -\frac{(x^{(i)} - \mu)^2}{2\sigma^2}. $$
+    <p>$n$ 個足し合わせると本文の式。$\quad\square$</p>
+  </details>
+
+  <h3>μ の最尤推定 → 標本平均</h3>
+
+  <details>
+    <summary>導出（途中計算込み）</summary>
+    <p>$\mu$ で偏微分（$\sigma$ は定数扱い）：</p>
+    $$ \frac{\partial\ell}{\partial\mu} = -\frac{1}{2\sigma^2}\sum_{i=1}^{n} 2(x^{(i)} - \mu)\cdot(-1) = \frac{1}{\sigma^2}\sum_{i=1}^{n}(x^{(i)} - \mu). $$
+    <p>$= 0$ とおく：</p>
+    $$ \sum_{i=1}^{n}(x^{(i)} - \mu) = 0\ \Longleftrightarrow\ n\mu = \sum_{i=1}^{n} x^{(i)} $$
+    $$ \therefore\ \hat{\mu} = \frac{1}{n}\sum_{i=1}^{n} x^{(i)} = \bar{x}.\quad\square $$
+    <p>つまり <strong>標本平均</strong>。</p>
+  </details>
+
+  <h3>σ² の最尤推定 → 標本分散（n で割る）</h3>
+
+  <details>
+    <summary>導出（途中計算込み）</summary>
+    <p>$\ell$ を $\sigma^2$ で偏微分する。$\log\sigma = \tfrac{1}{2}\log\sigma^2$ なので、$v := \sigma^2$ と置くと</p>
+    $$ \ell = -\frac{n}{2}\log(2\pi) - \frac{n}{2}\log v - \frac{1}{2v}\sum_{i=1}^{n}(x^{(i)} - \mu)^2. $$
+    <p>$v$ で微分：</p>
+    $$ \frac{\partial\ell}{\partial v} = -\frac{n}{2v} + \frac{1}{2v^2}\sum_{i=1}^{n}(x^{(i)} - \mu)^2. $$
+    <p>$= 0$ とおき、両辺に $2v^2$ をかける：</p>
+    $$ -nv + \sum_{i=1}^{n}(x^{(i)} - \mu)^2 = 0 $$
+    $$ \therefore\ \hat{v} = \widehat{\sigma^2} = \frac{1}{n}\sum_{i=1}^{n}(x^{(i)} - \hat{\mu})^2.\quad\square $$
+  </details>
+
+  <div class="callout">
+    <strong>注意</strong>：これは $n$ で割る分散（標本分散）であり、<strong>不偏分散</strong>（$n - 1$ で割る）とは少しずれる。$n$ が小さいと <strong>過小評価</strong>。$n$ が大きければほぼ同じ。<br>
+    なぜ過小評価か：$\hat{\mu}$ がデータから推定されている分、偏差が真の平均からのズレより小さくなるため（第 1 回参照）。
+  </div>
+
+  <h2>8. 線形回帰の確率的解釈：ガウス線形モデル</h2>
+
+  <p>現実のデータには「真の関係＋ノイズ」が乗っている：</p>
+  $$ y = \beta x + \alpha + \varepsilon,\quad \varepsilon \sim N(0, \sigma^2) $$
+
+  <p>したがって $y$ も正規分布に従う：</p>
+  $$ y \mid x \sim N(\beta x + \alpha,\ \sigma^2). $$
+
+  <p>これが <strong>ガウス線形モデル</strong>。</p>
+
+  <h3>ガウス線形モデルの最尤推定 → 最小二乗法</h3>
+
+  <p>$n$ 組の独立観測 $(x^{(i)}, y^{(i)})$ の対数尤度：</p>
+  $$ \ell(\alpha, \beta, \sigma^2) = -\frac{n}{2}\log(2\pi) - n\log\sigma - \frac{1}{2\sigma^2}\sum_{i=1}^{n}\bigl(y^{(i)} - (\beta x^{(i)} + \alpha)\bigr)^2. $$
+
+  <p>$\alpha, \beta$ について最大化するのは、最後の項を <strong>最小化</strong> するのと同じ（前の項は $\alpha, \beta$ に依存しない）：</p>
+  $$ J(\alpha, \beta) = \sum_{i=1}^{n}\bigl(y^{(i)} - (\beta x^{(i)} + \alpha)\bigr)^2 $$
+
+  <details>
+    <summary>「最尤＝最小二乗」の意味</summary>
+    <p>これは <a href="02.html">第 2 回</a> の最小二乗法の目的関数そのもの。よって解も同じ：</p>
+    $$ \hat\beta = \frac{S_{xy}}{S_{xx}},\quad \hat\alpha = \bar{y} - \hat\beta\bar{x}. $$
+    <p><strong>結論</strong>：ノイズが正規分布だと仮定すると、<strong>最尤推定が最小二乗法に一致</strong>する。逆に言えば、最小二乗法は「ノイズが正規である」という暗黙の前提を置いていることになる。</p>
+  </details>
+
+  <details>
+    <summary>$\sigma^2$ の最尤推定（残差の平均二乗）</summary>
+    <p>正規分布の場合と同様の計算で：</p>
+    $$ \widehat{\sigma^2} = \frac{1}{n}\sum_{i=1}^{n}\bigl(y^{(i)} - \hat{\beta}x^{(i)} - \hat{\alpha}\bigr)^2 $$
+    <p>＝ 残差の二乗和を $n$ で割ったもの。回帰の <strong>不偏分散</strong> は $n - 2$（推定したパラメータが $\alpha, \beta$ の 2 つあるため）で割る：</p>
+    $$ \hat{s}^2 = \frac{1}{n - 2}\sum_{i=1}^{n}\bigl(y^{(i)} - \hat{\beta}x^{(i)} - \hat{\alpha}\bigr)^2. $$
+  </details>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li>連続量データの代表モデルは <strong>正規分布</strong> $N(\mu, \sigma^2)$。中心極限定理が自然界での頻出を保証</li>
+    <li>$\mu \pm \sigma, 2\sigma, 3\sigma$ 区間にそれぞれ 68%, 95%, 99.7% が入る</li>
+    <li>正規分布の最尤推定：$\hat{\mu} = \bar{x}$、$\widehat{\sigma^2} = \frac{1}{n}\sum(x - \bar{x})^2$（$n$ で割る）</li>
+    <li>線形回帰にガウスノイズを仮定したのが <strong>ガウス線形モデル</strong>。その最尤推定は <strong>最小二乗法と等価</strong></li>
+    <li>つまり「最小二乗法は『ノイズが正規』という暗黙仮定の下での最尤推定」と読み替えられる</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="03.html" class="prev">第3回 最尤推定とベイズ決定</a>
+    <a href="index.html" class="next">科目トップへ</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

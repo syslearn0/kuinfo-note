@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第2回 転置・特殊行列・逆行列 ｜ 線形代数</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">線形代数</a> ／ 第2回</div>
+</header>
+
+<main>
+  <h1>第2回 転置・特殊行列・逆行列</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>1. 連立一次方程式 → $A\mathbf{x} = \mathbf{b}$</h2>
+  <p>係数行列 $A$・未知数ベクトル $\mathbf{x}$・定数ベクトル $\mathbf{b}$ を並べると、連立方程式が1本の式になる：</p>
+  $$ \begin{pmatrix} 2 & 3 \\ 1 & -1 \end{pmatrix}\begin{pmatrix} x_1 \\ x_2 \end{pmatrix} = \begin{pmatrix} 5 \\ 1 \end{pmatrix} \;\Longleftrightarrow\; \begin{cases} 2x_1 + 3x_2 = 5 \\ x_1 - x_2 = 1 \end{cases} $$
+
+  <h2>2. 転置行列 ${}^t\!A = (a_{ji})$</h2>
+  <p>行と列を入れ替える操作。$(m,n)$ 型 → $(n,m)$ 型。</p>
+
+  <figure>
+    <svg viewBox="0 0 380 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="転置のイメージ">
+      <!-- A -->
+      <g font-family="monospace" font-size="14">
+        <rect x="20" y="40" width="120" height="80" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="40"  y="65" >1</text><text x="75" y="65">2</text><text x="110" y="65">3</text>
+        <text x="40"  y="100">4</text><text x="75" y="100">5</text><text x="110" y="100">6</text>
+        <text x="58"  y="32" fill="#4f46e5">A (2×3)</text>
+      </g>
+      <text x="175" y="85" font-size="18">⇒</text>
+      <!-- ᵗA -->
+      <g font-family="monospace" font-size="14">
+        <rect x="220" y="20" width="80" height="120" fill="#dcfce7" stroke="#059669"/>
+        <text x="240" y="50" >1</text><text x="270" y="50" >4</text>
+        <text x="240" y="80" >2</text><text x="270" y="80" >5</text>
+        <text x="240" y="110">3</text><text x="270" y="110">6</text>
+        <text x="232" y="156" fill="#059669">ᵗA (3×2)</text>
+      </g>
+    </svg>
+    <figcaption>図 1：転置。$i$ 行 $j$ 列の成分が、$j$ 行 $i$ 列に移る。</figcaption>
+  </figure>
+
+  $$ A = \begin{pmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{pmatrix} \;\xrightarrow{\text{転置}}\; {}^t\!A = \begin{pmatrix} 1 & 4 \\ 2 & 5 \\ 3 & 6 \end{pmatrix} $$
+
+  <h2>3. 特殊な行列</h2>
+
+  <h3>対称行列（${}^t\!A = A$）</h3>
+  $$ A = \begin{pmatrix} 1 & 2 & 3 \\ 2 & 5 & 4 \\ 3 & 4 & 6 \end{pmatrix},\quad {}^t\!A = A \;\checkmark $$
+
+  <h3>交代行列（${}^t\!A = -A$）</h3>
+  $$ A = \begin{pmatrix} 0 & 2 & -3 \\ -2 & 0 & 5 \\ 3 & -5 & 0 \end{pmatrix} $$
+  <p>対角成分は必ず $0$、$a_{ij} = -a_{ji}$。</p>
+
+  <h3>複素共役行列 $\bar{A}$（成分の虚部を反転）</h3>
+  $$ A = \begin{pmatrix} 1+2i & 3-i \\ 2i & 4+i \end{pmatrix} \;\Longrightarrow\; \bar{A} = \begin{pmatrix} 1-2i & 3+i \\ -2i & 4-i \end{pmatrix} $$
+
+  <h3>随伴行列 $A^* = {}^t\bar{A}$</h3>
+  $$ A = \begin{pmatrix} 1+2i & 3-i \\ 2i & 4+i \end{pmatrix} \xrightarrow{\;\bar{\;}\;} \bar{A} \xrightarrow{\;{}^t\;} A^* = \begin{pmatrix} 1-2i & -2i \\ 3+i & 4-i \end{pmatrix} $$
+
+  <h3>エルミート行列（$A^* = A$）</h3>
+  $$ A = \begin{pmatrix} 2 & 1+i \\ 1-i & 3 \end{pmatrix},\quad A^* = A \;\checkmark $$
+
+  <h2>4. 対角行列・単位行列・スカラー行列・零行列</h2>
+
+  <p>対角行列：</p>
+  $$ \begin{pmatrix} 3 & 0 & 0 \\ 0 & -1 & 0 \\ 0 & 0 & 5 \end{pmatrix} $$
+
+  <p>単位行列 $E = (\delta_{ij})$、$\delta_{ij}$ はクロネッカーのデルタ：</p>
+  $$ E = \begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix},\quad \delta_{ij} = \begin{cases} 1 & (i=j) \\ 0 & (i\ne j) \end{cases} $$
+
+  <p>スカラー行列（$kE$ の形）：</p>
+  $$ 3E = \begin{pmatrix} 3 & 0 & 0 \\ 0 & 3 & 0 \\ 0 & 0 & 3 \end{pmatrix} $$
+
+  <p>零行列：</p>
+  $$ O = \begin{pmatrix} 0 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & 0 \end{pmatrix} $$
+
+  <h2>5. 転置の性質：${}^t(AB) = {}^t\!B\cdot {}^t\!A$（順序が逆）</h2>
+  $$ A = \begin{pmatrix}1&2\\3&4\end{pmatrix},\; B = \begin{pmatrix}0&1\\2&3\end{pmatrix} \;\Longrightarrow\; AB = \begin{pmatrix}4&7\\8&15\end{pmatrix} $$
+  $$ {}^t(AB) = \begin{pmatrix}4&8\\7&15\end{pmatrix} = {}^t\!B\cdot {}^t\!A = \begin{pmatrix}0&2\\1&3\end{pmatrix}\begin{pmatrix}1&3\\2&4\end{pmatrix} = \begin{pmatrix}4&8\\7&15\end{pmatrix} \;\checkmark $$
+
+  <h2>6. 行列と数の違い（注意点）</h2>
+
+  <div class="callout">
+    行列は実数と違って <strong>可換ではない・零因子がある・約分できない</strong>。「行列＝数の拡張」と思い込むと事故るポイント。
+  </div>
+
+  <h3>（II）交換法則は成り立たない $AB \ne BA$</h3>
+  $$ AB = \begin{pmatrix}1&2\\0&1\end{pmatrix}\begin{pmatrix}1&0\\1&1\end{pmatrix} = \begin{pmatrix}3&2\\1&1\end{pmatrix} \ne \begin{pmatrix}1&2\\1&3\end{pmatrix} = BA $$
+
+  <h3>（III）零因子：$A\ne O$ かつ $B\ne O$ でも $AB = O$ になりうる</h3>
+  $$ \begin{pmatrix}1&0\\0&0\end{pmatrix}\begin{pmatrix}0&0\\1&0\end{pmatrix} = \begin{pmatrix}0&0\\0&0\end{pmatrix} = O $$
+
+  <h3>（V）$AB = A$ でも $B = E$ とは限らない</h3>
+  $$ A = \begin{pmatrix}1&0\\0&0\end{pmatrix},\; B = \begin{pmatrix}1&0\\5&1\end{pmatrix} \;\Longrightarrow\; AB = A,\quad B \ne E $$
+
+  <h2>7. 正則行列と逆行列 $AB = BA = E$</h2>
+  <p>$2\times 2$ の逆行列公式（$ad-bc \ne 0$ のとき）：</p>
+  $$ A = \begin{pmatrix}a&b\\c&d\end{pmatrix} \;\Longrightarrow\; A^{-1} = \frac{1}{ad-bc}\begin{pmatrix}d & -b \\ -c & a\end{pmatrix} $$
+
+  <p>具体例：</p>
+  $$ A = \begin{pmatrix}2&3\\1&2\end{pmatrix},\quad ad-bc = 1 \;\Longrightarrow\; A^{-1} = \begin{pmatrix}2 & -3 \\ -1 & 2\end{pmatrix} $$
+  $$ AA^{-1} = \begin{pmatrix}4-3 & -6+6 \\ 2-2 & -3+4\end{pmatrix} = \begin{pmatrix}1 & 0 \\ 0 & 1\end{pmatrix} = E \;\checkmark $$
+
+  <h2>定理 2.5.1：逆行列の一意性</h2>
+  <p>$A$ の逆行列が $B,C$ の2つ存在すると仮定する：</p>
+  $$ AB = BA = E,\quad AC = CA = E $$
+  <p>このとき $B$ に右から $AC = E$ を掛けて：</p>
+  $$ B = BE = B(AC) = (BA)C = EC = C $$
+  <p>よって $B = C$。<strong>逆行列は存在すれば一意</strong>。$\square$</p>
+
+  <nav class="pager">
+    <a href="01.html" class="prev">第1回 行列の積</a>
+    <a href="03.html" class="next">第3回 ブロック行列・線形写像</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

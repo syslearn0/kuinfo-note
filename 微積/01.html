@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第1回 数列の収束と ε-N 論法 ｜ 微積</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">微積</a> ／ 第1回</div>
+</header>
+
+<main>
+  <h1>第1回 数列の収束と ε-N 論法</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>テーマ：数列の収束（第7章）</h2>
+  <p>この回の目標は、感覚的に「<em>$a_n$ が $\alpha$ に近づく</em>」と言っていた事実を、誤魔化しのない論理式（<strong>$\varepsilon$-$N$ 論法</strong>）に書き換えることです。さらに、極限値 $\alpha$ を知らなくても収束が保証される最初の定理（<strong>単調収束定理</strong>）を述べ、その応用として $\bigl(1+\tfrac{1}{n}\bigr)^n \to e$ を証明します。</p>
+
+  <h2>定義 1.3：$\varepsilon$-$N$ 論法</h2>
+
+  <div class="callout">
+    <strong>$a_n \to \alpha\ (n\to\infty)$ の定義：</strong>
+    $$ \forall \varepsilon > 0,\ \exists n_0 \in \mathbb{N}\ \text{s.t.}\ \forall n \ge n_0,\ |a_n - \alpha| \le \varepsilon $$
+  </div>
+
+  <p>「どんな $\varepsilon$（許容誤差）を要求されても、それを上回る精度で $\alpha$ に近づいてくれる $n_0$ 番目以降が存在する」という主張です。「いずれ近づく」ではなく <strong>「許容誤差ごとに必ず開始番号 $n_0$ を提示できる」</strong> のがポイント。</p>
+
+  <figure>
+    <svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ε-N 論法のイメージ">
+      <line x1="30" y1="180" x2="450" y2="180" stroke="#9ca3af"/>
+      <text x="450" y="195" font-size="12">n</text>
+      <!-- 極限値 α の水平線 -->
+      <line x1="30" y1="100" x2="450" y2="100" stroke="#4f46e5" stroke-dasharray="4 3"/>
+      <text x="12" y="104" font-size="12" fill="#4f46e5">α</text>
+      <!-- α ± ε 帯 -->
+      <rect x="30" y="80" width="420" height="40" fill="#4f46e5" opacity="0.12"/>
+      <line x1="30" y1="80"  x2="450" y2="80"  stroke="#4f46e5" stroke-dasharray="3 3"/>
+      <line x1="30" y1="120" x2="450" y2="120" stroke="#4f46e5" stroke-dasharray="3 3"/>
+      <text x="455" y="84" font-size="11" fill="#4f46e5">α+ε</text>
+      <text x="455" y="124" font-size="11" fill="#4f46e5">α−ε</text>
+      <!-- 点列 -->
+      <circle cx="55"  cy="40"  r="3.5"/>
+      <circle cx="85"  cy="160" r="3.5"/>
+      <circle cx="115" cy="65"  r="3.5"/>
+      <circle cx="145" cy="135" r="3.5"/>
+      <circle cx="175" cy="85"  r="3.5"/>
+      <!-- n0 を境に帯の中 -->
+      <line x1="200" y1="60" x2="200" y2="180" stroke="#dc2626" stroke-dasharray="4 3"/>
+      <text x="195" y="200" font-size="12" fill="#dc2626">n₀</text>
+      <circle cx="220" cy="115" r="3.5" fill="#059669"/>
+      <circle cx="250" cy="95"  r="3.5" fill="#059669"/>
+      <circle cx="280" cy="108" r="3.5" fill="#059669"/>
+      <circle cx="310" cy="103" r="3.5" fill="#059669"/>
+      <circle cx="340" cy="98"  r="3.5" fill="#059669"/>
+      <circle cx="370" cy="101" r="3.5" fill="#059669"/>
+      <circle cx="400" cy="99"  r="3.5" fill="#059669"/>
+      <text x="220" y="50" font-size="11" fill="#059669">n ≥ n₀ では帯の中</text>
+    </svg>
+    <figcaption>図 1：$\alpha\pm\varepsilon$ の帯。$\varepsilon$ を狭めれば $n_0$ は大きくなるかもしれないが、必ず<strong>存在する</strong>。</figcaption>
+  </figure>
+
+  <h3>記号の意味</h3>
+  <ul>
+    <li><strong>$\forall \varepsilon > 0$</strong>：相手が指定する <em>任意の</em> 許容誤差</li>
+    <li><strong>$\exists n_0$</strong>：それに対して <em>こちらが提示</em> する開始番号</li>
+    <li><strong>$\forall n \ge n_0$</strong>：それ以降は <em>例外なく</em> 帯の中</li>
+  </ul>
+  <p>「最初の数項はどれだけ暴れていてもよい」「ある番号から先がぴったり収まれば収束」というのが、$\varepsilon$-$N$ の本質的な発想です。</p>
+
+  <h3>$+\infty$ への発散の定義</h3>
+  $$ a_n \to +\infty \;\stackrel{\mathrm{def}}{\iff}\; \forall M > 0,\ \exists n_0 \in \mathbb{N}\ \text{s.t.}\ \forall n \ge n_0,\ a_n > M $$
+  <p>「どれだけ大きな $M$ を持ってきても、いずれ追い越す」という気持ちです。</p>
+
+  <h2>定義 1.2：単調性と有界性</h2>
+  <ul>
+    <li><strong>単調増加（狭義）</strong>：$a_n < a_{n+1}$</li>
+    <li><strong>単調非減少</strong>：$a_n \le a_{n+1}$</li>
+    <li><strong>単調減少（狭義）</strong>：$a_n > a_{n+1}$</li>
+    <li><strong>単調非増加</strong>：$a_n \ge a_{n+1}$</li>
+    <li><strong>有界</strong>：$\exists M > 0$ s.t. $\forall n \in \mathbb{N},\ |a_n| \le M$</li>
+  </ul>
+
+  <h2>定理 1.1（単調収束定理）</h2>
+
+  <p>次の定理は、「<strong>極限値の正体を一切知らずに、収束だけは保証できる</strong>」という解析学の出発点となる結果です。</p>
+
+  <div class="callout">
+    <strong>定理 1.1.</strong> 数列 $\{a_n\}$ が
+    <ul style="margin:6px 0 0;">
+      <li>(i) $\forall n,\ a_n \le a_{n+1}$（単調非減少）</li>
+      <li>(ii) $\exists M,\ \forall n,\ a_n \le M$（上に有界）</li>
+    </ul>
+    を満たすならば、$\{a_n\}$ は収束し $\displaystyle \lim_{n\to\infty} a_n \le M$。
+  </div>
+
+  <p>厳密な証明は <strong>実数の連続性</strong>（Dedekind 公理 / Weierstrass の上限定理）を要するため、次回（第2回）に行います。ここでは「<strong>上限を極限の候補にする</strong>」というアイディアだけ図で示しておきます。</p>
+
+  <figure>
+    <svg viewBox="0 0 480 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="単調収束のイメージ">
+      <line x1="20" y1="90" x2="460" y2="90" stroke="#9ca3af"/>
+      <text x="460" y="105" font-size="12">n</text>
+      <!-- 上限と上界 -->
+      <line x1="20" y1="40" x2="460" y2="40" stroke="#4f46e5" stroke-dasharray="4 3"/>
+      <text x="465" y="44" font-size="11" fill="#4f46e5">α = sup</text>
+      <line x1="20" y1="20" x2="460" y2="20" stroke="#d97706" stroke-dasharray="4 3"/>
+      <text x="465" y="24" font-size="11" fill="#d97706">M（上界）</text>
+      <!-- 単調増加点列 -->
+      <circle cx="50"  cy="85" r="3.5"/>
+      <circle cx="90"  cy="75" r="3.5"/>
+      <circle cx="130" cy="68" r="3.5"/>
+      <circle cx="170" cy="62" r="3.5"/>
+      <circle cx="210" cy="55" r="3.5"/>
+      <circle cx="250" cy="50" r="3.5"/>
+      <circle cx="290" cy="47" r="3.5"/>
+      <circle cx="330" cy="45" r="3.5"/>
+      <circle cx="370" cy="43" r="3.5"/>
+      <circle cx="410" cy="41" r="3.5"/>
+    </svg>
+    <figcaption>図 2：単調に上がりつつ天井 $M$ を超えない数列は、$\alpha = \sup\{a_n\}$ に張り付く。</figcaption>
+  </figure>
+
+  <h2>例 1.4：基本的な極限</h2>
+  <ul>
+    <li>$\dfrac{1}{n} \to 0,\quad \dfrac{1}{n^2}\to 0,\quad \dfrac{1}{n!}\to 0$</li>
+    <li>$n \to +\infty,\quad n^2 \to +\infty$</li>
+    <li>$n^{1/n} \to 1$</li>
+    <li>$\displaystyle \sum_{k=1}^{n}\frac{1}{k} \to +\infty$（<strong>調和級数の発散</strong>）</li>
+  </ul>
+
+  <h3>(1) $\dfrac{1}{n}\to 0$</h3>
+  <p><strong>気持ち</strong>。$1/n$ を $\varepsilon$ より小さくするには $n > 1/\varepsilon$ を取ればよい。床関数で「境界のちょうど右の自然数」を構成する。</p>
+  <details>
+    <summary>証明</summary>
+    <p>$\varepsilon > 0$ を任意に固定する。アルキメデスの性質により $\tfrac{1}{\varepsilon}$ より大きな自然数が存在する。具体的には</p>
+    $$ n_0 := \left\lfloor \tfrac{1}{\varepsilon} \right\rfloor + 1 \in \mathbb{N} $$
+    <p>と取れば $n_0 > \tfrac{1}{\varepsilon}$、すなわち $\tfrac{1}{n_0} < \varepsilon$。よって $n \ge n_0$ なら</p>
+    $$ \left|\tfrac{1}{n} - 0\right| = \tfrac{1}{n} \le \tfrac{1}{n_0} < \varepsilon. \qquad\square $$
+    <p>注：$\varepsilon = 0.03$ なら $1/\varepsilon = 33.33\ldots$ で $n_0 = 34$。アルキメデスの性質は実数の連続性から従う基本事実。</p>
+  </details>
+
+  <h3>(2) $n^2 \to +\infty$</h3>
+  <details>
+    <summary>証明</summary>
+    <p>$M > 0$ を任意に固定し、$n_0 := \lfloor \sqrt{M}\rfloor + 1$ とおく。$n_0 > \sqrt{M}$ より $n_0^2 > M$、よって $n \ge n_0$ なら $n^2 \ge n_0^2 > M$。$\quad\square$</p>
+  </details>
+
+  <h3>(3) $n^{1/n} \to 1$</h3>
+  <p>これは初見ではちょっと意外な極限です。「$n$ は大きい、しかし $1/n$ 乗は弱い」のせめぎ合いを定量化する。<strong>方針</strong>：$a_n = n^{1/n} - 1 \ge 0$ とおいて $a_n \to 0$ を示す。$n = (1 + a_n)^n$ を <strong>二項展開</strong> し、第 2 項 $\binom{n}{2}a_n^2$ で下から押さえて $a_n$ について逆向きに解く。</p>
+  <details>
+    <summary>証明</summary>
+    <p>$n \ge 2$ とする。二項定理により</p>
+    $$ n = (1 + a_n)^n = \sum_{k=0}^{n}\binom{n}{k}a_n^k \ge \binom{n}{2}a_n^2 = \frac{n(n-1)}{2}a_n^2 $$
+    <p>$n \ge 2$ ゆえ両辺を $\tfrac{n(n-1)}{2}$ で割って</p>
+    $$ a_n^2 \le \frac{2}{n-1} \;\Longrightarrow\; 0 \le a_n \le \sqrt{\frac{2}{n-1}} \to 0. $$
+    <p>はさみうちにより $a_n \to 0$、すなわち $n^{1/n} \to 1$。$\quad\square$</p>
+    <p>補足：$(1 + a_n)^n$ の中で $a_n^2$ の項がもっとも効率よく $a_n$ を上から押さえ、「$a_n$ は $1/\sqrt{n}$ 程度以下」を引き出せる。</p>
+  </details>
+
+  <h3>(4) 調和級数 $\sum 1/k \to +\infty$</h3>
+  <p><strong>気持ち</strong>。項を「2 つずつ・4 つずつ・8 つずつ……」とブロックにまとめると、各ブロックの和は必ず $\tfrac{1}{2}$ 以上になる。よって部分和はいくらでも大きくなる。</p>
+  <details>
+    <summary>証明</summary>
+    <p>$S_n = \sum_{k=1}^{n} \tfrac{1}{k}$ とおく。$n = 2^m$ のときの $S_{2^m}$ を評価する：</p>
+    $$ S_{2^m} = 1 + \tfrac{1}{2} + \underbrace{\Bigl(\tfrac{1}{3} + \tfrac{1}{4}\Bigr)}_{\ge\, 2\cdot \frac{1}{4} = \frac{1}{2}} + \underbrace{\Bigl(\tfrac{1}{5} + \cdots + \tfrac{1}{8}\Bigr)}_{\ge\, 4\cdot \frac{1}{8} = \frac{1}{2}} + \cdots + \underbrace{\Bigl(\tfrac{1}{2^{m-1}+1} + \cdots + \tfrac{1}{2^m}\Bigr)}_{\ge\, 2^{m-1}\cdot \frac{1}{2^m} = \frac{1}{2}} $$
+    <p>各ブロックは $\ge \tfrac{1}{2}$、計 $m$ 個あるので</p>
+    $$ S_{2^m} \ge 1 + \tfrac{m}{2}. $$
+    <p>任意の $M$ に対して $m \ge 2(M-1)$ を取れば $S_{2^m} \ge M$。$S_n$ は単調増加なので $S_n \to +\infty$。$\quad\square$</p>
+  </details>
+
+  <h2>応用：$\left(1 + \dfrac{1}{n}\right)^n \to e$</h2>
+
+  <p>定理 1.1 の華々しい応用がこれ。<strong>極限値の正体（$e$ という値）を一切使わずに、まずは「収束する」だけを示し</strong>、後から $e$ を比較対象に押し付ける、というのが鍵です。</p>
+
+  <p>記号を定めておく：</p>
+  $$ a_n := \left(1 + \tfrac{1}{n}\right)^n,\qquad S_n := \sum_{k=0}^{n}\frac{1}{k!} $$
+
+  <p><strong>方針の全体像</strong>。① 二項展開で $a_n$ を $\sum\tfrac{1}{k!}\prod(1-j/n)$ と書き直す → ② 因子 $1 - j/n$ が $n$ につれ増えることから単調性、各因子 $\le 1$ から上有界（$<3$）。③ 定理 1.1 で収束を保証し、その値を $e$ と命名。④ $a_n$ と $S_n := \sum_{k=0}^n 1/k!$ を挟みうちで一致させる。</p>
+
+  <details>
+    <summary>Step 1：$\{a_n\}$ は単調非減少（証明）</summary>
+    <p>二項定理から</p>
+    $$ a_n = \sum_{k=0}^{n}\binom{n}{k}\frac{1}{n^k} = \sum_{k=0}^{n}\frac{1}{k!}\cdot \frac{n(n-1)\cdots(n-k+1)}{n^k} = \sum_{k=0}^{n}\frac{1}{k!}\prod_{j=1}^{k-1}\!\left(1 - \frac{j}{n}\right). $$
+    <p>各 $k$ について、因子 $1 - \tfrac{j}{n}$ は $n$ を $n+1$ に増やすと <strong>大きくなる</strong>（$j/n$ が減るため）。さらに $a_{n+1}$ の和には $k = n+1$ の項（非負）が新たに加わる。項ごとに $\ge$ で和も $a_{n+1} \ge a_n$。$\quad\square$</p>
+  </details>
+
+  <details>
+    <summary>Step 2：$\{a_n\}$ は上に有界（$a_n < 3$）（証明）</summary>
+    <p>Step 1 の展開で各因子 $1 - \tfrac{j}{n} \le 1$ なので</p>
+    $$ a_n \le \sum_{k=0}^{n}\frac{1}{k!} = S_n. $$
+    <p>$k \ge 2$ で $k! \ge 2^{k-1}$ より</p>
+    $$ S_n \le 2 + \sum_{k=2}^{n}\frac{1}{2^{k-1}} = 2 + \left(1 - \frac{1}{2^{n-1}}\right) < 3. $$
+    <p>よって $a_n < 3$。$\quad\square$</p>
+  </details>
+
+  <h3>Step 3：$e$ の定義</h3>
+  <p>Step 1, 2 と定理 1.1 より $\{a_n\}$ は収束する。その極限値を $e$ と定義する：</p>
+  $$ e := \lim_{n\to\infty}\left(1 + \tfrac{1}{n}\right)^n. $$
+  <p>$a_n \le S_n$ から $e \le \lim_n S_n$。</p>
+
+  <details>
+    <summary>Step 4：$\lim a_n = \lim S_n$ の証明（挟みうち）</summary>
+    <p>$a_n \le S_n$ は既出。逆向き $\lim a_n \ge \lim S_n$ を示す。</p>
+    <p>$m$ を固定。$n \ge m$ で $a_n$ の和の最初の $m+1$ 項だけ取って</p>
+    $$ a_n \ge \sum_{k=0}^{m}\frac{1}{k!}\prod_{j=1}^{k-1}\!\left(1 - \frac{j}{n}\right). $$
+    <p>右辺で先に $n \to \infty$。各因子は $1$ に収束するので</p>
+    $$ \lim_{n\to\infty} a_n \ge \sum_{k=0}^{m}\frac{1}{k!} = S_m. $$
+    <p>続いて $m \to \infty$ で $\lim_n a_n \ge \lim_m S_m$。$\quad\square$</p>
+  </details>
+
+  <p>以上より</p>
+  $$ \boxed{\ e = \lim_{n\to\infty}\!\left(1 + \tfrac{1}{n}\right)^n = \sum_{k=0}^{\infty}\frac{1}{k!}\ } $$
+
+  <details>
+    <summary>$e$ が無理数である簡単な証明（おまけ）</summary>
+    <p>背理法：$e = p/q$（$p, q \in \mathbb{N}$）と仮定する。$N := q$ を取り、</p>
+    $$ q!\cdot e = q!\cdot S_q + q!\cdot R,\quad R = \sum_{k = q+1}^{\infty}\frac{1}{k!} $$
+    <p>左辺は仮定より整数 $p\cdot (q-1)!$。右辺の $q!\cdot S_q$ も整数。よって $q!\cdot R$ も整数。ところが</p>
+    $$ 0 < q!\cdot R = \sum_{k=q+1}^{\infty}\frac{q!}{k!} < \sum_{j=1}^{\infty}\frac{1}{(q+1)^j} = \frac{1}{q} \le 1. $$
+    <p>$0$ と $1$ の間の整数は存在しないので矛盾。よって $e \notin \mathbb{Q}$。$\quad\square$</p>
+  </details>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li>収束・発散を $\varepsilon$-$N$ 論法で <strong>論理式として</strong> 定義した</li>
+    <li>「許容誤差 $\varepsilon$ ごとに $n_0$ を構成する」のが収束証明の基本動作。床関数 $\lfloor\cdot\rfloor$ で $n_0$ をきれいに取り出せる</li>
+    <li><strong>定理 1.1（単調収束定理）</strong>：上に有界な単調非減少列は収束。<em>極限値を知らずに収束を保証できる</em>のが要点</li>
+    <li>$n^{1/n}\to 1$ は二項展開の第 2 項で $a_n$ を上から押さえる</li>
+    <li>調和級数の発散はブロック和 $\ge 1/2$ を $m$ 個積むことで示せる</li>
+    <li>$\bigl(1+\tfrac{1}{n}\bigr)^n$ は単調非減少・上に有界 $\Rightarrow$ 定理 1.1 で収束、その極限値が $e = \sum 1/k!$ と一致することを挟みうちで示した</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="index.html" class="prev">科目トップへ</a>
+    <a href="02.html" class="next">第2回 実数の連続性</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

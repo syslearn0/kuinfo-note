@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第3回 最尤推定とベイズ決定 ｜ 自然現象と数学</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">自然現象と数学</a> ／ 第3回</div>
+</header>
+
+<main>
+  <h1>第3回 最尤推定とベイズ決定</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>講義の流れ</h2>
+  <p>「<strong>質的データ（特に 2 値変数）の確率をデータから推定したい</strong>」という問いを出発点に、以下の順で議論が展開する：</p>
+
+  <ol>
+    <li><strong>データの種類・質的変数</strong>：2 値変数 (0 or 1) を確率変数として捉える</li>
+    <li><strong>ベルヌイ分布</strong>：パラメータ $p$ で記述</li>
+    <li><strong>最尤推定</strong>：尤度・対数尤度で「最もらしい $p$」を求める原理</li>
+    <li><strong>2 項分布・ポアソン分布</strong>：ベルヌイ拡張、同じ枠組みで解ける</li>
+    <li><strong>離散分布の最尤推定</strong>：多値変数。等式制約付きで <strong>ラグランジュ未定乗数法</strong></li>
+    <li><strong>ベイズ決定</strong>：推定モデルで「どちらのモデルから来たか」を事後確率で判断</li>
+  </ol>
+
+  <h2>データの種類</h2>
+  <p>今回は <strong>質的データ</strong>、特に 2 値変数 $X \in \{0, 1\}$。</p>
+
+  <h2>ベルヌイ分布</h2>
+  $$ \Pr(X = 1) = p,\quad \Pr(X = 0) = 1 - p\qquad (0 \le p \le 1) $$
+  <p>$X = x$（$x \in \{0, 1\}$）の確率を 1 つの式に：</p>
+  $$ \Pr(X = x \mid p) = p^x (1 - p)^{1 - x}. $$
+
+  <h2>最尤推定</h2>
+
+  <p>「データを最もよく再現するパラメータ」を選ぶ原理。</p>
+
+  <h3>例：観測 $1, 0, 0, 1, 1$ の最尤 $p$</h3>
+
+  <p><strong>尤度</strong>：パラメータ $p$ のもとでこの観測列が出る確率。各観測は独立と仮定して</p>
+  $$ \ell(p) = p \cdot (1-p) \cdot (1-p) \cdot p \cdot p = p^3 (1-p)^2 $$
+
+  <details>
+    <summary>最大化の途中計算</summary>
+    <p>対数尤度をとる（積 → 和に変わって扱いやすい）：</p>
+    $$ \log \ell(p) = 3\log p + 2\log(1 - p). $$
+    <p>$p$ で微分：</p>
+    $$ \frac{d}{dp}\log\ell(p) = \frac{3}{p} - \frac{2}{1 - p}. $$
+    <p>$= 0$ とおく：</p>
+    $$ \frac{3}{p} = \frac{2}{1 - p}\ \Longleftrightarrow\ 3(1 - p) = 2p\ \Longleftrightarrow\ 3 = 5p $$
+    $$ \therefore\ \hat{p} = \frac{3}{5}. $$
+    <p><strong>2 階の条件</strong>：$\dfrac{d^2}{dp^2}\log\ell = -\dfrac{3}{p^2} - \dfrac{2}{(1-p)^2} < 0$ なので確かに最大。$\quad\square$</p>
+  </details>
+
+  <h3>一般化：$n$ 回中 $k$ 回成功</h3>
+
+  <p>同様にして $\hat{p} = k / n$（標本比）。</p>
+
+  <details>
+    <summary>導出</summary>
+    <p>$\log\ell(p) = k\log p + (n - k)\log(1 - p)$。微分してゼロ：</p>
+    $$ \frac{k}{p} - \frac{n - k}{1 - p} = 0\ \Longleftrightarrow\ k(1 - p) = (n - k)p\ \Longleftrightarrow\ k = np $$
+    $$ \therefore\ \hat{p} = \frac{k}{n}.\quad\square $$
+  </details>
+
+  <h2>2 項分布</h2>
+  <p>$n$ 回のベルヌイ試行で $X = 1$ が $k$ 回出る確率：</p>
+  $$ P(K = k \mid p) = \binom{n}{k}p^k (1 - p)^{n - k} $$
+  <p>最尤推定で同じく $\hat{p} = k / n$。</p>
+
+  <details>
+    <summary>導出（$\binom{n}{k}$ は $p$ に依存しないので無視できる）</summary>
+    <p>$\log P = \log\binom{n}{k} + k\log p + (n-k)\log(1-p)$。<br>
+    第 1 項は定数なので微分でゼロ、上のベルヌイの場合とまったく同じ計算で $\hat{p} = k/n$。$\quad\square$</p>
+  </details>
+
+  <h2>ポアソン分布</h2>
+
+  <p>「一定期間内のまれなイベント発生回数」のモデル。2 項分布で $np = \lambda$ を固定して $n \to \infty$ の極限：</p>
+  $$ P(K = k \mid \lambda) = \frac{\lambda^k}{k!}e^{-\lambda} $$
+
+  <details>
+    <summary>2 項分布からの極限の導出（途中計算込み）</summary>
+    <p>$np = \lambda$ で $p = \lambda/n$ と置くと、</p>
+    $$ P(K = k) = \binom{n}{k}\left(\frac{\lambda}{n}\right)^k\!\left(1 - \frac{\lambda}{n}\right)^{n-k}. $$
+    <p>$\binom{n}{k}\left(\dfrac{\lambda}{n}\right)^k$ を整理：</p>
+    $$ \binom{n}{k}\left(\frac{\lambda}{n}\right)^k = \frac{n(n-1)\cdots(n-k+1)}{k!}\cdot\frac{\lambda^k}{n^k} = \frac{\lambda^k}{k!}\cdot\underbrace{\frac{n}{n}\cdot\frac{n-1}{n}\cdots\frac{n-k+1}{n}}_{k 個の因子}. $$
+    <p>$k$ を固定して $n \to \infty$ で各因子は $1$ に収束、合わせて</p>
+    $$ \binom{n}{k}\left(\frac{\lambda}{n}\right)^k \xrightarrow[n\to\infty]{} \frac{\lambda^k}{k!}. $$
+    <p>残りの $(1 - \lambda/n)^{n-k}$：</p>
+    $$ \left(1 - \frac{\lambda}{n}\right)^{n-k} = \underbrace{\left(1 - \frac{\lambda}{n}\right)^{n}}_{\to\, e^{-\lambda}} \cdot \underbrace{\left(1 - \frac{\lambda}{n}\right)^{-k}}_{\to\, 1} \xrightarrow[n\to\infty]{} e^{-\lambda}. $$
+    <p>両者を掛け合わせて</p>
+    $$ P(K = k \mid \lambda) = \frac{\lambda^k}{k!}e^{-\lambda}.\quad\square $$
+  </details>
+
+  <details>
+    <summary>ポアソン分布の最尤推定（$\hat\lambda = \bar{k}$）</summary>
+    <p>独立な観測 $k_1, \ldots, k_n$ の対数尤度：</p>
+    $$ \log\ell(\lambda) = \sum_{i=1}^{n}\bigl(k_i\log\lambda - \lambda - \log(k_i!)\bigr) = \left(\sum_i k_i\right)\log\lambda - n\lambda + \text{const}. $$
+    <p>$\lambda$ で微分してゼロ：</p>
+    $$ \frac{d}{d\lambda}\log\ell = \frac{\sum_i k_i}{\lambda} - n = 0\ \Longrightarrow\ \hat\lambda = \frac{1}{n}\sum_i k_i = \bar{k}.\quad\square $$
+  </details>
+
+  <h2>離散分布の最尤推定（多値）</h2>
+
+  <p>$X \in \{1, \ldots, K\}$、$\Pr(X = k) = p_k$、$\sum_{k=1}^{K} p_k = 1$。観測で各値が $n_k$ 回出たとする。</p>
+
+  $$ \ell = \prod_{k=1}^{K} p_k^{n_k}\ \Longrightarrow\ \log\ell = \sum_{k=1}^{K} n_k \log p_k $$
+
+  <p><strong>制約付き最大化</strong>：等式制約 $\sum p_k = 1$ があるため <strong>ラグランジュ未定乗数法</strong> を使う。</p>
+
+  <details>
+    <summary>ラグランジュ未定乗数法とは（短い復習）</summary>
+    <p>制約 $g(\mathbf{p}) = 0$ のもとで $f(\mathbf{p})$ を最大化したい。ラグランジアン</p>
+    $$ L(\mathbf{p}, \lambda) = f(\mathbf{p}) + \lambda\, g(\mathbf{p}) $$
+    <p>の偏微分をすべてゼロとおいた連立を解く（停留点が制約付き最大の候補）。$\lambda$ は最初は未知の <strong>乗数</strong>、後から決まる。</p>
+  </details>
+
+  <details>
+    <summary>$\hat{p}_k = n_k / \sum_j n_j$ の導出</summary>
+    <p>ラグランジアン：</p>
+    $$ L(p_1, \ldots, p_K, \lambda) = \sum_{k=1}^{K} n_k \log p_k + \lambda\!\left(\sum_{k=1}^{K} p_k - 1\right). $$
+
+    <p><strong>Step 1：</strong>$p_k$ に関する偏微分をゼロ。</p>
+    $$ \frac{\partial L}{\partial p_k} = \frac{n_k}{p_k} + \lambda = 0\ \Longrightarrow\ p_k = -\frac{n_k}{\lambda}.\tag{$\ast$} $$
+    <p>各 $k$ で同じ形。$\lambda$ は <strong>$k$ に依らない</strong> ことに注目。</p>
+
+    <p><strong>Step 2：</strong>$\lambda$ に関する偏微分（＝ 制約の復元）。</p>
+    $$ \frac{\partial L}{\partial \lambda} = \sum_{k=1}^{K} p_k - 1 = 0\ \Longrightarrow\ \sum_k p_k = 1. $$
+
+    <p><strong>Step 3：</strong>$(\ast)$ を制約に代入して $\lambda$ を決める。</p>
+    $$ \sum_{k=1}^{K}\left(-\frac{n_k}{\lambda}\right) = 1\ \Longrightarrow\ \lambda = -\sum_{k=1}^{K} n_k. $$
+
+    <p><strong>Step 4：</strong>$\lambda$ を $(\ast)$ に戻す。</p>
+    $$ \hat{p}_k = -\frac{n_k}{\lambda} = \frac{n_k}{\sum_{j=1}^{K} n_j}.\quad\square $$
+    <p>結果は直感通り：各カテゴリの <strong>標本比</strong>。</p>
+  </details>
+
+  <h2>ベイズ決定</h2>
+
+  <p>「サイコロ A と B のどちらから新データ $\mathcal{D}$ が生成されたか」を確率的に判断する。</p>
+
+  <h3>1. 道具立て：事前確率・尤度・事後確率</h3>
+
+  <table>
+    <thead><tr><th>記号</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td>$P(X = A),\ P(X = B)$</td><td><strong>事前確率</strong>。データを見る前のモデルへの確信</td></tr>
+      <tr><td>$P(\mathcal{D} \mid X = A)$</td><td><strong>尤度</strong>。A だと仮定したときデータが出る確率</td></tr>
+      <tr><td>$P(X = A \mid \mathcal{D})$</td><td><strong>事後確率</strong>。データを見た後の確信</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2. ベイズの定理</h3>
+  $$ P(X \mid \mathcal{D}) = \frac{P(\mathcal{D} \mid X)\,P(X)}{P(\mathcal{D})} $$
+
+  <p>$P(\mathcal{D})$ は <strong>正規化定数</strong>：</p>
+  $$ P(\mathcal{D}) = P(\mathcal{D} \mid A)P(A) + P(\mathcal{D} \mid B)P(B). $$
+  <p>これで $P(A \mid \mathcal{D}) + P(B \mid \mathcal{D}) = 1$ になる。</p>
+
+  <h3>3. 判断基準：分母は消える</h3>
+  <p>A と B を <strong>比較するだけ</strong> なら $P(\mathcal{D})$ は両辺共通で消える：</p>
+  $$ \frac{P(\mathcal{D} \mid A)P(A)}{P(\mathcal{D})} \gtrless \frac{P(\mathcal{D} \mid B)P(B)}{P(\mathcal{D})} $$
+  $$ \Longleftrightarrow\ P(\mathcal{D} \mid A)P(A) \gtrless P(\mathcal{D} \mid B)P(B). $$
+  <p>さらに事前確率が等しい（$P(A) = P(B) = 1/2$）なら、<strong>尤度の比較だけ</strong> で済む：</p>
+  $$ P(\mathcal{D} \mid A) \gtrless P(\mathcal{D} \mid B). $$
+
+  <h3>4. 尤度の計算</h3>
+  <p>新データで目 $k$ が $n_k^C$ 回出たとする（多値の独立試行）：</p>
+  $$ P(\mathcal{D} \mid X = A) = \prod_{k=1}^{K} (p_k^A)^{n_k^C} $$
+  <p>ここで $p_k^A$ は訓練データから <strong>最尤推定</strong>で求めたもの。$B$ も同様に $p_k^B$。</p>
+
+  <h3>5. 全体の流れ</h3>
+  <ol>
+    <li>訓練データから $p_k^A, p_k^B$ を最尤推定で求める</li>
+    <li>新データ $\mathcal{D}$ を観察する</li>
+    <li>尤度 $P(\mathcal{D} \mid A), P(\mathcal{D} \mid B)$ を計算</li>
+    <li>大きい方のモデルを採用</li>
+  </ol>
+
+  <h3>6. 実装上のコツ：対数をとる</h3>
+  <p>確率の積を繰り返すとアンダーフローする。対数をとって <strong>和</strong> に変換する：</p>
+  $$ \log P(\mathcal{D} \mid X = A) = \sum_{k=1}^{K} n_k^C \log p_k^A. $$
+  <p>大小関係は変わらないので、対数尤度の比較で判断できる。</p>
+
+  <details>
+    <summary>具体例：3 面サイコロ A, B でどちらか判断</summary>
+    <p>訓練データから推定したパラメータ：</p>
+    <table>
+      <thead><tr><th></th><th>$p_1$</th><th>$p_2$</th><th>$p_3$</th></tr></thead>
+      <tbody>
+        <tr><td>$A$</td><td>$0.5$</td><td>$0.3$</td><td>$0.2$</td></tr>
+        <tr><td>$B$</td><td>$0.2$</td><td>$0.5$</td><td>$0.3$</td></tr>
+      </tbody>
+    </table>
+    <p>新データ $\mathcal{D} = (1, 1, 2, 3, 1)$ → $n_1^C = 3, n_2^C = 1, n_3^C = 1$。</p>
+    <p>対数尤度：</p>
+    $$ \log P(\mathcal{D} \mid A) = 3\log 0.5 + 1\log 0.3 + 1\log 0.2 \approx -2.08 - 1.20 - 1.61 = -4.89 $$
+    $$ \log P(\mathcal{D} \mid B) = 3\log 0.2 + 1\log 0.5 + 1\log 0.3 \approx -4.83 - 0.69 - 1.20 = -6.72 $$
+    <p>$\log P(\mathcal{D} \mid A) > \log P(\mathcal{D} \mid B)$ → <strong>A</strong> と判断。1 が多い新データは「1 が出やすい A」由来と判定するのが妥当。</p>
+  </details>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li><strong>最尤推定</strong>：尤度を最大化するパラメータを選ぶ。対数尤度を使うと計算が楽（積 → 和）</li>
+    <li>ベルヌイ・2 項・ポアソン・離散分布いずれも最尤推定で直感的な結果（標本比 / 標本平均）</li>
+    <li>等式制約付き最大化 → <strong>ラグランジュ未定乗数法</strong>。$\lambda$ は制約から決定</li>
+    <li>ベイズ決定：ベイズの定理で事後確率 → 最も確率の高いモデルを選ぶ</li>
+    <li>事前確率が等しいときは <strong>尤度の比較</strong>（さらに対数尤度で実装）だけで足りる</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="02.html" class="prev">第2回 線形回帰</a>
+    <a href="04.html" class="next">第4回 正規分布と最尤推定</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

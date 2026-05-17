@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第5回 ソフトウェアと言語処理系 ｜ 情報AI基礎</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">情報AI基礎</a> ／ 第5回</div>
+</header>
+
+<main>
+  <h1>第5回 ソフトウェアと言語処理系</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>大きな絵</h2>
+  <p>前回までで「ハードウェアは <strong>CPU + メモリ</strong> で、機械語を実行する」ことを見た。今回は <strong>ソフトウェア側</strong>。人間が書いたプログラムが、どのようにして CPU が実行できる形（機械語）に変換され、動くのか。鍵になるのは <strong>抽象化</strong> と <strong>翻訳（コンパイル）／逐次実行（インタプリト）</strong> の 2 つの戦略。</p>
+
+  <figure>
+    <svg viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ソフトウェア階層の全体像">
+      <g font-size="12">
+        <rect x="40"  y="30" width="640" height="40" rx="6" fill="#dcfce7" stroke="#059669"/>
+        <text x="360" y="55" text-anchor="middle" font-weight="600" fill="#059669">アルゴリズム（手順の数学的記述）</text>
+
+        <rect x="40"  y="80" width="640" height="40" rx="6" fill="#fef3c7" stroke="#d97706"/>
+        <text x="360" y="105" text-anchor="middle" font-weight="600" fill="#d97706">高水準言語プログラム（C, Python, Java, ...）</text>
+
+        <rect x="40"  y="130" width="640" height="40" rx="6" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="360" y="155" text-anchor="middle" font-weight="600" fill="#4f46e5">アセンブリ言語プログラム（ADD, LD, BR, ...）</text>
+
+        <rect x="40"  y="180" width="640" height="40" rx="6" fill="#fee2e2" stroke="#dc2626"/>
+        <text x="360" y="205" text-anchor="middle" font-weight="600" fill="#dc2626">機械語プログラム（0 と 1 のビット列）→ CPU が実行</text>
+
+        <text x="690" y="55" font-size="11" fill="#6b7280" text-anchor="end">人間に近い</text>
+        <text x="690" y="205" font-size="11" fill="#6b7280" text-anchor="end">CPU に近い</text>
+      </g>
+    </svg>
+    <figcaption>図 1：上から下へ「アルゴリズム → 高水準言語 → アセンブリ → 機械語」と段階的に具体化する。各境界で「翻訳」が行われる。</figcaption>
+  </figure>
+
+  <h2>1. 計算機ソフトウェアとは</h2>
+  <p>計算機システムは <strong>ハードウェア</strong>（変更しにくい機械の部分）と <strong>ソフトウェア</strong>（命令の集まり）から成る。</p>
+
+  <div class="callout">
+    <strong>フォン・ノイマンの核心アイディア。</strong>「プログラムもデータと同じく <strong>メモリに格納する</strong>」。これによってメモリの中身を書き換えるだけで、同じハードウェアがまったく違う作業をこなせるようになる。
+  </div>
+
+  <h2>2. アルゴリズムとプログラムの違い</h2>
+
+  <ul>
+    <li><strong>アルゴリズム</strong>：計算の手順を厳密・曖昧さなく記述したもの。計算機とは独立。</li>
+    <li><strong>プログラム</strong>：アルゴリズムを特定の計算機・言語で書き直したもの。</li>
+  </ul>
+  <p>カーニハン流に言えば「アルゴリズム＝設計図、プログラム＝建物」。同じアルゴリズムから、C / Python / アセンブリで異なるプログラムが作れる。</p>
+
+  <h3>例：ユークリッドの互除法（紀元前 3 世紀、世界最古のアルゴリズム）</h3>
+  <p>2 つの自然数 $n, m$ の最大公約数 GCD を求める：</p>
+  <ol>
+    <li>$k \leftarrow n \bmod m$</li>
+    <li>$k = 0$ なら $m$ が GCD（終了）</li>
+    <li>そうでなければ $(n, m) \leftarrow (m, k)$ として 1. に戻る</li>
+  </ol>
+
+  <figure>
+    <svg viewBox="0 0 540 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ユークリッド互除法のフロー">
+      <defs>
+        <marker id="aru" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4f46e5"/>
+        </marker>
+      </defs>
+      <g font-size="12">
+        <rect x="200" y="20"  width="140" height="36" rx="18" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="270" y="42" text-anchor="middle">開始（n, m）</text>
+
+        <rect x="200" y="72"  width="140" height="36" rx="6" fill="#fff" stroke="#1f2328"/>
+        <text x="270" y="94" text-anchor="middle">k ← n mod m</text>
+
+        <polygon points="270,124 360,144 270,164 180,144" fill="#fef3c7" stroke="#d97706"/>
+        <text x="270" y="148" text-anchor="middle" font-size="11">k = 0 ?</text>
+
+        <rect x="400" y="126" width="120" height="36" rx="6" fill="#dcfce7" stroke="#059669"/>
+        <text x="460" y="148" text-anchor="middle">GCD = m</text>
+
+        <rect x="20"  y="126" width="140" height="36" rx="6" fill="#fff" stroke="#1f2328"/>
+        <text x="90"  y="148" text-anchor="middle">n ← m, m ← k</text>
+
+        <line x1="270" y1="56" x2="270" y2="72" stroke="#4f46e5" stroke-width="2" marker-end="url(#aru)"/>
+        <line x1="270" y1="108" x2="270" y2="124" stroke="#4f46e5" stroke-width="2" marker-end="url(#aru)"/>
+        <line x1="360" y1="144" x2="400" y2="144" stroke="#4f46e5" stroke-width="2" marker-end="url(#aru)"/>
+        <text x="378" y="138" font-size="10" fill="#4f46e5">Yes</text>
+        <line x1="180" y1="144" x2="160" y2="144" stroke="#4f46e5" stroke-width="2" marker-end="url(#aru)"/>
+        <text x="165" y="138" font-size="10" fill="#4f46e5">No</text>
+        <path d="M 20 144 Q 0 144 0 90 Q 0 30 200 30" fill="none" stroke="#4f46e5" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#aru)"/>
+      </g>
+    </svg>
+    <figcaption>図 2：ユークリッド互除法のフロー。$k = 0$ になるまで $(n, m)$ を更新し続ける。</figcaption>
+  </figure>
+
+  <h2>3. アセンブリ言語と高水準プログラミング言語</h2>
+
+  <h3>機械語 → アセンブリ言語</h3>
+  <p>初期は機械語（0/1 の列）を直接書いていた。<strong>あまりに人間に不向き</strong>。そこで機械語命令に <strong>ニモニック</strong>（ADD, BZ など）と <strong>メモリ番地への名前付け</strong> を導入したのが <strong>アセンブリ言語</strong>。アセンブリ → 機械語の変換は <strong>アセンブラ</strong> というプログラムが行う。</p>
+
+  <div class="callout">
+    <strong>ソフトウェア技術の核心思想：</strong>「プログラムをデータとして、プログラムの加工をプログラムで行う」。アセンブラ自身もプログラム。後に出てくるコンパイラ・インタプリタもすべてこの考え方の発展形。
+  </div>
+
+  <h3>高水準プログラミング言語の登場</h3>
+  <p>アセンブリ言語の欠点：</p>
+  <ul>
+    <li>命令が単純すぎて、アルゴリズムとの <strong>抽象度の乖離</strong> が大きい</li>
+    <li>CPU が変わると命令体系も変わる → プログラム全書き直し</li>
+  </ul>
+  <p>これを解決するのが <strong>高水準言語</strong>。最初の高水準言語は <strong>FORTRAN</strong>（FORmula TRANslation system）。<code>(x + y) * 2</code> のような数式の自然な書き方がそのまま使える。</p>
+
+  <h3>例：C 言語でのユークリッド互除法</h3>
+  <pre style="background:var(--code-bg); padding:14px; border-radius:6px; font-family:monospace; overflow-x:auto;">#include &lt;stdio.h&gt;
+
+int main(void) {
+    int n, m, k;
+    scanf("%d, %d", &amp;n, &amp;m);
+    printf("GCD of %d and %d is ", n, m);
+    while ((k = n % m) != 0) {
+        n = m;
+        m = k;
+    }
+    printf("%d\n", m);
+    return 0;
+}</pre>
+
+  <h3>抽象化（abstraction）</h3>
+  <p>高水準言語ではレジスタの数や命令セットといった「計算機の詳細を意識しないで」プログラムが書ける。このように <strong>詳細を忘れてよい仕組みを提供する</strong> ことを <strong>抽象化</strong> と呼ぶ。計算機科学全体で最も重要な考え方の一つ。</p>
+
+  <h3>構文と意味</h3>
+  <ul>
+    <li><strong>構文（syntax）</strong>：どんな記号列がプログラムとして認められるか（文法）</li>
+    <li><strong>意味（semantics）</strong>：プログラムを実行するとどんな結果になるか（動作）</li>
+  </ul>
+
+  <h2>4. コンパイラとインタプリタ</h2>
+
+  <p>高水準言語のプログラムはそのままでは CPU で動かない。2 つの戦略がある。</p>
+
+  <figure>
+    <svg viewBox="0 0 720 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="コンパイラとインタプリタ">
+      <defs>
+        <marker id="arc5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4f46e5"/>
+        </marker>
+      </defs>
+      <g font-size="12">
+        <text x="180" y="25" text-anchor="middle" font-weight="600" fill="#4f46e5">コンパイラ方式</text>
+        <rect x="60" y="40" width="240" height="36" rx="6" fill="#fef3c7" stroke="#d97706"/>
+        <text x="180" y="63" text-anchor="middle">高水準プログラム</text>
+        <line x1="180" y1="76" x2="180" y2="100" stroke="#4f46e5" stroke-width="2" marker-end="url(#arc5)"/>
+        <text x="195" y="94" font-size="11" fill="#4f46e5">コンパイラ</text>
+        <rect x="60" y="106" width="240" height="36" rx="6" fill="#fee2e2" stroke="#dc2626"/>
+        <text x="180" y="129" text-anchor="middle">機械語プログラム</text>
+        <line x1="180" y1="142" x2="180" y2="166" stroke="#4f46e5" stroke-width="2" marker-end="url(#arc5)"/>
+        <text x="195" y="160" font-size="11" fill="#4f46e5">CPU が実行</text>
+        <rect x="60" y="172" width="240" height="36" rx="6" fill="#dcfce7" stroke="#059669"/>
+        <text x="180" y="195" text-anchor="middle">結果</text>
+        <text x="180" y="225" text-anchor="middle" font-size="11" fill="#6b7280">変換 → 実行の 2 段階</text>
+
+        <text x="540" y="25" text-anchor="middle" font-weight="600" fill="#4f46e5">インタプリタ方式</text>
+        <rect x="420" y="40" width="240" height="36" rx="6" fill="#fef3c7" stroke="#d97706"/>
+        <text x="540" y="63" text-anchor="middle">高水準プログラム</text>
+        <line x1="540" y1="76" x2="540" y2="100" stroke="#4f46e5" stroke-width="2" marker-end="url(#arc5)"/>
+        <text x="555" y="94" font-size="11" fill="#4f46e5">インタプリタが</text>
+        <rect x="420" y="106" width="240" height="68" rx="6" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="540" y="130" text-anchor="middle">読みながら直接実行</text>
+        <text x="540" y="152" text-anchor="middle" font-size="11" fill="#6b7280">（変換せず逐次解釈）</text>
+        <line x1="540" y1="174" x2="540" y2="198" stroke="#4f46e5" stroke-width="2" marker-end="url(#arc5)"/>
+        <rect x="420" y="204" width="240" height="36" rx="6" fill="#dcfce7" stroke="#059669"/>
+        <text x="540" y="227" text-anchor="middle">結果</text>
+      </g>
+    </svg>
+    <figcaption>図 3：コンパイラは「全部翻訳してから実行」、インタプリタは「読みながら都度実行」。</figcaption>
+  </figure>
+
+  <div class="callout">
+    <strong>料理にたとえると。</strong>
+    <ul style="margin:6px 0 0;">
+      <li><strong>コンパイラ</strong>：日本語レシピを丸ごと英語に翻訳して料理人に渡す</li>
+      <li><strong>インタプリタ</strong>：日本語レシピを横で読み上げながら料理人が逐次調理する</li>
+    </ul>
+  </div>
+
+  <h3>言語処理系の「3 つの言語」</h3>
+
+  <p>コンパイラ・インタプリタなど「高水準言語プログラムを処理するソフトウェア」を総称して <strong>言語処理系</strong> という。1 つの言語処理系には必ず 3 種類の言語が関わる：</p>
+
+  <table>
+    <thead><tr><th>用語</th><th>意味</th><th>例（GCC の場合）</th></tr></thead>
+    <tbody>
+      <tr><td>ソース言語</td><td>処理系が入力として受け取る言語</td><td>C 言語</td></tr>
+      <tr><td>ターゲット言語</td><td>コンパイラが出力する言語</td><td>x86 機械語</td></tr>
+      <tr><td>実装言語</td><td>言語処理系自身が書かれている言語</td><td>C 言語（GCC 自体も C で書かれている）</td></tr>
+    </tbody>
+  </table>
+
+  <details>
+    <summary>身近な例で整理</summary>
+    <ul>
+      <li>Python (CPython)：ソース＝Python、実装＝C</li>
+      <li>TypeScript コンパイラ tsc：ソース＝TS、ターゲット＝JS、実装＝TS</li>
+      <li>Java コンパイラ javac：ソース＝Java、ターゲット＝JVM バイトコード、実装＝Java</li>
+    </ul>
+    <p>ソース言語と実装言語が一致するのが <strong>セルフホスティングコンパイラ</strong>（後述）。</p>
+  </details>
+
+  <div class="callout">
+    <strong>よくある誤解：「コンパイラ言語／インタプリタ言語」は正確ではない。</strong>どんな言語も原理的にはコンパイラでもインタプリタでも実装できる。「Python は遅い」というのも、CPython の実装上の話で、PyPy のような JIT コンパイラ実装もある。
+  </div>
+
+  <h2>4.1 コンパイルの実例</h2>
+
+  <p>C の <code>while ((k = n % m) != 0) { n = m; m = k; }</code> を GCC で x86 アセンブリにコンパイルすると：</p>
+
+  <pre style="background:var(--code-bg); padding:14px; border-radius:6px; font-family:monospace; overflow-x:auto;">    jmp .L2
+.L3:
+    movl  -16(%rbp), %eax     ; n = m
+    movl  %eax,  -20(%rbp)
+    movl  -12(%rbp), %eax     ; m = k
+    movl  %eax,  -16(%rbp)
+.L2:
+    movl  -20(%rbp), %eax     ; n の値をレジスタへ
+    movl  -16(%rbp), %ecx
+    cltd
+    idivl %ecx                ; eax ÷ ecx → 商 eax, 余り edx
+    movl  %edx, -12(%rbp)     ; 余りを k に格納
+    cmpl  $0, -12(%rbp)       ; k と 0 を比較
+    jne   .L3                 ; k ≠ 0 なら .L3 へ</pre>
+
+  <p>C の <strong>4 行</strong> がアセンブリでは <strong>16 行</strong>。高水準言語の <strong>簡潔さ</strong>＝抽象化のメリットがはっきり見える。</p>
+
+  <h2>4.2 コンパイラのバリエーション</h2>
+
+  <table>
+    <thead><tr><th>種類</th><th>説明</th></tr></thead>
+    <tbody>
+      <tr><td><strong>セルフホスティング</strong></td><td>ソース言語と実装言語が同じコンパイラ（自分自身でビルドできる）</td></tr>
+      <tr><td><strong>クロスコンパイラ</strong></td><td>実行環境と <strong>違う CPU</strong> 向けの機械語を生成（例：PC 上で ARM 用のコードを作る）</td></tr>
+      <tr><td><strong>source-to-source（トランスパイラ）</strong></td><td>ターゲットも高水準言語のコンパイラ（例：TypeScript → JavaScript）</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4.3 発展形：JIT・仮想機械・最適化</h2>
+
+  <h3>エミュレータ・仮想機械（Virtual Machine）</h3>
+  <p>計算機 X の機械語を入力とするインタプリタを計算機 Y 上で動かすと、Y の上で X が動いているように見える。実在のハードを模倣するのが <strong>エミュレータ</strong>、抽象的に設計された計算機なら <strong>仮想機械（VM）</strong>。</p>
+
+  <figure>
+    <svg viewBox="0 0 540 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Java VM の例">
+      <defs>
+        <marker id="arj" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4f46e5"/>
+        </marker>
+      </defs>
+      <g font-size="12">
+        <rect x="20"  y="40" width="120" height="40" rx="6" fill="#fef3c7" stroke="#d97706"/>
+        <text x="80" y="64" text-anchor="middle">Java ソース</text>
+        <line x1="140" y1="60" x2="180" y2="60" stroke="#4f46e5" stroke-width="2" marker-end="url(#arj)"/>
+        <text x="160" y="52" text-anchor="middle" font-size="10" fill="#4f46e5">javac</text>
+
+        <rect x="180" y="40" width="140" height="40" rx="6" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="250" y="64" text-anchor="middle">JVM バイトコード</text>
+        <line x1="320" y1="60" x2="360" y2="60" stroke="#4f46e5" stroke-width="2" marker-end="url(#arj)"/>
+        <text x="340" y="52" text-anchor="middle" font-size="10" fill="#4f46e5">JVM</text>
+
+        <rect x="360" y="40" width="140" height="40" rx="6" fill="#dcfce7" stroke="#059669"/>
+        <text x="430" y="64" text-anchor="middle">実行（解釈）</text>
+
+        <text x="270" y="125" text-anchor="middle" font-size="11" fill="#6b7280">JVM は様々な OS／CPU に用意されているので</text>
+        <text x="270" y="142" text-anchor="middle" font-size="11" fill="#6b7280">同じバイトコードがどこでも動く（write once, run anywhere）</text>
+      </g>
+    </svg>
+    <figcaption>図 4：Java の典型的な実行モデル。コンパイル先が「JVM という仮想 CPU の機械語」になっている。</figcaption>
+  </figure>
+
+  <h3>JIT コンパイル（just-in-time）</h3>
+  <p>インタプリタが内部にコンパイラを抱え、<strong>実行中に</strong> 必要な部分だけを機械語に変換して走らせる方式。通常の「実行前に全部変換」する方式は <strong>ahead-of-time</strong>。インタプリタの柔軟さとコンパイラの速さの折衷。</p>
+
+  <h3>最適化（optimization）</h3>
+  <p>同じ意味のコードを、より速い／小さい機械語に変換するコンパイラ内の処理。例：<code>1 + 1 + x</code> はコンパイル時に <code>2 + x</code> にしておけば加算命令が 1 つ減る（<strong>定数畳み込み</strong>）。</p>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li>ソフトウェアは命令の集まり。フォン・ノイマン式では <strong>プログラムもメモリに置く</strong> ことで柔軟性を獲得</li>
+    <li>アルゴリズムは設計図、プログラムはそれを特定の計算機・言語で実装したもの</li>
+    <li>アセンブリ言語は機械語に名前を付けたもの。<strong>アセンブラ</strong> が機械語に変換する</li>
+    <li>高水準言語は <strong>抽象化</strong> で計算機の詳細を隠す。同じプログラムを別の CPU で動かせる</li>
+    <li><strong>コンパイラ</strong>：丸ごと翻訳してから実行。<strong>インタプリタ</strong>：読みながら逐次実行</li>
+    <li>「コンパイラ言語／インタプリタ言語」という分類は厳密には誤り。どんな言語もどちらでも実装可能</li>
+    <li>発展形に <strong>JIT コンパイル</strong>、<strong>仮想機械（JVM など）</strong>、<strong>最適化</strong> がある</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="04.html" class="prev">第4回 コンピュータの仕組み</a>
+    <a href="index.html" class="next">科目トップへ</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

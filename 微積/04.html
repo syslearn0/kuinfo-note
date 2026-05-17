@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第4回 無限級数 ｜ 微積</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+</script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">微積</a> ／ 第4回</div>
+</header>
+
+<main>
+  <h1>第4回 無限級数</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>大きな絵</h2>
+  <p>無限個の数を足す $\sum_{n=0}^{\infty} a_n$ を、第1〜3回で整備した <strong>数列の収束</strong>の言葉で定義し直し、種々の <strong>収束判定法</strong>を体系的に作っていきます。最終目標は、$e^x$ の級数表示と $e^x e^y = e^{x+y}$ の <strong>厳密な</strong> 導出です。</p>
+
+  <h2>準備：$\dfrac{x^n}{n!} \to 0$</h2>
+
+  <div class="callout">
+    <strong>命題。</strong> 任意の実数 $x$ に対して $\displaystyle\lim_{n\to\infty}\frac{x^n}{n!} = 0$。
+  </div>
+
+  <p><strong>気持ち</strong>。階乗 $n!$ は冪 $x^n$ より「遥かに」速く大きくなる。$n$ がいずれ $|x|$ を追い越すと、毎ステップ $|x|/n$ という縮小因子が掛かり、後はほぼ等比的に縮む。</p>
+
+  <details>
+    <summary>証明（等比数列ではさみうち）</summary>
+    <p>$x$ を固定。$n_0 > 2|x|$ を取る。$n \ge n_0$ で</p>
+    $$ \left|\frac{x^n}{n!}\right| = \left|\frac{x^{n_0}}{n_0!}\right| \cdot \prod_{k=n_0+1}^{n} \frac{|x|}{k}. $$
+    <p>各因子 $|x|/k < 1/2$ より $\left|\dfrac{x^n}{n!}\right| \le C \cdot (1/2)^{n-n_0}\,\to\, 0$。$\quad\square$</p>
+  </details>
+
+  <h2>無限級数の定義</h2>
+
+  <div class="callout">
+    <strong>定義（無限級数）。</strong> 数列 $\{a_n\}_{n \ge 0}$ の <strong>部分和</strong> を
+    $$ S_n := \sum_{k=0}^{n} a_k $$
+    と定める。$\{S_n\}$ が収束するとき
+    $$ \sum_{n=0}^{\infty} a_n := \lim_{n\to\infty} S_n $$
+    と定義し、級数は <strong>収束する</strong> と言う。それ以外は <strong>発散する</strong> と言う。
+  </div>
+
+  <h2>等比級数</h2>
+
+  <div class="callout">
+    $|r| < 1$ のとき $\displaystyle\sum_{n=0}^{\infty} r^n = \frac{1}{1-r}$、$|r| \ge 1$ のとき発散。
+  </div>
+
+  <details>
+    <summary>証明</summary>
+    <p>$r \ne 1$ のとき有限等比和の公式 $S_n = \dfrac{1 - r^{n+1}}{1-r}$。$|r| < 1$ なら $r^{n+1} \to 0$ で $S_n \to 1/(1-r)$。$|r| > 1$ なら $|r^{n+1}| \to \infty$ で発散。$r=1$ で $S_n = n+1 \to \infty$、$r=-1$ で $S_n$ は $0,1,0,1,\ldots$ と振動。$\quad\square$</p>
+  </details>
+
+  <h2>基本性質</h2>
+
+  <h3>(i) 線形性</h3>
+  <p>$\sum a_n,\ \sum b_n$ が収束するなら、$c, d \in \mathbb{R}$ に対し</p>
+  $$ \sum_{n=0}^{\infty}(c\,a_n + d\,b_n) = c\sum a_n + d\sum b_n. $$
+  <p>（部分和の収束に関する線形性そのまま。）</p>
+
+  <h3>(ii) 収束の必要条件：$a_n \to 0$</h3>
+  <p><strong>主張</strong>。$\sum a_n$ が収束するならば $a_n \to 0$（証明は1行：$a_n = S_n - S_{n-1} \to S - S = 0$）。</p>
+
+  <div class="callout">
+    <strong>逆は成り立たない。</strong> $a_n = 1/n$ は $0$ に収束するが、調和級数 $\sum 1/n$ は発散する（<a href="01.html">第1回</a>）。「$a_n \to 0$」は収束の <strong>必要条件にすぎず、十分条件ではない</strong>。
+  </div>
+
+  <h2>コーシー判定法（Prop 4.7）</h2>
+
+  <div class="callout">
+    $\displaystyle\sum a_n$ が収束 $\iff$ $\forall \varepsilon > 0,\ \exists N_0,\ \forall m > N \ge N_0,\ |a_{N+1} + \cdots + a_m| < \varepsilon$.
+  </div>
+
+  <details>
+    <summary>証明</summary>
+    <p>$S_m - S_N = a_{N+1} + \cdots + a_m$ ($m > N$) より、条件は「$\{S_n\}$ がコーシー列」と同値。$\mathbb{R}$ の完備性（<a href="03.html">第3回</a>）から $\{S_n\}$ が収束することと同値。$\quad\square$</p>
+  </details>
+  <p>この判定法は <strong>極限値を知らずに</strong> 収束を判定できる点が強力で、以下のほとんどの判定法の出発点になる。</p>
+
+  <h2>比較判定法</h2>
+
+  <div class="callout">
+    <strong>優級数判定法。</strong> $|a_n| \le b_n$ かつ $\sum b_n$ が収束するなら $\sum a_n$ は <strong>絶対収束</strong>（したがって収束）。
+  </div>
+
+  <details>
+    <summary>証明</summary>
+    <p>$\sum b_n$ にコーシー判定法を適用：$\varepsilon > 0$ に対しある $N_0$ で $m > N \ge N_0 \Rightarrow \sum_{k=N+1}^{m} b_k < \varepsilon$。$|a_k| \le b_k$ から</p>
+    $$ \left|\sum_{k=N+1}^{m} a_k\right| \le \sum_{k=N+1}^{m} |a_k| \le \sum_{k=N+1}^{m} b_k < \varepsilon. $$
+    <p>$|a_k|$ にも同じ評価が成り立つので、$\sum |a_n|,\ \sum a_n$ ともコーシー判定法を満たす。$\quad\square$</p>
+  </details>
+
+  <h3>極限比較判定法</h3>
+  <p>$a_n \ge 0,\ b_n > 0$ かつ $\dfrac{a_n}{b_n} \to L \in (0, \infty)$ ならば、$\sum a_n$ と $\sum b_n$ は同時に収束/発散する。</p>
+
+  <details>
+    <summary>証明</summary>
+    <p>$\varepsilon := L/2$ を取ると、ある $N$ で $n \ge N$ ⇒ $L/2 < a_n/b_n < 3L/2$、すなわち</p>
+    $$ \tfrac{L}{2}\,b_n < a_n < \tfrac{3L}{2}\,b_n. $$
+    <p>優級数判定法を双方向に適用すると同時収束・同時発散。$\quad\square$</p>
+  </details>
+
+  <h2>$p$ 級数</h2>
+
+  <div class="callout">
+    $\displaystyle\sum_{n=1}^{\infty}\frac{1}{n^s}$ は $s > 1$ で収束、$s \le 1$ で発散。
+  </div>
+
+  <p><strong>気持ち</strong>。$a_n = 1/n^s$ は単調非増加なので、項を $2^k$ 個ずつブロックにまとめ「同じくらいの値の項が $2^k$ 個」と見ると、$\sum a_n$ と $\sum 2^k a_{2^k}$ が同時に収束・発散する（<strong>Cauchy の凝集判定法</strong>）。後者は等比級数。</p>
+  <details>
+    <summary>証明（Cauchy の凝集判定）</summary>
+    <p><em>凝集判定法</em>：非負・単調非増加な $\{a_n\}$ について、$\sum a_n$ と $\sum 2^k a_{2^k}$ は同時に収束・発散する。証明はブロック $a_{2^k} + a_{2^k+1} + \cdots + a_{2^{k+1}-1}$ を上下から $2^k a_{2^{k+1}},\ 2^k a_{2^k}$ で挟むだけ。</p>
+    <p>$a_n = 1/n^s$ に適用すると</p>
+    $$ \sum_k 2^k\cdot \frac{1}{(2^k)^s} = \sum_k 2^{k(1-s)} = \sum_k r^k,\quad r := 2^{1-s}. $$
+    <p>$s > 1 \Leftrightarrow r < 1$ で等比級数として収束、$s \le 1 \Leftrightarrow r \ge 1$ で発散。$\quad\square$</p>
+  </details>
+
+  <details>
+    <summary>$s = 2$ の例：$\sum 1/n^2 = \pi^2/6$</summary>
+    <p>収束値の計算は Fourier 級数や複素解析を使うのが標準。ここでは「収束する」ことだけ重要。</p>
+  </details>
+
+  <h2>絶対収束と条件収束</h2>
+
+  <ul>
+    <li><strong>絶対収束</strong>：$\sum |a_n| < \infty$ のとき $\sum a_n$ は絶対収束するという。</li>
+    <li><strong>条件収束</strong>：$\sum a_n$ は収束するが $\sum |a_n| = \infty$ のとき条件収束するという。</li>
+  </ul>
+
+  <div class="callout">
+    <strong>定理（絶対収束 ⇒ 収束）。</strong> $\sum |a_n|$ 収束ならば $\sum a_n$ も収束する。
+  </div>
+
+  <details>
+    <summary>証明</summary>
+    <p>$\sum |a_n|$ がコーシー判定法を満たすので $|a_{N+1}|+\cdots+|a_m| < \varepsilon$。三角不等式 $|a_{N+1}+\cdots+a_m| \le |a_{N+1}|+\cdots+|a_m| < \varepsilon$ より $\sum a_n$ もコーシー判定法を満たす。$\quad\square$</p>
+  </details>
+
+  <h3>正部分・負部分への分解</h3>
+
+  <p>$a_n^+ := \max(a_n, 0) \ge 0$、$a_n^- := \max(-a_n, 0) \ge 0$ と定めると</p>
+  $$ a_n = a_n^+ - a_n^-,\qquad |a_n| = a_n^+ + a_n^-. $$
+  <p>これより：</p>
+  <ul>
+    <li>$\sum a_n$ 絶対収束 $\iff$ $\sum a_n^+,\ \sum a_n^-$ がともに収束</li>
+    <li>条件収束のときは $\sum a_n^+ = \sum a_n^- = +\infty$（差が有限値だけ残る）</li>
+  </ul>
+
+  <h2>比率・根判定法（d'Alembert と Cauchy）</h2>
+
+  <div class="callout">
+    <strong>比率判定法。</strong> $a_n \ne 0$ で $\rho := \displaystyle\limsup_{n\to\infty}\left|\frac{a_{n+1}}{a_n}\right|$ とおくと、
+    $\rho < 1$ なら絶対収束、$\rho > 1$ なら発散、$\rho = 1$ は不定。<br>
+    <strong>根判定法。</strong> $\rho' := \displaystyle\limsup_{n\to\infty}|a_n|^{1/n}$ について同様。
+  </div>
+
+  <p>（教科書版では $\lim$ で定義することが多いが、$\limsup$ で書くほうが少し強い形になる。$\lim$ が存在するときはどちらも同じ。）</p>
+
+  <p><strong>気持ち</strong>。比 $\rho < 1$ なら「ある $r < 1$ で $|a_n|$ が等比 $r^n$ で上から押さえられる」→ 比較で絶対収束。$\rho > 1$ なら $|a_n|$ が 0 に行かないので必要条件で発散。$\rho = 1$ は $\sum 1/n,\ \sum 1/n^2$ の両例から判定不能。</p>
+
+  <details>
+    <summary>比率判定法の証明（$\rho < 1$ と $\rho > 1$）</summary>
+    <p><strong>$\rho < 1$。</strong>$\rho < r < 1$ となる $r$ を選ぶ。$\limsup$ の定義から、ある $N_0$ で $n \ge N_0 \Rightarrow |a_{n+1}/a_n| \le r$。帰納的に</p>
+    $$ |a_n| \le |a_{N_0}|\cdot r^{n - N_0} = \underbrace{|a_{N_0}|\,r^{-N_0}}_{C}\cdot r^n\quad (n \ge N_0). $$
+    <p>等比級数 $\sum r^n$ が収束するから、優級数判定法で $\sum |a_n|$ も収束。絶対収束。</p>
+    <p><strong>$\rho > 1$。</strong>ある $N$ から先で $|a_{n+1}/a_n| > 1$、つまり $|a_n|$ は単調非減少で 0 に行かない。$\sum a_n$ の必要条件 $a_n \to 0$ が破れて発散。$\quad\square$</p>
+  </details>
+
+  <p>注：$\sum 1/n$（発散）も $\sum 1/n^2$（収束）も $a_{n+1}/a_n \to 1$ なので、$\rho = 1$ からは何も言えない。</p>
+
+  <h3>応用：$a_n = x^n / n!$ は全 $x$ で絶対収束</h3>
+
+  <p>$\left|\dfrac{a_{n+1}}{a_n}\right| = \dfrac{|x|}{n+1} \to 0 < 1$。比率判定法から $\displaystyle\sum_{n=0}^{\infty}\frac{x^n}{n!}$ は任意の $x \in \mathbb{R}$ で絶対収束する。この値を $\exp(x)$ または $e^x$ と定義する：</p>
+  $$ \boxed{\ e^x := \sum_{n=0}^{\infty}\frac{x^n}{n!}\ } $$
+
+  <h2>再配列定理（Thm 4.8）</h2>
+
+  <div class="callout">
+    <strong>定理。</strong> $\sum_{n=0}^{\infty} a_n$ が絶対収束するとき、任意の並べ替え $\sum_{n=0}^{\infty} a_{\sigma(n)}$（$\sigma:\mathbb{N}_0 \to \mathbb{N}_0$ は全単射）も同じ値に収束する。
+  </div>
+
+  <p><strong>気持ち</strong>。非負級数なら部分和は単調増加で上限が和。並べ替え後の部分和も同じ上限以下、対称性で逆向きも成立 → 同じ値。一般の絶対収束は $a_n^\pm$ の分解で非負に帰着。</p>
+  <details>
+    <summary>証明（非負 → 一般）</summary>
+    <p><strong>Step 1：非負の場合。</strong>$a_n \ge 0$、$S := \sum a_n$、$T_N := \sum_{n=0}^{N} a_{\sigma(n)}$ とおく。$\sigma$ が単射なので $\{\sigma(0), \ldots, \sigma(N)\}$ は有限集合。$N_1 := \max\{\sigma(0), \ldots, \sigma(N)\}$ とすると</p>
+    $$ T_N = \sum_{n=0}^{N} a_{\sigma(n)} \le \sum_{k=0}^{N_1} a_k \le S. $$
+    <p>$\{T_N\}$ は非負・単調非減少・$S$ で上に有界。<a href="01.html">第1回</a>の単調収束定理で $\lim T_N \le S$。逆向きは $\sigma^{-1}$ の対称性で得て等号。</p>
+    <p><strong>Step 2：一般の絶対収束。</strong>$a_n = a_n^+ - a_n^-$ と分解。絶対収束より $\sum a_n^\pm$ がともに非負級数として収束。Step 1 を各々に適用：</p>
+    $$ \sum_n a_{\sigma(n)} = \sum_n a_{\sigma(n)}^+ - \sum_n a_{\sigma(n)}^- = \sum_n a_n^+ - \sum_n a_n^- = \sum_n a_n.\qquad\square $$
+  </details>
+
+  <details>
+    <summary>Riemann の並べ替え定理（条件収束のときの落とし穴）</summary>
+    <p>$\sum a_n$ が条件収束するなら、任意の実数 $\alpha$（および $\pm\infty$）に対して、ある並べ替えで $\sum a_{\sigma(n)} = \alpha$ にできる。<br>
+    アイデア：$a_n^+$ と $a_n^-$ がともに発散することを使い、「正項を $\alpha$ を越えるまで足す → 負項を $\alpha$ を切るまで足す → …」を繰り返す。$a_n \to 0$ から振幅が小さくなり $\alpha$ に収束する。</p>
+  </details>
+
+  <h2>コーシー積と $e^x e^y = e^{x+y}$</h2>
+
+  <div class="callout">
+    <strong>定理（コーシー積）。</strong> $\sum a_n,\ \sum b_n$ がともに絶対収束するならば、$c_n := \sum_{k=0}^{n} a_k\,b_{n-k}$ と定めるとき
+    $$ \left(\sum_{n=0}^{\infty} a_n\right)\!\left(\sum_{n=0}^{\infty} b_n\right) = \sum_{n=0}^{\infty} c_n $$
+    が成立し、右辺も絶対収束する。
+  </div>
+
+  <h3>コーシー積の視覚化</h3>
+  <figure>
+    <svg viewBox="0 0 360 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="コーシー積の対角線">
+      <g font-family="monospace" font-size="12">
+        <text x="80"  y="20">b₀</text><text x="140" y="20">b₁</text><text x="200" y="20">b₂</text><text x="260" y="20">b₃</text>
+        <text x="30"  y="60">a₀</text><text x="30" y="100">a₁</text><text x="30" y="140">a₂</text><text x="30" y="180">a₃</text>
+        <text x="75"  y="60">a₀b₀</text><text x="135" y="60">a₀b₁</text><text x="195" y="60">a₀b₂</text><text x="255" y="60">a₀b₃</text>
+        <text x="75"  y="100">a₁b₀</text><text x="135" y="100">a₁b₁</text><text x="195" y="100">a₁b₂</text>
+        <text x="75"  y="140">a₂b₀</text><text x="135" y="140">a₂b₁</text>
+        <text x="75"  y="180">a₃b₀</text>
+      </g>
+      <!-- 対角線 -->
+      <line x1="70"  y1="68"  x2="100" y2="48"  stroke="#4f46e5" stroke-width="1.4"/>
+      <line x1="70"  y1="108" x2="160" y2="48"  stroke="#dc2626" stroke-width="1.4"/>
+      <line x1="70"  y1="148" x2="220" y2="48"  stroke="#059669" stroke-width="1.4"/>
+      <line x1="70"  y1="188" x2="280" y2="48"  stroke="#d97706" stroke-width="1.4"/>
+      <text x="300" y="60"  font-size="11" fill="#4f46e5">c₀</text>
+      <text x="300" y="80"  font-size="11" fill="#dc2626">c₁</text>
+      <text x="300" y="100" font-size="11" fill="#059669">c₂</text>
+      <text x="300" y="120" font-size="11" fill="#d97706">c₃</text>
+    </svg>
+    <figcaption>図 1：$c_n$ は $i + j = n$ となる $a_i b_j$ を <strong>対角線</strong> で集めた和。</figcaption>
+  </figure>
+
+  <p><strong>気持ち</strong>。「縦横の有限和」$P_N$ と「対角線の有限和」$Q_N$ の差は、$i + j > N$ の部分。鳩の巣で $i > N/2$ or $j > N/2$ に追い込めば、絶対収束の <strong>尻尾</strong> $\sum_{i > N/2}|a_i|$ が 0 に行くことで挟みうちできる。</p>
+
+  <details>
+    <summary>証明（$P_N - Q_N \to 0$ ＋ 絶対収束）</summary>
+    <p>$A := \sum a_n,\ B := \sum b_n,\ A^* := \sum |a_n|,\ B^* := \sum |b_n|$（すべて有限）。</p>
+    <p>$P_N := \sum_{i\le N}a_i \cdot \sum_{j\le N}b_j$、$Q_N := \sum_{n=0}^{N} c_n = \sum_{i+j \le N} a_i b_j$ とおく。差は</p>
+    $$ P_N - Q_N = \sum_{\substack{i,j \le N \\ i + j > N}} a_i b_j. $$
+    <p>$i+j > N$ かつ $i,j \le N$ なら $i > N/2$ または $j > N/2$（鳩の巣）。よって</p>
+    $$ |P_N - Q_N| \le \Bigl(\sum_{i > N/2}|a_i|\Bigr)\!B^* + A^*\!\Bigl(\sum_{j > N/2}|b_j|\Bigr). $$
+    <p>絶対収束より両方の尻尾は $N \to \infty$ で $0$ に行くので $P_N - Q_N \to 0$。$P_N \to AB$ なので $Q_N \to AB$、すなわち $\sum c_n = AB$。</p>
+    <p>絶対収束：$\sum_{n=0}^{N}|c_n| \le \sum_{n=0}^{N}\sum_{k=0}^{n}|a_k||b_{n-k}| \le A^* B^* < \infty$。$\quad\square$</p>
+  </details>
+
+  <h3>応用：$e^x \cdot e^y = e^{x+y}$</h3>
+
+  <p>$a_n := x^n/n!,\ b_n := y^n/n!$ は絶対収束（比率判定法）。コーシー積に二項定理を使えば $c_n = (x+y)^n/n!$ となり、指数法則 $e^x e^y = e^{x+y}$ が級数の演算だけで出てくる。<strong>微分も連続性も使わない</strong>のがポイント。</p>
+  <details>
+    <summary>計算</summary>
+    $$ c_n = \sum_{k=0}^{n}\frac{x^k}{k!}\cdot \frac{y^{n-k}}{(n-k)!} = \frac{1}{n!}\sum_{k=0}^{n}\binom{n}{k}x^k y^{n-k} = \frac{(x+y)^n}{n!}. $$
+    $$ \therefore\ e^x\cdot e^y = \sum_n \frac{(x+y)^n}{n!} = e^{x+y}.\qquad\square $$
+  </details>
+
+  <h2>交代級数（Leibniz の判定法、Thm 4.10）</h2>
+
+  <div class="callout">
+    <strong>定理。</strong> $\{a_n\}$ が単調非増加（$a_0 \ge a_1 \ge \cdots \ge 0$）かつ $a_n \to 0$ ならば、交代級数
+    $$ \sum_{n=0}^{\infty}(-1)^n a_n = a_0 - a_1 + a_2 - a_3 + \cdots $$
+    は収束する。さらに $\bigl|S - S_N\bigr| \le a_{N+1}$（誤差は次の項以下）。
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 540 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="交代級数の部分和">
+      <line x1="20" y1="70" x2="520" y2="70" stroke="#1f2328"/>
+      <circle cx="120" cy="70" r="4" fill="#dc2626"/><text x="113" y="60" font-size="11" fill="#dc2626">s₁</text>
+      <circle cx="200" cy="70" r="4" fill="#dc2626"/><text x="193" y="60" font-size="11" fill="#dc2626">s₃</text>
+      <circle cx="260" cy="70" r="4" fill="#dc2626"/><text x="253" y="60" font-size="11" fill="#dc2626">s₅</text>
+      <circle cx="300" cy="70" r="6" fill="#1f2328"/><text x="293" y="55" font-size="12">S</text>
+      <circle cx="340" cy="70" r="4" fill="#4f46e5"/><text x="333" y="95" font-size="11" fill="#4f46e5">s₄</text>
+      <circle cx="400" cy="70" r="4" fill="#4f46e5"/><text x="393" y="95" font-size="11" fill="#4f46e5">s₂</text>
+      <circle cx="480" cy="70" r="4" fill="#4f46e5"/><text x="473" y="95" font-size="11" fill="#4f46e5">s₀</text>
+    </svg>
+    <figcaption>図 2：偶数番部分和は単調減少、奇数番部分和は単調増加、両者が $S$ に挟みうちで近づく。</figcaption>
+  </figure>
+
+  <p><strong>気持ち</strong>。偶数番部分和は単調非増加、奇数番部分和は単調非減少。両者の差が $a_{N+1} \to 0$ なので、$S$ の値を挟みうちで同定できる。「両側から振動しながら $S$ に挟み込む」のが Leibniz の核心。</p>
+  <details>
+    <summary>証明（偶奇の単調性＋差→0）</summary>
+    <p>$S_n := \sum_{k=0}^{n}(-1)^k a_k$ とおく。</p>
+    <p><strong>(i)</strong> $S_{2m+2} - S_{2m} = a_{2m+2} - a_{2m+1} \le 0$（偶数番は単調非増加）。<br>
+    <strong>(ii)</strong> $S_{2m+3} - S_{2m+1} = a_{2m+2} - a_{2m+3} \ge 0$（奇数番は単調非減少）。<br>
+    <strong>(iii)</strong> $S_{2m+1} = S_{2m} - a_{2m+1} \le S_{2m}$。さらに $\{S_{2m}\}$ は非増加、$\{S_{2m+1}\}$ は非減少なので、任意の $m, m'$ で $S_{2m+1} \le S_{2(m+m')+1} \le S_{2(m+m')} \le S_{2m'}$。</p>
+    <p>(i)–(iii) より $\{S_{2m+1}\}$ は上有界・非減少、$\{S_{2m}\}$ は下有界・非増加。単調収束定理で $L_{\mathrm{odd}} := \lim S_{2m+1},\ L_{\mathrm{even}} := \lim S_{2m}$ が存在。</p>
+    <p><strong>(iv)</strong> $S_{2m} - S_{2m+1} = a_{2m+1} \to 0$ より $L_{\mathrm{even}} = L_{\mathrm{odd}} =: S$、$S_n \to S$。</p>
+    <p><strong>(v) 誤差評価</strong>：$S_{2m+1} \le S \le S_{2m}$ かつ $S_{2m} - S_{2m+1} = a_{2m+1}$ より $|S - S_N| \le a_{N+1}$。$\quad\square$</p>
+  </details>
+
+  <details>
+    <summary>例：交代調和級数 $\sum (-1)^{n+1}/n = \log 2$</summary>
+    <p>$a_n = 1/(n+1)$ は単調減少で $0$ に行くので Leibniz 判定法で収束する（値が $\log 2$ になることは Taylor 展開などで別途）。一方 $\sum 1/n = \infty$ なので絶対収束はしない。これが <strong>条件収束</strong> の典型例。</p>
+  </details>
+
+  <h2>判定法の使い分けフロー</h2>
+
+  <p>級数を見たときに <strong>どの判定法を当てるか</strong> の決定木。緑が「収束」、赤が「発散」、灰が「判定不能で別法へ」。</p>
+
+  <div class="mermaid">
+flowchart TD
+    A["Σaₙ を判定したい"] --> B{"aₙ → 0 ?"}
+    B -- "No" --> X0["発散<br/>（必要条件を満たさない）"]
+    B -- "Yes" --> C{"aₙ の形は?"}
+
+    C -- "等比型 aₙ = a·rⁿ" --> D1{"|r| &lt; 1 ?"}
+    D1 -- "Yes" --> R1["収束<br/>Σaₙ = a / (1 − r)"]
+    D1 -- "No" --> X1["発散"]
+
+    C -- "p級数型 1/nˢ" --> D2{"s &gt; 1 ?"}
+    D2 -- "Yes" --> R2["収束"]
+    D2 -- "No" --> X2["発散"]
+
+    C -- "n!, rⁿ, nⁿ などを含む" --> E1["比率判定<br/>ρ = lim |aₙ₊₁ / aₙ|"]
+    C -- "aⁿ・nⁿ など累乗根が綺麗" --> E2["根判定<br/>ρ' = lim |aₙ|^(1/n)"]
+
+    E1 --> F{"ρ の値"}
+    E2 --> F
+    F -- "&lt; 1" --> R3["絶対収束"]
+    F -- "&gt; 1" --> X3["発散"]
+    F -- "= 1" --> G["判定不能<br/>→ 別法へ"]
+
+    C -- "非負・単調減少" --> H["凝集判定<br/>Σaₙ ⇔ Σ 2ᵏ a_(2ᵏ)"]
+    H --> I["等比級数に帰着<br/>→ 結論"]
+
+    C -- "交代級数 Σ(−1)ⁿ aₙ" --> J{"Σ|aₙ| 収束?"}
+    J -- "Yes" --> R4["絶対収束"]
+    J -- "No" --> K{"aₙ 単調減少で 0 か?"}
+    K -- "Yes" --> R5["条件収束 (Leibniz)<br/>誤差 ≤ aₙ₊₁"]
+    K -- "No" --> X4["振動・発散の可能性"]
+
+    C -- "上記いずれでもない" --> L["既知級数と比較<br/>（優級数 / 極限比較）"]
+    L --> M{"|aₙ| ≤ bₙ かつ<br/>Σbₙ 収束?"}
+    M -- "Yes" --> R6["絶対収束"]
+    M -- "No" --> N["より強い判定へ<br/>（積分判定・Abel など）"]
+
+    G --> L
+
+    classDef ok fill:#dcfce7,stroke:#059669,color:#065f46
+    classDef ng fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+    classDef wait fill:#fef3c7,stroke:#d97706,color:#78350f
+    class R1,R2,R3,R4,R5,R6 ok
+    class X0,X1,X2,X3,X4 ng
+    class G,N wait
+  </div>
+
+  <p style="color:var(--muted); font-size:0.88rem;">図 3：判定法の選び方の決定木。まず <strong>必要条件 aₙ → 0</strong> でふるい落とし、級数の <strong>形</strong> から最初に当てる判定法を選ぶ。比率／根判定で ρ = 1 になったら比較判定など別法へ戻る。</p>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li><strong>無限級数</strong>は部分和の極限。必要条件は $a_n \to 0$、十分ではない（調和級数）</li>
+    <li><strong>等比級数</strong>：$|r| < 1$ で $\sum r^n = 1/(1-r)$</li>
+    <li><strong>コーシー判定法</strong>：完備性（第3回）と一体で級数の収束判定の基盤</li>
+    <li><strong>比較・極限比較・比率・根判定・$p$ 級数・凝集判定</strong>を体系化</li>
+    <li><strong>絶対収束 ⇒ 収束</strong>。逆は不成立（条件収束）</li>
+    <li><strong>再配列定理</strong>：絶対収束なら並べ替え自由、条件収束では Riemann の並べ替えで任意の値に</li>
+    <li><strong>コーシー積</strong>＋二項定理で $e^x e^y = e^{x+y}$ が厳密に出る</li>
+    <li><strong>Leibniz の判定法</strong>：単調減少 0 への交代級数は収束、誤差は $a_{N+1}$ 以下</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="03.html" class="prev">第3回 集積点・上下極限</a>
+    <a href="index.html" class="next">科目トップへ</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

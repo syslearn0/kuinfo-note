@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第3回 ニュートンの法則・運動方程式の解 ｜ 物理学基礎論A</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+</script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">物理学基礎論A</a> ／ 第3回</div>
+</header>
+
+<main>
+  <h1>第3回 ニュートンの法則・運動方程式の解</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>2.1 ニュートンの運動の3法則</h2>
+  <p>物体単体について成立する基本則。</p>
+
+  <h3>① 慣性の法則（重要）</h3>
+  <p>力が働いていない物体は、等速直線運動を続ける（$\mathbf{a}=\mathbf{0}$）。慣性は保たれる。</p>
+
+  <h3>② 運動の法則</h3>
+  <p>加速度は力に比例する：</p>
+  $$ f = ma = m\ddot{x} $$
+
+  <h3>③ 作用反作用の法則</h3>
+  <p>物体 A が B にベクトル $\vec{F}$ をおよぼすと、B は A に $-\vec{F}$ の力をおよぼす（同じ大きさ、逆向き）。</p>
+
+  <figure>
+    <svg viewBox="0 0 380 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="作用反作用">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4f46e5"/>
+        </marker>
+        <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+        </marker>
+      </defs>
+      <rect x="80"  y="55" width="60" height="50" fill="#dbeafe" stroke="#1f2328"/>
+      <text x="103" y="86" font-size="14">A</text>
+      <rect x="240" y="55" width="60" height="50" fill="#fee2e2" stroke="#1f2328"/>
+      <text x="263" y="86" font-size="14">B</text>
+      <!-- F: A→B -->
+      <line x1="145" y1="70" x2="235" y2="70" stroke="#4f46e5" stroke-width="2.4" marker-end="url(#ar)"/>
+      <text x="170" y="62" font-size="12" fill="#4f46e5">F (A → B)</text>
+      <!-- −F: B→A -->
+      <line x1="235" y1="92" x2="145" y2="92" stroke="#dc2626" stroke-width="2.4" marker-end="url(#arR)"/>
+      <text x="160" y="116" font-size="12" fill="#dc2626">−F (B → A)</text>
+    </svg>
+    <figcaption>図 1：作用反作用。大きさ等しく、向き逆。働く相手が異なる点に注意。</figcaption>
+  </figure>
+
+  <p><strong>力の種類：</strong>重力、摩擦力、電磁力、万有引力。</p>
+
+  <h2>ガリレイ変換</h2>
+  <p>慣性系に対して等速直線運動する座標系への変換：</p>
+  $$ x \to x_G = x - Vt $$
+  $$ \dot{x}_G = \dot{x} - V,\qquad \ddot{x}_G = \ddot{x} $$
+  <p>よって $f = m\ddot{x} = m\ddot{x}_G$。<strong>慣性系どうしでは運動方程式の形が変わらない。</strong></p>
+
+  <details>
+    <summary>非慣性系（加速度系）への変換</summary>
+    <p>例えば $x \to x' = x - \alpha t^2$ と置くと：</p>
+    $$ \ddot{x}' = \ddot{x} - 2\alpha\quad\Rightarrow\quad f = m\ddot{x}' + 2m\alpha $$
+    <p>つまり加速度系では、見かけの力（慣性力）$2m\alpha$ が現れる。</p>
+  </details>
+
+  <h2>2.3 次元（単位）について</h2>
+  <p>本講義では MKSA 系（質量・長さ・時間・電流）を基本とする。</p>
+  <table>
+    <thead><tr><th>物理量</th><th>単位</th><th>次元</th></tr></thead>
+    <tbody>
+      <tr><td>力</td><td>N = kg·m·s⁻²</td><td>$[M][L][T^{-2}]$</td></tr>
+      <tr><td>運動エネルギー $\frac{1}{2}mv^2$</td><td>J</td><td>$[M][L^2][T^{-2}]$</td></tr>
+      <tr><td>仕事 $f\cdot x$</td><td>J</td><td>$[M][L^2][T^{-2}]$</td></tr>
+      <tr><td>バネ定数 $k$（$f=-kx$）</td><td>N/m</td><td>$[M][T^{-2}]$</td></tr>
+    </tbody>
+  </table>
+
+  <h3>次元解析：バネの角振動数</h3>
+  <p>$\omega$ は $[T^{-1}]$。$k,m,A$（振幅）の冪で表現すると仮定：</p>
+  $$ \omega = k^a m^b A^c $$
+  <p>次元を合わせる：$[T^{-1}] = [MT^{-2}]^a [M]^b [L]^c$。よって</p>
+  $$ a = \tfrac{1}{2},\quad b = -\tfrac{1}{2},\quad c = 0 $$
+  $$ \therefore\ \omega = \sqrt{\tfrac{k}{m}} $$
+  <p>振幅 $A$ に依存しないことが次元から予言される。</p>
+
+  <h2>2.4.1 定数力（等加速度運動）</h2>
+  <p>$f = m\ddot{x} = \alpha$（定数）。$v(0)=C_1,\,x(0)=C_2$ として：</p>
+  $$ v(t) = \frac{\alpha}{m}t + C_1 $$
+  $$ x(t) = \frac{1}{2}\frac{\alpha}{m}t^2 + C_1 t + C_2 $$
+  <p>$C_1=C_2=0$ なら $v = \sqrt{\dfrac{2\alpha x}{m}}$。</p>
+
+  <h2>2.4.2 速度に比例する抵抗</h2>
+  <p>$f = m\ddot{x} = -\eta v\ (\eta>0)$。</p>
+
+  <details>
+    <summary>導出</summary>
+    $$ m\dot v = -\eta v\quad\Rightarrow\quad \frac{dv}{v} = -\frac{\eta}{m}\,dt $$
+    $$ \ln|v| = -\frac{\eta}{m}t + C_0\quad\Rightarrow\quad v(t) = v_0\,e^{-\eta t/m} $$
+    $$ x(t) = x_0 + \frac{m}{\eta}v_0\!\left(1 - e^{-\eta t/m}\right) $$
+  </details>
+
+  $$ v(t) = v_0\exp\!\left[-\frac{\eta}{m}t\right] \quad (\text{指数的減衰}) $$
+  $$ x(t) = x_0 + \frac{m}{\eta}v_0\!\left(1 - e^{-\eta t/m}\right) $$
+  <p>$t\to\infty$ で $x\to x_0 + \dfrac{m}{\eta}v_0$（<strong>有限の距離で止まる</strong>）。</p>
+
+  <figure>
+    <svg viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="指数減衰の速度">
+      <line x1="40" y1="170" x2="340" y2="170" stroke="#9ca3af"/>
+      <line x1="40" y1="170" x2="40"  y2="20"  stroke="#9ca3af"/>
+      <text x="340" y="185" font-size="12">t</text>
+      <text x="20"  y="25"  font-size="12">v</text>
+      <text x="15"  y="55"  font-size="11" fill="#6b7280">v₀</text>
+      <!-- v(t) = v0 * exp(-t/τ) のサンプル曲線 -->
+      <path d="M 40 50 Q 100 110, 160 138 T 340 168" fill="none" stroke="#4f46e5" stroke-width="2.2"/>
+      <line x1="36" y1="50" x2="44" y2="50" stroke="#1f2328"/>
+    </svg>
+    <figcaption>図 2：粘性抵抗下の速度。$v(t)=v_0 e^{-t/\tau}$、$\tau=m/\eta$。</figcaption>
+  </figure>
+
+  <h2>2.4.2（続）粘性抵抗＋重力</h2>
+  <p>下向きを正に取り、$f = -\eta v + mg$：</p>
+  $$ m\dot v = -\eta\!\left(v - \frac{mg}{\eta}\right) $$
+  <p>終端速度 $v_\infty = \dfrac{mg}{\eta}$、緩和時間 $\tau = \dfrac{m}{\eta}$。</p>
+  $$ v(t) = (v_0 - v_\infty)\,e^{-t/\tau} + v_\infty $$
+  $$ x(t) = x_0 + v_\infty t + \tau(v_0 - v_\infty)\!\left(1 - e^{-t/\tau}\right) $$
+  <p>$t\to\infty$ で速度は $v_\infty$ に近づき、変位は等速運動成分が支配する。</p>
+
+  <h2>解法の流れ（まとめ）</h2>
+  <div class="mermaid">
+flowchart TD
+  A["運動方程式<br/>m\ddot{x} = f"] --> B{"f の形は?"}
+  B -- "定数" --> C["直接積分<br/>等加速度"]
+  B -- "v に依存" --> D["v に対する1階ODE<br/>変数分離"]
+  B -- "x に依存（線形）" --> E["線形ODE<br/>特性方程式・指数解"]
+  B -- "解析的に解けない" --> F["数値シミュレーション<br/>カオスの可能性"]
+  </div>
+
+  <ul>
+    <li>$m\dot v = (\text{v の関数})$ → 変数分離で積分</li>
+    <li>$m\ddot x = (\text{x の関数})$ → 同様、ただし $\ddot x = v\,dv/dx$ などの技法</li>
+    <li>解析的に解けないケースはシミュレーションへ。初期値の微小な違いがマクロに効くとカオス。</li>
+  </ul>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li>ニュートンの3法則：①慣性、②$f=ma$、③作用反作用</li>
+    <li>ガリレイ変換は慣性系間で運動方程式の形を保存。非慣性系では慣性力が出現</li>
+    <li>MKSA 系での次元解析でバネの角振動数 $\omega=\sqrt{k/m}$ を導出</li>
+    <li>等加速度：$x(t)=x_0+v_0 t + \tfrac{1}{2}\tfrac{\alpha}{m}t^2$</li>
+    <li>粘性抵抗：速度は指数減衰、変位は有限距離に収束</li>
+    <li>粘性抵抗＋重力：終端速度 $v_\infty=mg/\eta$、緩和時間 $\tau=m/\eta$</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="02.html" class="prev">第2回 極座標</a>
+    <a href="04.html" class="next">第4回 単振動・減衰振動</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

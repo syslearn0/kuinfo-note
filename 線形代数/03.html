@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第3回 ブロック行列・写像・線形写像 ｜ 線形代数</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">線形代数</a> ／ 第3回</div>
+</header>
+
+<main>
+  <h1>第3回 ブロック行列・写像・線形写像</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>復習：正則行列の性質</h2>
+
+  <h3>$2\times 2$ 逆行列公式</h3>
+  $$ A = \begin{pmatrix} a & b \\ c & d \end{pmatrix},\quad A^{-1} = \frac{1}{ad-bc}\begin{pmatrix} d & -b \\ -c & a \end{pmatrix} $$
+  <p>$ad-bc \ne 0$ が $A$ が正則であるための <strong>必要十分条件</strong>。</p>
+
+  <details>
+    <summary>導出（逆行列はどう作る？）</summary>
+    <p>逆行列を $\begin{pmatrix} p & q \\ r & s \end{pmatrix}$ と置いて $A\!\cdot\!A^{-1} = E$ を成分で書く：</p>
+    $$ \begin{pmatrix} ap+br & aq+bs \\ cp+dr & cq+ds \end{pmatrix} = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} $$
+    <p>4本の連立を解くと $p = \dfrac{d}{ad-bc}$、$q = \dfrac{-b}{ad-bc}$、$r = \dfrac{-c}{ad-bc}$、$s = \dfrac{a}{ad-bc}$。</p>
+  </details>
+
+  <h3>定理 2.5.2：積の逆行列</h3>
+  <p>$A,B$ がともに正則ならば $AB$ も正則で：</p>
+  $$ (AB)^{-1} = B^{-1}A^{-1} $$
+  <div class="callout">順序が逆になる点に注意。$A^{-1}B^{-1}$ ではない。</div>
+
+  <details>
+    <summary>証明</summary>
+    $$ (AB)(B^{-1}A^{-1}) = A(BB^{-1})A^{-1} = AEA^{-1} = AA^{-1} = E $$
+    $$ (B^{-1}A^{-1})(AB) = B^{-1}(A^{-1}A)B = B^{-1}EB = B^{-1}B = E $$
+    <p>よって $B^{-1}A^{-1}$ は $AB$ の逆行列。$\square$</p>
+  </details>
+
+  <h3>定理 2.5.3：逆行列の逆行列</h3>
+  $$ (A^{-1})^{-1} = A $$
+  <details>
+    <summary>証明</summary>
+    $$ A^{-1}A = AA^{-1} = E $$
+    <p>これは $A$ が $A^{-1}$ の逆行列であることを意味する。$\square$</p>
+  </details>
+
+  <h3>定理 2.5.4：転置行列の逆行列</h3>
+  $$ ({}^t\!A)^{-1} = {}^t(A^{-1}) $$
+  <details>
+    <summary>証明</summary>
+    <p>$AA^{-1}=A^{-1}A=E$ の両辺を転置する。${}^t E = E$、${}^t(XY) = {}^t Y\,{}^t X$ より：</p>
+    $$ {}^t(A^{-1})\cdot {}^t A = E,\quad {}^t A\cdot {}^t(A^{-1}) = E $$
+    <p>よって ${}^t(A^{-1})$ は ${}^t A$ の逆行列。$\square$</p>
+  </details>
+
+  <h2>① ブロック行列</h2>
+
+  <h3>定義</h3>
+  <p>$m\times n$ 行列 $A$ を、行方向に $m = m_1 + \cdots + m_\ell$、列方向に $n = n_1 + \cdots + n_s$ で分割して、</p>
+  $$ A = \begin{pmatrix} A_{11} & A_{12} & \cdots & A_{1s} \\ A_{21} & A_{22} & \cdots & A_{2s} \\ \vdots & & \ddots & \vdots \\ A_{\ell 1} & \cdots & & A_{\ell s} \end{pmatrix} $$
+  <p>各 $A_{ij}$ は $(m_i, n_j)$ 型の小行列。</p>
+
+  <figure>
+    <svg viewBox="0 0 280 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ブロック分割の例">
+      <!-- 4x4 grid -->
+      <g font-family="monospace" font-size="14">
+        <rect x="40" y="20" width="200" height="200" fill="#fff" stroke="#1f2328"/>
+        <!-- vertical split -->
+        <line x1="140" y1="20" x2="140" y2="220" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 4"/>
+        <!-- horizontal split -->
+        <line x1="40"  y1="120" x2="240" y2="120" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 4"/>
+        <!-- numbers -->
+        <text x="60"  y="50" >1</text><text x="95"  y="50" >2</text><text x="160" y="50" >3</text><text x="200" y="50" >4</text>
+        <text x="60"  y="90" >5</text><text x="95"  y="90" >6</text><text x="160" y="90" >7</text><text x="200" y="90" >8</text>
+        <text x="55"  y="155">9</text><text x="90"  y="155">10</text><text x="155" y="155">11</text><text x="195" y="155">12</text>
+        <text x="55"  y="195">13</text><text x="90" y="195">14</text><text x="155" y="195">15</text><text x="195" y="195">16</text>
+        <!-- labels -->
+        <text x="80"  y="14" fill="#dc2626" font-size="12">A₁₁</text>
+        <text x="180" y="14" fill="#dc2626" font-size="12">A₁₂</text>
+        <text x="6"   y="90" fill="#dc2626" font-size="12">A₂₁</text>
+        <text x="6"   y="160" fill="#dc2626" font-size="12">A₂₂</text>
+      </g>
+    </svg>
+    <figcaption>図 1：$4\times 4$ を $2+2$ 行、$2+2$ 列に分割。各小行列は $2\times 2$。</figcaption>
+  </figure>
+
+  <details>
+    <summary>具体例</summary>
+    $$ A_{11}=\begin{pmatrix}1&2\\5&6\end{pmatrix},\; A_{12}=\begin{pmatrix}3&4\\7&8\end{pmatrix},\; A_{21}=\begin{pmatrix}9&10\\13&14\end{pmatrix},\; A_{22}=\begin{pmatrix}11&12\\15&16\end{pmatrix} $$
+  </details>
+
+  <h3>列ベクトル・行ベクトル分割</h3>
+  $$ A = (\mathbf{a}_1,\, \mathbf{a}_2,\, \ldots,\, \mathbf{a}_n)\quad\text{（列分割）} $$
+  $$ A = \begin{pmatrix} \mathbf{a}_1' \\ \mathbf{a}_2' \\ \vdots \\ \mathbf{a}_m' \end{pmatrix}\quad\text{（行分割）} $$
+
+  <h2>② ブロック行列の演算</h2>
+
+  <h3>和とスカラー倍</h3>
+  <p>同じ分割をもつ $A,B$ について：</p>
+  $$ A + B = (A_{ij} + B_{ij}),\qquad kA = (kA_{ij}) $$
+
+  <h3>積</h3>
+  <p>$A$ の列ブロックサイズと $B$ の行ブロックサイズが一致するとき：</p>
+  $$ AB = \left( \sum_{k=1}^{s} A_{ik}B_{kj} \right)_{i,j} $$
+
+  <details>
+    <summary>例：対角ブロック行列の積</summary>
+    $$ \begin{pmatrix} A & O \\ O & B \end{pmatrix}\begin{pmatrix} C & O \\ O & D \end{pmatrix} = \begin{pmatrix} AC & O \\ O & BD \end{pmatrix} $$
+    <p>非対角は $O$ のまま、対角ブロックは対応するブロック同士の積になる。</p>
+  </details>
+
+  <h2>③ 写像</h2>
+  <p>集合 $X$ から集合 $Y$ への <strong>写像</strong> $f$：</p>
+  $$ f : X \to Y;\quad x \mapsto y = f(x) $$
+  <ul>
+    <li><strong>定義域</strong>：$X$（入力の集合）</li>
+    <li><strong>値域</strong>：$Y$（出力の集合）</li>
+    <li>$f$ による $x$ の <strong>像</strong>：$y = f(x)$</li>
+  </ul>
+
+  <figure>
+    <svg viewBox="0 0 380 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="写像のイメージ">
+      <defs>
+        <marker id="arm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4f46e5"/>
+        </marker>
+      </defs>
+      <!-- X -->
+      <ellipse cx="80"  cy="100" rx="55" ry="80" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="68"  y="30"  font-size="13" fill="#4f46e5">X</text>
+      <circle cx="60"  cy="60"  r="4"/><text x="40" y="64" font-size="11">x₁</text>
+      <circle cx="60"  cy="110" r="4"/><text x="40" y="114" font-size="11">x₂</text>
+      <circle cx="60"  cy="160" r="4"/><text x="40" y="164" font-size="11">x₃</text>
+      <!-- Y -->
+      <ellipse cx="300" cy="100" rx="60" ry="80" fill="#fef3c7" stroke="#d97706"/>
+      <text x="294" y="30"  font-size="13" fill="#d97706">Y</text>
+      <circle cx="310" cy="65"  r="4"/><text x="320" y="69" font-size="11">y₁</text>
+      <circle cx="290" cy="110" r="4"/><text x="300" y="114" font-size="11">y₂</text>
+      <circle cx="320" cy="155" r="4"/><text x="330" y="159" font-size="11">y₃</text>
+      <!-- arrows -->
+      <line x1="65" y1="60" x2="305" y2="64" stroke="#4f46e5" stroke-width="1.6" marker-end="url(#arm)"/>
+      <line x1="65" y1="110" x2="285" y2="109" stroke="#4f46e5" stroke-width="1.6" marker-end="url(#arm)"/>
+      <line x1="65" y1="160" x2="285" y2="111" stroke="#4f46e5" stroke-width="1.6" marker-end="url(#arm)"/>
+    </svg>
+    <figcaption>図 2：写像は「$X$ の各点から $Y$ へ矢印が1本ずつ」。$Y$ 側の点に矢印が0本や複数本来ても写像。</figcaption>
+  </figure>
+
+  <h3>像 $\mathrm{Im}\, f$</h3>
+  $$ \mathrm{Im}\, f = f(X) = \{ f(x) \mid x \in X \} \subseteq Y $$
+  <p>一般に $\mathrm{Im}\, f \subseteq Y$ であり、等号は成り立つとは限らない。</p>
+
+  <h2>④ 全射・単射・全単射・恒等写像</h2>
+  <table>
+    <thead><tr><th>種類</th><th>定義</th><th>イメージ</th></tr></thead>
+    <tbody>
+      <tr><td><strong>全射</strong>（surjection）</td><td>$\mathrm{Im}\,f = Y$</td><td>$Y$ の全点に矢印が届く</td></tr>
+      <tr><td><strong>単射</strong>（injection）</td><td>$x_1 \ne x_2 \Rightarrow f(x_1) \ne f(x_2)$</td><td>異なる $x$ は異なる先へ</td></tr>
+      <tr><td><strong>全単射</strong>（bijection）</td><td>全射かつ単射</td><td>完全な 1 対 1 対応</td></tr>
+      <tr><td><strong>恒等写像</strong>（identity）</td><td>$f(x) = x$</td><td>何も動かさない</td></tr>
+    </tbody>
+  </table>
+
+  <figure>
+    <svg viewBox="0 0 540 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="全射・単射・全単射">
+      <defs>
+        <marker id="ar4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4f46e5"/>
+        </marker>
+      </defs>
+      <!-- 全射 -->
+      <g>
+        <text x="20" y="20" font-size="13" font-weight="600">全射（surjection）</text>
+        <ellipse cx="45" cy="110" rx="28" ry="55" fill="#eef2ff" stroke="#4f46e5"/>
+        <ellipse cx="155" cy="110" rx="28" ry="55" fill="#fef3c7" stroke="#d97706"/>
+        <circle cx="40" cy="75" r="3"/><circle cx="40" cy="110" r="3"/><circle cx="40" cy="145" r="3"/>
+        <circle cx="155" cy="85" r="3"/><circle cx="155" cy="135" r="3"/>
+        <line x1="44" y1="75" x2="151" y2="85" stroke="#4f46e5" marker-end="url(#ar4)"/>
+        <line x1="44" y1="110" x2="151" y2="135" stroke="#4f46e5" marker-end="url(#ar4)"/>
+        <line x1="44" y1="145" x2="151" y2="135" stroke="#4f46e5" marker-end="url(#ar4)"/>
+      </g>
+      <!-- 単射 -->
+      <g transform="translate(190, 0)">
+        <text x="20" y="20" font-size="13" font-weight="600">単射（injection）</text>
+        <ellipse cx="45" cy="110" rx="28" ry="55" fill="#eef2ff" stroke="#4f46e5"/>
+        <ellipse cx="155" cy="110" rx="28" ry="55" fill="#fef3c7" stroke="#d97706"/>
+        <circle cx="40" cy="85" r="3"/><circle cx="40" cy="135" r="3"/>
+        <circle cx="155" cy="75" r="3"/><circle cx="155" cy="110" r="3"/><circle cx="155" cy="145" r="3"/>
+        <line x1="44" y1="85" x2="151" y2="75" stroke="#4f46e5" marker-end="url(#ar4)"/>
+        <line x1="44" y1="135" x2="151" y2="145" stroke="#4f46e5" marker-end="url(#ar4)"/>
+      </g>
+      <!-- 全単射 -->
+      <g transform="translate(370, 0)">
+        <text x="10" y="20" font-size="13" font-weight="600">全単射（bijection）</text>
+        <ellipse cx="45" cy="110" rx="28" ry="55" fill="#eef2ff" stroke="#4f46e5"/>
+        <ellipse cx="155" cy="110" rx="28" ry="55" fill="#fef3c7" stroke="#d97706"/>
+        <circle cx="40" cy="75" r="3"/><circle cx="40" cy="110" r="3"/><circle cx="40" cy="145" r="3"/>
+        <circle cx="155" cy="75" r="3"/><circle cx="155" cy="110" r="3"/><circle cx="155" cy="145" r="3"/>
+        <line x1="44" y1="75" x2="151" y2="75" stroke="#4f46e5" marker-end="url(#ar4)"/>
+        <line x1="44" y1="110" x2="151" y2="110" stroke="#4f46e5" marker-end="url(#ar4)"/>
+        <line x1="44" y1="145" x2="151" y2="145" stroke="#4f46e5" marker-end="url(#ar4)"/>
+      </g>
+    </svg>
+    <figcaption>図 3：全射は「届く」、単射は「重ならない」、全単射は「1 対 1」。</figcaption>
+  </figure>
+
+  <details>
+    <summary>全射の例・非例</summary>
+    <p><strong>全射の例</strong>：$f: \mathbb{R}\to\mathbb{R},\ f(x) = 2x+1$。任意の $y$ に対し $x = (y-1)/2$。</p>
+    <p><strong>非例</strong>：$f(x) = x^2$。$y = -1$ に届く $x$ がない。</p>
+  </details>
+
+  <details>
+    <summary>単射の例・非例</summary>
+    <p><strong>単射の例</strong>：$f(x) = 2x+1$。$f(x_1)=f(x_2)\Rightarrow x_1 = x_2$。</p>
+    <p><strong>非例</strong>：$f(x) = x^2$。$f(1) = f(-1) = 1$ なのに $1 \ne -1$。</p>
+  </details>
+
+  <h2>⑤ 合成写像</h2>
+  <p>$f: X\to Y$、$g: Y\to Z$ のとき、合成写像 $g\circ f$：</p>
+  $$ g\circ f : X \to Z;\quad x \mapsto g(f(x)) $$
+  <p>$X \xrightarrow{f} Y \xrightarrow{g} Z$。<strong>右から読む</strong>（まず $f$、次に $g$）。一般に $g\circ f \ne f\circ g$。</p>
+
+  <h2>⑥ 逆写像</h2>
+
+  <h3>定理 3.1.1</h3>
+  <p>$f: X\to Y$ が <strong>全単射</strong>ならば、</p>
+  $$ g\circ f = \mathrm{id}_X,\quad f\circ g = \mathrm{id}_Y $$
+  <p>を満たす $g: Y\to X$ がただ1つ存在する。これを $f^{-1}$ と書き、$f$ の <strong>逆写像</strong> という。</p>
+
+  <details>
+    <summary>証明</summary>
+    <p>$f$ が全射 → 任意の $y\in Y$ に対して $f(x) = y$ なる $x$ が存在。$f$ が単射 → その $x$ は一意。<br>
+    $y\mapsto x$ の対応で $g$ が定まり、$g(f(x)) = x$、$f(g(y)) = y$ が成り立つ。$\square$</p>
+  </details>
+
+  <h3>定理 3.1.2</h3>
+  <p>$g\circ f = \mathrm{id}$ ならば $f$ は単射、$g$ は全射。さらに $f\circ g = \mathrm{id}$ も成り立てば $f,g$ はともに全単射で互いに逆写像。</p>
+
+  <details>
+    <summary>証明（$g\circ f = \mathrm{id}$ ⇒ $f$ 単射、$g$ 全射）</summary>
+    <p><strong>$f$ が単射</strong>：$f(x_1)=f(x_2)$ なら</p>
+    $$ x_1 = g(f(x_1)) = g(f(x_2)) = x_2 $$
+    <p><strong>$g$ が全射</strong>：任意の $x$ に対し $g(f(x)) = x$。$g$ の像は $X$ 全体。$\square$</p>
+  </details>
+
+  <h2>⑦ 線形写像</h2>
+  <p>$f: X \to Y$ が、任意の $\mathbf{x},\mathbf{y}\in X$ と任意のスカラー $k$ に対して</p>
+  $$ f(\mathbf{x}+\mathbf{y}) = f(\mathbf{x}) + f(\mathbf{y}) $$
+  $$ f(k\mathbf{x}) = k f(\mathbf{x}) $$
+  <p>を満たすとき、$f$ を <strong>線形写像</strong> という。</p>
+
+  <div class="callout">
+    直感：「足してから写す＝写してから足す」「スカラー倍してから写す＝写してからスカラー倍する」。<br>
+    <strong>加法とスカラー倍を保存する写像</strong>。
+  </div>
+
+  <details>
+    <summary>典型例：行列による線形写像</summary>
+    <p>$A \in M_{m\times n}$ に対して $f(\mathbf{x}) = A\mathbf{x}$ は線形：</p>
+    $$ f(\mathbf{x}+\mathbf{y}) = A(\mathbf{x}+\mathbf{y}) = A\mathbf{x} + A\mathbf{y} = f(\mathbf{x}) + f(\mathbf{y}) $$
+    $$ f(k\mathbf{x}) = A(k\mathbf{x}) = kA\mathbf{x} = kf(\mathbf{x}) $$
+    <p><strong>行列による変換は常に線形写像</strong>。逆も成り立ち、$\mathbb{R}^n \to \mathbb{R}^m$ の線形写像は必ずある行列で書ける。</p>
+  </details>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li>$(AB)^{-1} = B^{-1}A^{-1}$、$(A^{-1})^{-1} = A$、$({}^t A)^{-1} = {}^t(A^{-1})$</li>
+    <li>$2\times 2$ 逆行列：$A^{-1} = \dfrac{1}{ad-bc}\begin{pmatrix}d&-b\\-c&a\end{pmatrix}$（$ad-bc\ne 0$ が正則の必要十分条件）</li>
+    <li>ブロック行列：分割しても演算可能。積は $AB = \bigl(\sum_k A_{ik}B_{kj}\bigr)$</li>
+    <li>写像の種類：全射・単射・全単射、それぞれの定義と判定法</li>
+    <li>線形写像：$f(\mathbf{x}+\mathbf{y})=f(\mathbf{x})+f(\mathbf{y})$ かつ $f(k\mathbf{x})=kf(\mathbf{x})$。行列変換が典型例</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="02.html" class="prev">第2回 転置・特殊行列</a>
+    <a href="index.html" class="next">科目トップへ</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

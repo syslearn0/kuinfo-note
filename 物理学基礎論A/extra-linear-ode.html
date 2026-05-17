@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>番外編：線形斉次微分方程式 ｜ 物理学基礎論A</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+</script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">物理学基礎論A</a> ／ 番外編</div>
+</header>
+
+<main>
+  <h1>番外編：線形斉次微分方程式</h1>
+  <div class="meta"><span class="tag">補足</span></div>
+
+  <h2>微分方程式とは</h2>
+  <p><strong>関数そのもの</strong>ではなく、その<strong>微分（変化率）</strong>を含む方程式のこと。ばねの運動方程式：</p>
+  $$ m\frac{d^2x}{dt^2} = -kx\quad\Longleftrightarrow\quad \frac{d^2x}{dt^2} + \frac{k}{m}x = 0 $$
+  <p>「今どこにいるか」ではなく「位置の変化の変化（加速度）と位置の関係」を表す式。</p>
+
+  <h2>用語</h2>
+
+  <details>
+    <summary>「線形」ってどういう意味？</summary>
+    <p><strong>線形（linear）</strong>：$x,\,x',\,x''$ が <strong>1次の項しか出てこない</strong>。$x^2$ や $\sin x$ は不可。</p>
+    <p>線形：$\quad x'' + 3x' + 2x = 0$</p>
+    <p>非線形：$\quad x'' + x^2 = 0$</p>
+    <p>線形だと解法が体系化されている。</p>
+  </details>
+
+  <details>
+    <summary>「斉次（同次）」ってどういう意味？</summary>
+    <p><strong>斉次（homogeneous）</strong>：右辺が $0$。</p>
+    <p>斉次：$\quad x'' + 3x' + 2x = 0$</p>
+    <p>非斉次：$\quad x'' + 3x' + 2x = \sin t$</p>
+  </details>
+
+  <h2>解き方のレシピ</h2>
+
+  <div class="mermaid">
+flowchart LR
+  A["x = e^{λt} とおく"] --> B["特性方程式<br/>λ² + pλ + q = 0"]
+  B --> C{"λ の種類"}
+  C -- "異なる実数 λ₁, λ₂" --> D["x = C₁e^{λ₁t} + C₂e^{λ₂t}"]
+  C -- "重解 λ" --> E["x = (C₁ + C₂t)e^{λt}"]
+  C -- "複素数 α ± iβ" --> F["x = e^{αt}(C₁cosβt + C₂sinβt)"]
+  D --> G["初期条件で C₁, C₂ を決める"]
+  E --> G
+  F --> G
+  </div>
+
+  <h3>Step 1：特性方程式を作る</h3>
+  <p>$x = e^{\lambda t}$ を仮定して代入。$x''\to\lambda^2,\,x'\to\lambda,\,x\to 1$ の置換で：</p>
+  $$ x'' + px' + qx = 0\quad\Longrightarrow\quad \lambda^2 + p\lambda + q = 0 $$
+
+  <h3>Step 2：特性方程式を解く</h3>
+  <table>
+    <thead><tr><th>$\lambda$ の種類</th><th>一般解</th></tr></thead>
+    <tbody>
+      <tr><td>実数の異なる 2 解 $\lambda_1,\lambda_2$</td><td>$x = C_1 e^{\lambda_1 t} + C_2 e^{\lambda_2 t}$</td></tr>
+      <tr><td>重解 $\lambda$</td><td>$x = (C_1 + C_2 t)e^{\lambda t}$</td></tr>
+      <tr><td>複素数 $\lambda = \alpha \pm i\beta$</td><td>$x = e^{\alpha t}(C_1\cos\beta t + C_2\sin\beta t)$</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Step 3：初期条件で定数を決定</h3>
+  <p>$x(0)$ と $x'(0)$ が与えられれば $C_1,C_2$ が決まる。</p>
+
+  <h2>ばねに適用してみる</h2>
+  <p>$\omega^2 = k/m$ と置くと：$x'' + \omega^2 x = 0$。特性方程式：</p>
+  $$ \lambda^2 + \omega^2 = 0\quad\Rightarrow\quad \lambda = \pm i\omega $$
+  <p>$\alpha = 0,\beta=\omega$ を表に当てはめて：</p>
+  $$ x(t) = C_1\cos\omega t + C_2\sin\omega t $$
+  <p>これが <strong>単振動</strong>。$\omega$ が大きいほど速く振動。</p>
+
+  <details>
+    <summary>本当に解になっているか確認</summary>
+    $$ x = C_1\cos\omega t + C_2\sin\omega t $$
+    $$ x'' = -\omega^2 x $$
+    $$ x'' + \omega^2 x = 0\;\checkmark $$
+  </details>
+
+  <details>
+    <summary>初期条件の例：$x(0)=1,\,x'(0)=0$</summary>
+    <p>$x(0) = C_1 = 1$、$x'(0) = C_2\omega = 0 \Rightarrow C_2 = 0$。よって：</p>
+    $$ x(t) = \cos\omega t $$
+  </details>
+
+  <h2>なぜ $e^{\lambda t}$ と置けばよいか</h2>
+  <details>
+    <summary>理由（読み飛ばしてもよい）</summary>
+    <p>線形斉次ODEを解く鍵は「微分しても同じ関数の定数倍になる」性質。それを満たすのは <strong>指数関数</strong>：</p>
+    $$ \frac{d}{dt}e^{\lambda t} = \lambda e^{\lambda t} $$
+    <p>$x'' + px' + qx = 0$ に代入：</p>
+    $$ (\lambda^2 + p\lambda + q)e^{\lambda t} = 0 $$
+    <p>$e^{\lambda t}\ne 0$ より $\lambda^2 + p\lambda + q = 0$。<strong>微分方程式 → 代数方程式</strong>に変換できる。</p>
+  </details>
+
+  <details>
+    <summary>複素数解からなぜ $\cos,\sin$ が出るか</summary>
+    <p>オイラーの公式 $e^{i\theta} = \cos\theta + i\sin\theta$ により：</p>
+    $$ \cos\omega t = \frac{e^{i\omega t}+e^{-i\omega t}}{2},\quad \sin\omega t = \frac{e^{i\omega t}-e^{-i\omega t}}{2i} $$
+    <p>$C_1 e^{i\omega t} + C_2 e^{-i\omega t}$ を実数解の形に書き直すと、自然に $A\cos\omega t + B\sin\omega t$ になる。物理量 $x$ は実数なのでこの形が自然。</p>
+  </details>
+
+  <h2>まとめ</h2>
+  <ol>
+    <li>$x = e^{\lambda t}$ と仮定して代入</li>
+    <li>特性方程式を解く</li>
+    <li>$\lambda$ の種類に応じて一般解の形を書く</li>
+    <li>初期条件で定数を決める</li>
+  </ol>
+  <p>単振動は「複素数解」のケースで、$\lambda = \pm i\omega$ から自動的に三角関数解（＝振動）が現れる。<strong>「なぜ振動するのか」が方程式の構造から出てくる</strong>のがおもしろい点。</p>
+
+  <nav class="pager">
+    <a href="04.html" class="prev">第4回 単振動・減衰振動</a>
+    <a href="index.html" class="next">科目トップへ</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

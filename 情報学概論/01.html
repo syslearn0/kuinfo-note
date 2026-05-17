@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第1回 AI 概観 ｜ 情報学概論</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">情報学概論</a> ／ 第1回</div>
+</header>
+
+<main>
+  <h1>第1回 AI 概観：歴史・推論・学習</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>この回の流れ</h2>
+  <p>AI の <strong>歴史 → 2 つの主要アプローチ → 深層学習革命</strong> という大きな筋で進む。最後に主要人物・フレームワークを年表で整理する。</p>
+
+  <figure>
+    <svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="第1回の流れ">
+      <defs>
+        <marker id="ar01" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4f46e5"/>
+        </marker>
+      </defs>
+      <g font-size="12">
+        <rect x="240" y="10"  width="240" height="44" rx="8" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="360" y="38" text-anchor="middle" font-weight="600">① AI の定義と歴史（3 度のブーム）</text>
+        <line x1="360" y1="54" x2="360" y2="76" stroke="#4f46e5" stroke-width="2" marker-end="url(#ar01)"/>
+
+        <rect x="60"  y="86" width="280" height="80" rx="8" fill="#fef3c7" stroke="#d97706"/>
+        <text x="200" y="112" text-anchor="middle" font-weight="600">② 推論系 AI（古典的）</text>
+        <text x="200" y="134" text-anchor="middle" font-size="11">知識ベース・Prolog</text>
+        <text x="200" y="152" text-anchor="middle" font-size="11">エキスパートシステム</text>
+
+        <rect x="380" y="86" width="280" height="80" rx="8" fill="#dcfce7" stroke="#059669"/>
+        <text x="520" y="112" text-anchor="middle" font-weight="600">③ 学習系 AI（データ駆動）</text>
+        <text x="520" y="134" text-anchor="middle" font-size="11">機械学習・ニューラルネット</text>
+        <text x="520" y="152" text-anchor="middle" font-size="11">強化学習</text>
+
+        <line x1="200" y1="166" x2="360" y2="186" stroke="#4f46e5" stroke-width="2" marker-end="url(#ar01)"/>
+        <line x1="520" y1="166" x2="360" y2="186" stroke="#4f46e5" stroke-width="2" marker-end="url(#ar01)"/>
+
+        <rect x="200" y="190" width="320" height="60" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+        <text x="360" y="216" text-anchor="middle" font-weight="600">④ 深層学習革命（2012〜）</text>
+        <text x="360" y="236" text-anchor="middle" font-size="11">AlexNet → AlphaGo → ChatGPT</text>
+
+        <line x1="360" y1="250" x2="360" y2="272" stroke="#4f46e5" stroke-width="2" marker-end="url(#ar01)"/>
+
+        <rect x="200" y="280" width="320" height="60" rx="8" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="360" y="306" text-anchor="middle" font-weight="600">⑤ 主要人物・フレームワーク年表</text>
+        <text x="360" y="326" text-anchor="middle" font-size="11">Shannon → McCarthy → Hinton</text>
+      </g>
+    </svg>
+    <figcaption>図 1：推論系（ルール記述）と学習系（データ駆動）の 2 系統が並走し、後者が 2012 年以降 <strong>深層学習</strong> として爆発した。</figcaption>
+  </figure>
+
+  <h2>① AI の定義と歴史</h2>
+
+  <div class="callout">
+    <strong>本講義での AI の定義。</strong>「様々な状況で <em>効果的・安全に行動できる</em> 知的実体を構築する学問分野」。Russell & Norvig 教科書の立場。
+  </div>
+
+  <h3>3 度のブーム</h3>
+  <table>
+    <thead><tr><th>期間</th><th>名称</th><th>キー技術</th><th>転換点</th></tr></thead>
+    <tbody>
+      <tr><td>1950 〜 70s</td><td>第 1 次ブーム</td><td>記号的 AI・探索・論理</td><td>1956 年 ダートマス会議</td></tr>
+      <tr><td>1980s</td><td>第 2 次ブーム</td><td>エキスパートシステム・バックプロパゲーション</td><td>知識獲得のボトルネックで「AI の冬」</td></tr>
+      <tr><td>2010s 〜</td><td>第 3 次（〜第 4 次）</td><td>深層学習・大規模言語モデル</td><td>2012 AlexNet → 2022 ChatGPT</td></tr>
+    </tbody>
+  </table>
+
+  <h2>② 推論系 AI（古典的アプローチ）</h2>
+
+  <p>ルールと事実を人間が書き下し、論理的に推論させる方向性。第 2 次ブームの主役。</p>
+  <ul>
+    <li><strong>知識ベース＋論理推論</strong>：事実とルールから新しい事実を導く</li>
+    <li><strong>Prolog</strong>：論理プログラミング言語（事実とルールを宣言的に書くと自動推論）</li>
+    <li><strong>エキスパートシステム</strong>：「もし熱があって咳が出るなら → 風邪の可能性」のような専門家ルールを大量に投入。医療診断・コールセンター自動化に応用</li>
+    <li><strong>意味ネット／オントロジー</strong>：概念と関係をグラフで表現。現代の <strong>知識グラフ</strong> の原型。LLM が読めない社内情報の補完にも再注目</li>
+  </ul>
+
+  <h2>③ 学習系 AI（データ駆動アプローチ）</h2>
+
+  <p>人がルールを書くのではなく、データからコンピュータ自身にパターンを見つけさせる方向性。第 3 次ブームの主役。</p>
+
+  <table>
+    <thead><tr><th>手法</th><th>気持ち</th></tr></thead>
+    <tbody>
+      <tr><td>機械学習（分類木・ナイーブベイズ・SVM）</td><td>データから規則を統計的に抽出</td></tr>
+      <tr><td>ニューラルネットワーク</td><td>脳の神経細胞のつながりを模倣した数理モデル</td></tr>
+      <tr><td>誤差逆伝播法（Back Propagation）</td><td>誤差を出力側から入力側へ逆伝搬して重みを微調整。Hinton が普及</td></tr>
+      <tr><td>強化学習</td><td>「行動 → 報酬 → 次の行動」を繰り返し最適化。DQN・MADDPG など</td></tr>
+    </tbody>
+  </table>
+
+  <h2>④ 深層学習革命</h2>
+
+  <p>ニューラルネットを <strong>何十層も</strong> 重ねた深層学習が、「低レベル特徴（線・角）→ 高レベル特徴（顔・物体）」を段階的に <strong>自動で</strong> 学べることが鍵。人手の特徴設計が不要に。</p>
+
+  <figure>
+    <svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="伝統ML vs 深層学習">
+      <g font-size="12">
+        <rect x="20"  y="40" width="320" height="140" rx="8" fill="#fef3c7" stroke="#d97706"/>
+        <text x="180" y="62" text-anchor="middle" font-weight="600" fill="#d97706">伝統的機械学習</text>
+        <rect x="40"  y="80" width="120" height="36" rx="4" fill="#fff" stroke="#1f2328"/>
+        <text x="100" y="103" text-anchor="middle" font-size="11">人が特徴設計</text>
+        <rect x="180" y="80" width="140" height="36" rx="4" fill="#fff" stroke="#1f2328"/>
+        <text x="250" y="103" text-anchor="middle" font-size="11">分類器（SVM など）</text>
+        <text x="180" y="155" text-anchor="middle" font-size="11" fill="#6b7280">特徴設計に職人技と時間が要る</text>
+
+        <rect x="380" y="40" width="320" height="140" rx="8" fill="#dcfce7" stroke="#059669"/>
+        <text x="540" y="62" text-anchor="middle" font-weight="600" fill="#059669">深層学習（end-to-end）</text>
+        <rect x="400" y="80" width="280" height="36" rx="4" fill="#fff" stroke="#1f2328"/>
+        <text x="540" y="103" text-anchor="middle" font-size="11">入力 → 多層 NN → 出力（特徴も自動学習）</text>
+        <text x="540" y="155" text-anchor="middle" font-size="11" fill="#6b7280">大量データ＋計算資源があれば精度を一気に押し上げる</text>
+      </g>
+    </svg>
+    <figcaption>図 2：「人が特徴を設計」する古典的 ML と、「特徴も学習」する深層学習の違いが革命の核心。</figcaption>
+  </figure>
+
+  <h3>象徴的な応用</h3>
+  <table>
+    <thead><tr><th>年</th><th>システム</th><th>意義</th></tr></thead>
+    <tbody>
+      <tr><td>1997</td><td>Deep Blue（IBM）</td><td>チェス世界王者カスパロフに勝利</td></tr>
+      <tr><td>2011</td><td>IBM Watson</td><td>クイズ番組 Jeopardy! で人間王者に勝利</td></tr>
+      <tr><td>2012</td><td>AlexNet（CNN）</td><td>ImageNet で 2 位に 10% 以上の差。深層学習ブームの引き金</td></tr>
+      <tr><td>2016</td><td>AlphaGo</td><td>李セドルに勝利。<strong>Move 37</strong> は人間の常識を超える独創的な手</td></tr>
+    </tbody>
+  </table>
+
+  <details>
+    <summary>AlphaGo の Move 37 と分業構造</summary>
+    <p>AlphaGo は「<strong>ポリシーネットワーク</strong>（次の手の候補を出す）」「<strong>バリューネットワーク</strong>（局面の良し悪しを評価）」「<strong>モンテカルロ木探索</strong>（候補を絞り込んで深読み）」の 3 つを組み合わせている。Move 37 はバリューネットが「人間が打たない手だが勝率が高い」と判定し、ポリシーが選んだ手。</p>
+  </details>
+
+  <h2>⑤ 主要人物（活躍年代順）</h2>
+
+  <details>
+    <summary>主要人物の年表（クリックで展開）</summary>
+    <table>
+      <thead><tr><th>人物</th><th>主な貢献</th></tr></thead>
+      <tbody>
+        <tr><td>Claude Shannon (1916–2001)</td><td>情報理論。「ビット」で情報を数値化。ダートマス会議参加</td></tr>
+        <tr><td>Herbert Simon (1916–2001)</td><td>General Problem Solver。ノーベル経済学賞（1978）</td></tr>
+        <tr><td>Alan Newell (1927–1992)</td><td>「知的行動を計算で実現する」考え方を普及</td></tr>
+        <tr><td>John McCarthy (1927–2011)</td><td>「AI」という用語の創設者。ダートマス会議主催、LISP 開発</td></tr>
+        <tr><td>Marvin Minsky (1927–2016)</td><td>MIT AI ラボ共同創設。知能を哲学・工学から探求</td></tr>
+        <tr><td>Ross Quillian (1931–2020)</td><td>意味ネット（Semantic Net）を提案。オントロジー研究の起点</td></tr>
+        <tr><td>Geoffrey Hinton (1947–)</td><td>「深層学習の父」。誤差逆伝播の普及、AlexNet。2024 年ノーベル物理学賞</td></tr>
+        <tr><td>Peter Norvig (1956–)</td><td>本講義教科書の共著者。Google 研究部門</td></tr>
+        <tr><td>Stuart Russell (1962–)</td><td>同教科書の共著者。AI 安全性研究</td></tr>
+        <tr><td>Alex Krizhevsky / Ilya Sutskever</td><td>AlexNet を Hinton と共同開発（2012）</td></tr>
+      </tbody>
+    </table>
+  </details>
+
+  <h2>プログラミング言語・フレームワーク年表</h2>
+
+  <table>
+    <thead><tr><th>年</th><th>登場</th><th>意義</th></tr></thead>
+    <tbody>
+      <tr><td>1958</td><td>LISP</td><td>関数型・記号処理。初期 AI の標準</td></tr>
+      <tr><td>1972</td><td>Prolog</td><td>論理プログラミング。エキスパートシステム期に活躍</td></tr>
+      <tr><td>1991</td><td>Python</td><td>2000 年代後半から AI の標準言語に</td></tr>
+      <tr><td>2015</td><td>TensorFlow（Google）／ Keras</td><td>本番運用向け・初学者向け</td></tr>
+      <tr><td>2016</td><td>PyTorch（Facebook）</td><td>動的グラフでデバッグしやすく、研究で最も普及</td></tr>
+    </tbody>
+  </table>
+
+  <h2>主要専門用語の一言整理</h2>
+
+  <table>
+    <thead><tr><th>用語</th><th>一言で</th></tr></thead>
+    <tbody>
+      <tr><td>エキスパートシステム</td><td>専門家のルールを大量に投入した推論システム</td></tr>
+      <tr><td>機械学習</td><td>データからパターンを自動発見させる</td></tr>
+      <tr><td>ニューラルネットワーク</td><td>脳のつながりを模倣した数理モデル</td></tr>
+      <tr><td>誤差逆伝播法</td><td>誤差を逆向きに伝えて重みを微調整する学習法</td></tr>
+      <tr><td>深層学習</td><td>多層 NN で低→高レベルの特徴を自動学習</td></tr>
+      <tr><td>強化学習</td><td>行動と報酬の試行錯誤で最適行動を学ぶ</td></tr>
+      <tr><td>意味ネット／オントロジー</td><td>概念と関係をグラフで表す。LLM と組み合わせ再注目</td></tr>
+      <tr><td>LLM</td><td>大量のテキストで学習した大規模言語モデル</td></tr>
+    </tbody>
+  </table>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li>AI は <strong>推論系（ルール）</strong> と <strong>学習系（データ）</strong> の 2 系統が並走してきた</li>
+    <li>第 1〜2 次ブームは推論系中心、第 3 次は深層学習が主役</li>
+    <li>深層学習の核心は「<strong>特徴も自動で学習</strong>」できること</li>
+    <li>AlexNet → AlphaGo → ChatGPT と象徴的ブレイクスルーが続く</li>
+    <li>近年は意味ネット／知識グラフを LLM と組み合わせる方向も再注目されている</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="index.html" class="prev">科目トップへ</a>
+    <a href="02.html" class="next">第2回 ChatGPT / Transformer</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

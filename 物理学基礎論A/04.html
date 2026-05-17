@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第4回 単振動・減衰振動 ｜ 物理学基礎論A</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">物理学基礎論A</a> ／ 第4回</div>
+</header>
+
+<main>
+  <h1>第4回 単振動・減衰振動</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>2.4.3 ばねの力（単振動）</h2>
+  <figure>
+    <svg viewBox="0 0 380 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="水平ばねと質点">
+      <!-- 壁 -->
+      <line x1="30" y1="40" x2="30" y2="110" stroke="#1f2328" stroke-width="2"/>
+      <line x1="30" y1="40" x2="20" y2="50"  stroke="#1f2328"/>
+      <line x1="30" y1="55" x2="20" y2="65"  stroke="#1f2328"/>
+      <line x1="30" y1="70" x2="20" y2="80"  stroke="#1f2328"/>
+      <line x1="30" y1="85" x2="20" y2="95"  stroke="#1f2328"/>
+      <line x1="30" y1="100" x2="20" y2="110" stroke="#1f2328"/>
+      <!-- ばね（ジグザグ） -->
+      <polyline points="30,75 50,55 70,95 90,55 110,95 130,55 150,95 170,75" fill="none" stroke="#4f46e5" stroke-width="2"/>
+      <!-- 質点 -->
+      <rect x="170" y="55" width="50" height="40" fill="#dbeafe" stroke="#1f2328"/>
+      <text x="187" y="80" font-size="14">m</text>
+      <!-- 床 -->
+      <line x1="0" y1="110" x2="380" y2="110" stroke="#6b7280"/>
+      <!-- x軸 -->
+      <line x1="100" y1="125" x2="280" y2="125" stroke="#9ca3af"/>
+      <text x="285" y="128" font-size="12">x</text>
+      <line x1="195" y1="120" x2="195" y2="130" stroke="#1f2328"/>
+      <text x="180" y="138" font-size="11">0（つり合い）</text>
+    </svg>
+    <figcaption>図 1：水平方向のばね・質点系。$x$ はつり合い位置からの変位。</figcaption>
+  </figure>
+
+  <p>運動方程式：</p>
+  $$ m\ddot{x} = -kx $$
+  <p>右辺マイナスは「引き戻し」（フックの法則）。</p>
+
+  <h3>解き方のポイント</h3>
+  <p>「2回微分して自分自身の定数倍になる関数」を探す → $\cos,\sin$。</p>
+  <ul>
+    <li>$x = A\cos\omega t$ なら $\ddot x = -A\omega^2\cos\omega t = -\omega^2 x$ ✓</li>
+    <li>$x = B\sin\omega t$ なら $\ddot x = -\omega^2 x$ ✓</li>
+  </ul>
+  <p>$\omega = \sqrt{k/m}$（角振動数）。線形なので解の和も解：</p>
+  $$ x(t) = A\cos\omega t + B\sin\omega t = C\sin(\omega t + \theta) $$
+  <p>任意定数2つは初期条件で決まる。</p>
+
+  <details>
+    <summary>初期条件から $A,B$ を決める</summary>
+    <p>$x(0)=x_0,\,v(0)=v_0$ とすると</p>
+    $$ A = x_0,\qquad B = \frac{v_0}{\omega} $$
+    $$ x(t) = x_0\cos\omega t + \frac{v_0}{\omega}\sin\omega t $$
+  </details>
+
+  <h2>2.4.3.b ばね＋重力（鉛直方向）</h2>
+  <p>下向きを正とする。運動方程式：</p>
+  $$ m\ddot{x} = -kx + mg\quad\Longleftrightarrow\quad \ddot{x} = -\frac{k}{m}\!\left(x - \frac{mg}{k}\right) $$
+  <p>$y = x - \dfrac{mg}{k}$（つり合い位置からのずれ）と置くと、</p>
+  $$ \ddot{y} = -\omega^2 y\quad (\omega^2 = k/m) $$
+  <p>水平の場合と全く同じ形。</p>
+
+  <div class="callout">
+    <strong>ポイント：</strong>つり合い位置を原点にとれば、定常的な力（重力）を「忘れて」よい。物体はつり合い位置を中心に単振動する。
+  </div>
+
+  <h2>振り子の微小振動</h2>
+  <figure>
+    <svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="振り子">
+      <line x1="20" y1="20" x2="260" y2="20" stroke="#1f2328" stroke-width="2"/>
+      <line x1="140" y1="20" x2="200" y2="140" stroke="#6b7280" stroke-width="1.5"/>
+      <line x1="140" y1="20" x2="140" y2="170" stroke="#d1d5db" stroke-dasharray="3 3"/>
+      <path d="M 140 80 A 60 60 0 0 0 165 92" fill="none" stroke="#4f46e5"/>
+      <text x="148" y="78" font-size="13" fill="#4f46e5">θ</text>
+      <circle cx="200" cy="140" r="14" fill="#fee2e2" stroke="#1f2328"/>
+      <text x="195" y="145" font-size="12">m</text>
+      <text x="195" y="35" font-size="11" fill="#6b7280">長さ ℓ</text>
+    </svg>
+    <figcaption>図 2：振り子の微小振動。角度が小さければ単振動に帰着。</figcaption>
+  </figure>
+  <p>角度方向の運動方程式：</p>
+  $$ \ddot{\theta} = -\frac{g}{\ell}\sin\theta $$
+  <p>$\theta$ が小さければ $\sin\theta\approx\theta$：</p>
+  $$ \ddot{\theta} \approx -\frac{g}{\ell}\theta\quad\Rightarrow\quad \omega = \sqrt{g/\ell} $$
+
+  <h2>2.4.4 減衰振動</h2>
+  <p>ばね＋粘性抵抗 $-\eta\dot x$：</p>
+  $$ m\ddot{x} = -kx - \eta\dot{x} $$
+  <p>$\gamma = \dfrac{\eta}{2m}$（減衰定数）、$\omega = \sqrt{k/m}$ と置く：</p>
+  $$ \ddot{x} + 2\gamma\dot{x} + \omega^2 x = 0 $$
+
+  <h3>高次線形ODEの解き方</h3>
+  <p>独立な解の重ね合わせが一般解。$x = e^{\lambda t}$ と仮定して代入：</p>
+  $$ (\lambda^2 + 2\gamma\lambda + \omega^2)e^{\lambda t} = 0 $$
+  $$ \therefore\;\lambda^2 + 2\gamma\lambda + \omega^2 = 0\quad(\text{特性方程式}) $$
+  $$ \lambda = -\gamma \pm \sqrt{\gamma^2 - \omega^2} $$
+
+  <details>
+    <summary>オイラーの公式（複素数の指数）</summary>
+    <p>$e^{i\theta}$ のテイラー展開を実部・虚部に分けると：</p>
+    $$ e^{i\theta} = \cos\theta + i\sin\theta $$
+    <p>$e^{(-\gamma\pm i\Omega)t}$ を実数解（$\cos,\sin$）に変換するときに使う。</p>
+  </details>
+
+  <h2>3つのケース：$\gamma$ と $\omega$ の大小</h2>
+
+  <figure>
+    <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="減衰振動・過減衰・臨界減衰">
+      <line x1="40" y1="120" x2="380" y2="120" stroke="#9ca3af"/>
+      <line x1="40" y1="20"  x2="40"  y2="200" stroke="#9ca3af"/>
+      <text x="380" y="135" font-size="11">t</text>
+      <text x="20"  y="25"  font-size="11">x</text>
+      <!-- envelope -->
+      <path d="M 40 40 Q 200 100, 380 118" fill="none" stroke="#d1d5db" stroke-dasharray="3 3"/>
+      <path d="M 40 200 Q 200 140, 380 122" fill="none" stroke="#d1d5db" stroke-dasharray="3 3"/>
+      <!-- underdamped: damped oscillation -->
+      <path d="M 40 40 Q 70 200, 110 90 Q 140 40, 175 140 Q 205 170, 240 105 Q 275 80, 305 130 Q 340 140, 380 120"
+            fill="none" stroke="#4f46e5" stroke-width="2"/>
+      <!-- overdamped: slow decay -->
+      <path d="M 40 40 Q 120 100, 220 115 Q 300 119, 380 120" fill="none" stroke="#dc2626" stroke-width="2"/>
+      <!-- critical -->
+      <path d="M 40 40 Q 90 115, 180 119 Q 260 120, 380 120" fill="none" stroke="#059669" stroke-width="2" stroke-dasharray="5 3"/>
+      <!-- legend -->
+      <rect x="260" y="170" width="14" height="3" fill="#4f46e5"/>
+      <text x="280" y="174" font-size="11" fill="#4f46e5">γ &lt; ω：減衰振動</text>
+      <rect x="260" y="186" width="14" height="3" fill="#dc2626"/>
+      <text x="280" y="190" font-size="11" fill="#dc2626">γ &gt; ω：過減衰</text>
+      <rect x="260" y="202" width="14" height="3" fill="#059669"/>
+      <text x="280" y="206" font-size="11" fill="#059669">γ = ω：臨界減衰</text>
+    </svg>
+    <figcaption>図 3：3 ケースの $x(t)$ 概形。臨界減衰が最速で0に収束（振動なし）。</figcaption>
+  </figure>
+
+  <h3>ケース1：$\gamma &lt; \omega$（減衰振動 / underdamped）</h3>
+  <p>判別式が負 → $\lambda$ は複素数。$\Omega = \sqrt{\omega^2 - \gamma^2}$ とすると：</p>
+  $$ \lambda = -\gamma \pm i\Omega $$
+  $$ x(t) = e^{-\gamma t}\bigl(A\cos\Omega t + B\sin\Omega t\bigr) $$
+  <p>振幅が $e^{-\gamma t}$ で減衰しながら振動。</p>
+
+  <h3>ケース2：$\gamma &gt; \omega$（過減衰 / overdamped）</h3>
+  <p>$\lambda$ は実数 2 解。$\Gamma = \sqrt{\gamma^2 - \omega^2}$：</p>
+  $$ \lambda = -\gamma \pm \Gamma\quad(\text{ともに負}) $$
+  $$ x(t) = e^{-\gamma t}\bigl(Ae^{\Gamma t} + Be^{-\Gamma t}\bigr) $$
+  <p>振動せず単調に 0 へ。</p>
+
+  <h3>ケース3：$\gamma = \omega$（臨界減衰 / critically damped）</h3>
+  <p>$\lambda = -\gamma$（重解）。独立解が 1 つ足りないので $t e^{-\gamma t}$ も解になることが代入で確認できる。</p>
+  $$ x(t) = (A + Bt)\,e^{-\gamma t} $$
+  <p>振動せずに、3 ケース中 <strong>最速で 0 に収束</strong>。サスペンションなどはここに設計する。</p>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li>$m\ddot{x} = -kx$ の一般解：$x(t)=A\cos\omega t + B\sin\omega t$、$\omega=\sqrt{k/m}$</li>
+    <li>定常力（重力）はつり合い位置を原点にとると消える</li>
+    <li>振り子は微小振幅で単振動：$\omega = \sqrt{g/\ell}$</li>
+    <li>粘性抵抗付き：$\ddot x + 2\gamma\dot x + \omega^2 x = 0$、特性方程式で解く</li>
+    <li>$\gamma &lt; \omega$：減衰振動／ $\gamma &gt; \omega$：過減衰／ $\gamma = \omega$：臨界減衰（最速収束）</li>
+    <li>重根のとき $te^{\lambda t}$、三重根のとき $t^2 e^{\lambda t}$ も独立解</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="03.html" class="prev">第3回 ニュートンの法則</a>
+    <a href="extra-linear-ode.html" class="next">番外編 線形斉次ODE</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

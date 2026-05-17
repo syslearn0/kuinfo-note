@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第1回 ガイダンスとデータ表現 ｜ 情報AI基礎</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">情報AI基礎</a> ／ 第1回</div>
+</header>
+
+<main>
+  <h1>第1回 ガイダンスとデータ表現</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>大きな絵：何を学ぶ科目か</h2>
+  <p>「情報AI基礎」は <strong>計算機科学全体</strong> の入門。4 教員が分担し、ハード（ビット〜CPU）から始まり、ソフト・言語処理系、機械学習、生成AI までを横断する。本講義（湊担当 4 回分）は <strong>古典コンピュータの仕組み</strong> を扱う。</p>
+
+  <figure>
+    <svg viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="科目全体の構成">
+      <g font-size="12">
+        <rect x="20"  y="50" width="160" height="120" rx="8" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="100" y="40" text-anchor="middle" font-weight="600" fill="#4f46e5">湊（4回）</text>
+        <text x="100" y="80" text-anchor="middle">データ表現</text>
+        <text x="100" y="100" text-anchor="middle">数の演算</text>
+        <text x="100" y="120" text-anchor="middle">論理回路</text>
+        <text x="100" y="140" text-anchor="middle">コンピュータ</text>
+        <text x="100" y="160" text-anchor="middle">の仕組み</text>
+
+        <rect x="200" y="50" width="160" height="120" rx="8" fill="#fef3c7" stroke="#d97706"/>
+        <text x="280" y="40" text-anchor="middle" font-weight="600" fill="#d97706">五十嵐（4回）</text>
+        <text x="280" y="90" text-anchor="middle">プログラミング言語</text>
+        <text x="280" y="110" text-anchor="middle">言語処理系</text>
+        <text x="280" y="130" text-anchor="middle">OS</text>
+        <text x="280" y="150" text-anchor="middle">ネットワーク</text>
+
+        <rect x="380" y="50" width="160" height="120" rx="8" fill="#dcfce7" stroke="#059669"/>
+        <text x="460" y="40" text-anchor="middle" font-weight="600" fill="#059669">河原（4回）</text>
+        <text x="460" y="90" text-anchor="middle">オートマトン</text>
+        <text x="460" y="110" text-anchor="middle">情報・符号理論</text>
+        <text x="460" y="130" text-anchor="middle">機械学習</text>
+
+        <rect x="560" y="50" width="140" height="120" rx="8" fill="#fee2e2" stroke="#dc2626"/>
+        <text x="630" y="40" text-anchor="middle" font-weight="600" fill="#dc2626">下平（4回）</text>
+        <text x="630" y="90" text-anchor="middle">AIと知識表現</text>
+        <text x="630" y="110" text-anchor="middle">生成AI・LLM</text>
+        <text x="630" y="130" text-anchor="middle">特性と限界</text>
+      </g>
+      <line x1="20" y1="200" x2="700" y2="200" stroke="#9ca3af"/>
+      <text x="20" y="216" font-size="11">ハードに近い ←</text>
+      <text x="700" y="216" text-anchor="end" font-size="11">→ 応用・AI</text>
+    </svg>
+    <figcaption>図 1：科目全体の構成。湊パートは「ビットから CPU まで」を順に積み上げる。</figcaption>
+  </figure>
+
+  <h2>計算機科学とは</h2>
+  <p>「計算と情報処理の理論的基礎、およびコンピュータ上への実装と応用」。研究分野はアルゴリズム・データ構造、論理回路、計算機アーキテクチャ、OS、プログラミング言語、ネットワーク、AI・機械学習など多岐にわたる。<strong>理論・抽象化（モデル化）・設計</strong>の 3 つを組み合わせるのが学問的手法。</p>
+
+  <h2>AI の歴史と現在</h2>
+  <ul>
+    <li><strong>第 1 次ブーム（1960 年代）</strong>：記号的 AI。論理式・場合分け・探索で問題を解く</li>
+    <li><strong>第 2 次ブーム（1980 年代）</strong>：エキスパートシステム・知識ベース。「AI の冬」へ</li>
+    <li><strong>第 3 次ブーム（2010 年代〜）</strong>：深層学習。大量データから学ぶ。ChatGPT・Gemini 等</li>
+  </ul>
+
+  <div class="callout">
+    <strong>AI が得意／不得意</strong>。<br>
+    得意：翻訳・文法チェック・定型文・お手本のあるプログラミング。<br>
+    難しい：組合せ爆発・データ不足・正解が曖昧で命や財産に関わる判断。<br>
+    AI に移植しにくい人間の性質：好奇心・善悪の判断・責任能力・持続可能性。
+  </div>
+
+  <h2>デジタルシステムのデータ表現（本講義の本題）</h2>
+
+  <h3>デジタル vs アナログ</h3>
+  <p><strong>デジタル</strong>：数値（離散値）で表現。ノイズに強い。複製しても劣化しない。<br>
+  <strong>アナログ</strong>：連続的な物理量（電圧・磁化・歪み）で表現。直接的だがノイズに弱い。</p>
+  <p>デジタル回路は <strong>0 と 1 の 2 値</strong> しか扱わない。物理的には電位の高低、電流の有無、磁化の方向などで実現される。</p>
+
+  <h3>2 進数：整数</h3>
+  <p>$n$ ビット 2 進数 $[x_{n-1} x_{n-2} \cdots x_0]$ の値：</p>
+  $$ \sum_{i=0}^{n-1} 2^i\, x_i $$
+
+  <figure>
+    <svg viewBox="0 0 540 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="2進数の桁の重み">
+      <g font-family="monospace" font-size="20">
+        <rect x="20"  y="40" width="60" height="50" fill="#eef2ff" stroke="#4f46e5"/><text x="50" y="74" text-anchor="middle">1</text>
+        <rect x="80"  y="40" width="60" height="50" fill="#fff" stroke="#1f2328"/><text x="110" y="74" text-anchor="middle">1</text>
+        <rect x="140" y="40" width="60" height="50" fill="#eef2ff" stroke="#4f46e5"/><text x="170" y="74" text-anchor="middle">0</text>
+        <rect x="200" y="40" width="60" height="50" fill="#fff" stroke="#1f2328"/><text x="230" y="74" text-anchor="middle">1</text>
+        <rect x="260" y="40" width="60" height="50" fill="#eef2ff" stroke="#4f46e5"/><text x="290" y="74" text-anchor="middle">1</text>
+        <rect x="320" y="40" width="60" height="50" fill="#fff" stroke="#1f2328"/><text x="350" y="74" text-anchor="middle">0</text>
+      </g>
+      <g font-family="monospace" font-size="12">
+        <text x="50"  y="32" text-anchor="middle" fill="#6b7280">32</text>
+        <text x="110" y="32" text-anchor="middle" fill="#6b7280">16</text>
+        <text x="170" y="32" text-anchor="middle" fill="#6b7280">8</text>
+        <text x="230" y="32" text-anchor="middle" fill="#6b7280">4</text>
+        <text x="290" y="32" text-anchor="middle" fill="#6b7280">2</text>
+        <text x="350" y="32" text-anchor="middle" fill="#6b7280">1</text>
+        <text x="50"  y="108" text-anchor="middle">2⁵</text>
+        <text x="110" y="108" text-anchor="middle">2⁴</text>
+        <text x="170" y="108" text-anchor="middle">2³</text>
+        <text x="230" y="108" text-anchor="middle">2²</text>
+        <text x="290" y="108" text-anchor="middle">2¹</text>
+        <text x="350" y="108" text-anchor="middle">2⁰</text>
+      </g>
+      <text x="395" y="74" font-size="20">=</text>
+      <text x="415" y="74" font-size="20" font-family="monospace">32+16+4+2 = 54</text>
+    </svg>
+    <figcaption>図 2：[110110]₂ = 32+16+4+2 = 54。各桁の重みは右から 2⁰, 2¹, 2², ⋯。</figcaption>
+  </figure>
+
+  <h3>2 進数：小数</h3>
+  $$ [x_{n-1}\cdots x_0\,.\,x_{-1}\cdots x_{-m}]_2 \;=\; \sum_{i=-m}^{n-1} 2^i\, x_i $$
+  <p>例：$[.0111]_2 = \tfrac{1}{4} + \tfrac{1}{8} + \tfrac{1}{16} = 0.4375$。</p>
+
+  <details>
+    <summary>10 進数 → 2 進数の変換（具体例）</summary>
+    <p><strong>整数部</strong>：$35$ を 2 で割って余りを下から並べる：</p>
+    <p>35÷2=17 余 1、17÷2=8 余 1、8÷2=4 余 0、4÷2=2 余 0、2÷2=1 余 0、1÷2=0 余 1。<br>
+    下から拾って $[100011]_2 = 35$。</p>
+    <p><strong>小数部</strong>：$0.6875$ を 2 倍して整数部を上から拾う：</p>
+    <p>0.6875×2=1.375（→1）、0.375×2=0.75（→0）、0.75×2=1.5（→1）、0.5×2=1.0（→1）。<br>
+    上から並べて $[.1011]_2 = 0.6875$。</p>
+  </details>
+
+  <h3>文字コード（ASCII）</h3>
+  <p>英数字・記号を 7 または 8 ビットの 2 進数に対応付けた <strong>約束事</strong>。たとえば 'A' = 65 = $[01000001]$。文字の集合・順序を全員が共有してはじめて意味を持つ。</p>
+  <p>日本語のような大量の文字を扱うには Shift_JIS、EUC-JP、UTF-8 など別の符号化が必要。</p>
+
+  <h3>画像の符号化</h3>
+  <p>画像を <strong>画素（ピクセル）</strong> の格子に分け、各画素を数値化する。</p>
+  <ul>
+    <li>白黒：1 ビット（0 or 1）</li>
+    <li>グレースケール：8 ビット（0〜255）</li>
+    <li>カラー：RGB 各 8 ビット = 24 ビット → 約 1,677 万色</li>
+  </ul>
+
+  <figure>
+    <svg viewBox="0 0 460 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="画像の画素表現">
+      <g>
+        <rect x="20" y="20" width="160" height="160" fill="none" stroke="#1f2328"/>
+        <g font-size="9" text-anchor="middle">
+          <rect x="20"  y="20"  width="20" height="20" fill="#374151"/><text x="30"  y="34" fill="#fff">128</text>
+          <rect x="40"  y="20"  width="20" height="20" fill="#6b7280"/><text x="50"  y="34" fill="#fff">160</text>
+          <rect x="60"  y="20"  width="20" height="20" fill="#9ca3af"/><text x="70"  y="34">200</text>
+          <rect x="80"  y="20"  width="20" height="20" fill="#d1d5db"/><text x="90"  y="34">220</text>
+          <rect x="100" y="20"  width="20" height="20" fill="#e5e7eb"/><text x="110" y="34">240</text>
+          <rect x="120" y="20"  width="20" height="20" fill="#f3f4f6"/><text x="130" y="34">248</text>
+          <rect x="140" y="20"  width="20" height="20" fill="#fafaf7"/><text x="150" y="34">252</text>
+          <rect x="160" y="20"  width="20" height="20" fill="#fff"/><text x="170" y="34">255</text>
+        </g>
+        <text x="100" y="195" text-anchor="middle" font-size="11" fill="#6b7280">画素ごとに 0〜255 の値（8 ビット）</text>
+      </g>
+      <text x="220" y="105" font-size="20">→</text>
+      <g font-family="monospace" font-size="11">
+        <text x="260" y="40">10000000</text>
+        <text x="260" y="60">10100000</text>
+        <text x="260" y="80">11001000</text>
+        <text x="260" y="100">11011100</text>
+        <text x="260" y="120">11110000</text>
+        <text x="260" y="140">11111000</text>
+        <text x="260" y="160">11111100</text>
+        <text x="260" y="180">11111111</text>
+      </g>
+      <text x="350" y="105" font-size="11" fill="#6b7280">2 進ビット列に</text>
+    </svg>
+    <figcaption>図 3：画像は画素ごとの数値の集合。RGB ならその 3 倍のビット数。</figcaption>
+  </figure>
+
+  <h3>音声の符号化</h3>
+  <p>連続的な音波（アナログ）を 2 段階でデジタル化する：</p>
+  <ol>
+    <li><strong>標本化（サンプリング）</strong>：一定間隔（例：1/44100 秒）ごとに振幅を測る</li>
+    <li><strong>量子化</strong>：測った値を有限桁の 2 進数に近似する（例：16 ビット）</li>
+  </ol>
+
+  <figure>
+    <svg viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="標本化と量子化">
+      <line x1="20" y1="100" x2="460" y2="100" stroke="#9ca3af"/>
+      <path d="M 20 100 Q 60 30 100 100 T 180 100 T 260 100 T 340 100 T 420 100" fill="none" stroke="#4f46e5" stroke-width="2"/>
+      <g fill="#dc2626">
+        <circle cx="40"  cy="80"  r="4"/>
+        <circle cx="60"  cy="50"  r="4"/>
+        <circle cx="80"  cy="60"  r="4"/>
+        <circle cx="100" cy="100" r="4"/>
+        <circle cx="120" cy="135" r="4"/>
+        <circle cx="140" cy="150" r="4"/>
+        <circle cx="160" cy="125" r="4"/>
+        <circle cx="180" cy="100" r="4"/>
+        <circle cx="200" cy="75"  r="4"/>
+        <circle cx="220" cy="55"  r="4"/>
+        <circle cx="240" cy="68"  r="4"/>
+        <circle cx="260" cy="100" r="4"/>
+        <circle cx="280" cy="130" r="4"/>
+        <circle cx="300" cy="148" r="4"/>
+      </g>
+      <text x="40" y="170" font-size="11" fill="#dc2626">サンプル点（一定間隔）</text>
+      <text x="280" y="35" font-size="11" fill="#4f46e5">元の波形（アナログ）</text>
+    </svg>
+    <figcaption>図 4：標本化＝点で拾う／量子化＝拾った値を整数に丸める。間隔が短く・量子化ビットが多いほど元波形に近い。</figcaption>
+  </figure>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li>計算機科学は理論・抽象化・設計の組合せ。湊パートは「ビット → CPU」の積み上げ</li>
+    <li>AI は 3 度のブームを経て、現在は深層学習＋大量データの第 3 次</li>
+    <li>デジタル回路は 0/1 の 2 値だけ。物理量を 2 値にエンコードして使う</li>
+    <li>整数・小数・文字・画像・音声は、すべて 2 進数のビット列に符号化される</li>
+    <li>「符号化」とは結局「現実世界 → ビット列」の <strong>約束事</strong></li>
+  </ul>
+
+  <nav class="pager">
+    <a href="index.html" class="prev">科目トップへ</a>
+    <a href="02.html" class="next">第2回 数の表現と演算</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第2回 共分散・相関・線形回帰 ｜ 自然現象と数学</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">自然現象と数学</a> ／ 第2回</div>
+</header>
+
+<main>
+  <h1>第2回 共分散・相関・線形回帰</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>大きな絵</h2>
+  <p>第 1 回で導入した共分散・相関を <strong>具体的に計算</strong> し、それを用いて <strong>線形回帰のパラメータを最小二乗法で導出</strong> する回。最小二乗法の解の導出は計算が長いので、ステップごとにトグルで分けて完全に追えるようにする。</p>
+
+  <h2>1. 共分散</h2>
+  $$ S_{xy} = \frac{1}{n-1}\sum_{i=1}^{n}\bigl(x^{(i)} - \bar{x}\bigr)\bigl(y^{(i)} - \bar{y}\bigr) $$
+  <ul>
+    <li>$S_{xy} > 0$：$x$ が増えると $y$ も増える傾向</li>
+    <li>$S_{xy} < 0$：$x$ が増えると $y$ は減る傾向</li>
+    <li><strong>欠点</strong>：単位・スケールに依存。異なるデータ間の「強さ」比較に使えない</li>
+  </ul>
+
+  <details>
+    <summary>計算例：科目 A・B の点数（n = 6）</summary>
+    <p>データ：$(X, Y) = (45,75), (60,70), (80,90), (95,95), (85,80), (55,40)$</p>
+
+    <p><strong>Step 1：</strong>各平均</p>
+    $$ \bar{x} = \frac{45+60+80+95+85+55}{6} = \frac{420}{6} = 70 $$
+    $$ \bar{y} = \frac{75+70+90+95+80+40}{6} = \frac{450}{6} = 75 $$
+
+    <p><strong>Step 2：</strong>各偏差の積</p>
+    <table>
+      <thead><tr><th>$i$</th><th>$x - \bar{x}$</th><th>$y - \bar{y}$</th><th>積</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>−25</td><td>0</td><td>0</td></tr>
+        <tr><td>2</td><td>−10</td><td>−5</td><td>50</td></tr>
+        <tr><td>3</td><td>10</td><td>15</td><td>150</td></tr>
+        <tr><td>4</td><td>25</td><td>20</td><td>500</td></tr>
+        <tr><td>5</td><td>15</td><td>5</td><td>75</td></tr>
+        <tr><td>6</td><td>−15</td><td>−35</td><td>525</td></tr>
+        <tr><td colspan="3" style="text-align:right;"><strong>合計</strong></td><td><strong>1300</strong></td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>Step 3：</strong>$n - 1 = 5$ で割る</p>
+    $$ S_{xy} = \frac{1300}{5} = 260 $$
+  </details>
+
+  <h2>2. 相関係数</h2>
+
+  $$ r_{xy} = \frac{\sum_{i=1}^{n}(x^{(i)} - \bar{x})(y^{(i)} - \bar{y})}{\sqrt{\sum_{i=1}^{n}(x^{(i)} - \bar{x})^2}\sqrt{\sum_{i=1}^{n}(y^{(i)} - \bar{y})^2}} $$
+  <p>常に $-1 \le r_{xy} \le 1$（Cauchy–Schwarz の不等式から従う）。</p>
+
+  <details>
+    <summary>$|r_{xy}| \le 1$ の証明（Cauchy–Schwarz）</summary>
+    <p>$u_i := x^{(i)} - \bar{x}$、$v_i := y^{(i)} - \bar{y}$ と置く。任意の実数 $t$ について</p>
+    $$ \sum_{i=1}^{n}(u_i + t v_i)^2 \ge 0. $$
+    <p>展開して</p>
+    $$ \sum_i u_i^2 + 2t\sum_i u_i v_i + t^2\sum_i v_i^2 \ge 0. $$
+    <p>これは $t$ の 2 次式が常に $\ge 0$ なので、判別式 $\le 0$：</p>
+    $$ \left(2\sum u_i v_i\right)^2 - 4\sum u_i^2\cdot\sum v_i^2 \le 0 $$
+    $$ \therefore\ \left(\sum u_i v_i\right)^2 \le \sum u_i^2\cdot\sum v_i^2. $$
+    <p>両辺の正の平方根をとり比をつくれば $|r_{xy}| \le 1$。等号は $u_i = c v_i$（完全な線形関係）のとき。$\quad\square$</p>
+  </details>
+
+  <details>
+    <summary>計算例：科目 A・B の相関係数</summary>
+    <p>$S_{xy} = 260$（前段の計算）。</p>
+    <p>$x$ の偏差平方和：</p>
+    $$ \sum (x - \bar{x})^2 = (-25)^2 + (-10)^2 + 10^2 + 25^2 + 15^2 + (-15)^2 $$
+    $$ = 625 + 100 + 100 + 625 + 225 + 225 = 1900. $$
+    <p>$y$ の偏差平方和：</p>
+    $$ \sum (y - \bar{y})^2 = 0 + 25 + 225 + 400 + 25 + 1225 = 1900. $$
+    <p>$S_{xy}$ の定義は $n - 1$ で割っていたので、分子・分母を揃えて</p>
+    $$ r_{xy} = \frac{1300}{\sqrt{1900}\cdot\sqrt{1900}} = \frac{1300}{1900} = \frac{13}{19} \approx 0.684. $$
+  </details>
+
+  <h2>3. 相関と因果</h2>
+  <div class="callout">
+    <strong>相関関係</strong>：「片方が変化するともう片方も変化する」<em>観察事実</em>。<br>
+    <strong>因果関係</strong>：「片方を変化させる（介入する）ともう片方も変化する」<em>原因と結果</em>。
+  </div>
+
+  <details>
+    <summary>見かけ上の相関の例</summary>
+    <ul>
+      <li>「警察官の人数」と「犯罪率」に正の相関 → 治安が悪い地域に警察を多く配置している</li>
+      <li>「アイスクリームの売上」と「プールでの溺死事故」に正の相関 → 共通原因は <strong>気温</strong></li>
+      <li>「夜間照明をつけて眠る子供は近視になりやすい」→ 共通原因は <strong>近視の親</strong>（遺伝＋親の行動）</li>
+    </ul>
+    <p>共通原因のことを <strong>交絡因子</strong>（confounding factor）という。</p>
+  </details>
+
+  <h2>4. 線形回帰モデル</h2>
+  $$ y = g(x) = \beta x + \alpha $$
+  <ul>
+    <li>$\beta$：傾きパラメータ（$x$ が 1 増えると $y$ が $\beta$ 増える）</li>
+    <li>$\alpha$：切片（$x = 0$ のときの $y$）</li>
+  </ul>
+  <p>応用例：札幌市の 1 月の最低気温を年で回帰 → 2050 年の気候予測。</p>
+
+  <h2>5. 最小二乗法</h2>
+
+  <p>モデルの予測値 $\hat{y}^{(i)} = \beta x^{(i)} + \alpha$ と実測 $y^{(i)}$ の <strong>2 乗誤差の和</strong> を最小化する：</p>
+  $$ \ell(\alpha, \beta) = \sum_{i=1}^{n}\Bigl(y^{(i)} - (\beta x^{(i)} + \alpha)\Bigr)^2 $$
+  $$ (\hat\alpha, \hat\beta) = \arg\min_{\alpha, \beta}\ \ell(\alpha, \beta) $$
+
+  <p><strong>解の方針</strong>：$\ell$ は $\alpha, \beta$ について下に凸（2 次形式で正定値）。偏微分をゼロとおいて出た解が大域最小。</p>
+
+  <details>
+    <summary>Step 1：$\partial\ell/\partial\alpha = 0$ から $\alpha$ を消去</summary>
+    <p>合成関数の微分：</p>
+    $$ \frac{\partial \ell}{\partial \alpha} = \sum_{i=1}^{n} 2\Bigl(y^{(i)} - \beta x^{(i)} - \alpha\Bigr)\cdot(-1) = -2\sum_{i=1}^{n}(y^{(i)} - \beta x^{(i)} - \alpha). $$
+    <p>$= 0$ とおく：</p>
+    $$ \sum_{i=1}^{n}(y^{(i)} - \beta x^{(i)} - \alpha) = 0 $$
+    $$ \sum y^{(i)} - \beta\sum x^{(i)} - n\alpha = 0 $$
+    <p>両辺を $n$ で割る：</p>
+    $$ \bar{y} - \beta\bar{x} - \alpha = 0\quad\Longrightarrow\quad \boxed{\alpha = \bar{y} - \beta\bar{x}}. $$
+    <p>これは「<strong>回帰直線は重心 $(\bar{x}, \bar{y})$ を通る</strong>」と言っている。</p>
+  </details>
+
+  <details>
+    <summary>Step 2：$\partial\ell/\partial\beta = 0$ に Step 1 を代入</summary>
+    <p>偏微分：</p>
+    $$ \frac{\partial \ell}{\partial \beta} = -2\sum_{i=1}^{n}(y^{(i)} - \beta x^{(i)} - \alpha)\,x^{(i)} = 0. $$
+    <p>Step 1 から $\alpha = \bar{y} - \beta\bar{x}$ を代入：</p>
+    $$ \sum_{i=1}^{n}\bigl(y^{(i)} - \beta x^{(i)} - \bar{y} + \beta\bar{x}\bigr)\,x^{(i)} = 0 $$
+    $$ \sum_{i=1}^{n}\bigl((y^{(i)} - \bar{y}) - \beta(x^{(i)} - \bar{x})\bigr)\,x^{(i)} = 0 \tag{$\ast$} $$
+  </details>
+
+  <details>
+    <summary>Step 3：偏差形に書き換える（平均の性質 $\sum (x^{(i)} - \bar{x}) = 0$ を使う）</summary>
+    <p>$(\ast)$ の左辺第 1 項：</p>
+    $$ \sum_{i=1}^{n}(y^{(i)} - \bar{y})\,x^{(i)} = \sum_{i=1}^{n}(y^{(i)} - \bar{y})\bigl((x^{(i)} - \bar{x}) + \bar{x}\bigr) $$
+    $$ = \sum_{i=1}^{n}(x^{(i)} - \bar{x})(y^{(i)} - \bar{y}) + \bar{x}\underbrace{\sum_{i=1}^{n}(y^{(i)} - \bar{y})}_{= 0} = \sum_{i=1}^{n}(x^{(i)} - \bar{x})(y^{(i)} - \bar{y}). $$
+    <p>$(\ast)$ の左辺第 2 項（係数）：</p>
+    $$ \sum_{i=1}^{n}(x^{(i)} - \bar{x})\,x^{(i)} = \sum_{i=1}^{n}(x^{(i)} - \bar{x})\bigl((x^{(i)} - \bar{x}) + \bar{x}\bigr) $$
+    $$ = \sum_{i=1}^{n}(x^{(i)} - \bar{x})^2 + \bar{x}\underbrace{\sum_{i=1}^{n}(x^{(i)} - \bar{x})}_{= 0} = \sum_{i=1}^{n}(x^{(i)} - \bar{x})^2. $$
+  </details>
+
+  <details>
+    <summary>Step 4：$\beta$ について解く</summary>
+    <p>Step 3 の結果を $(\ast)$ に代入：</p>
+    $$ \sum_{i=1}^{n}(x^{(i)} - \bar{x})(y^{(i)} - \bar{y}) - \beta\sum_{i=1}^{n}(x^{(i)} - \bar{x})^2 = 0. $$
+    $$ \therefore\ \boxed{\hat\beta = \frac{\sum_{i=1}^{n}(x^{(i)} - \bar{x})(y^{(i)} - \bar{y})}{\sum_{i=1}^{n}(x^{(i)} - \bar{x})^2} = \frac{S_{xy}}{S_{xx}}}. $$
+    <p>切片は Step 1 から：</p>
+    $$ \boxed{\hat\alpha = \bar{y} - \hat\beta\,\bar{x}}. $$
+    <p>$\quad\square$</p>
+  </details>
+
+  <details>
+    <summary>Step 5：これが本当に最小値か（2 階の条件）</summary>
+    <p>ヘッセ行列を計算する：</p>
+    $$ \frac{\partial^2 \ell}{\partial \alpha^2} = 2n,\quad \frac{\partial^2 \ell}{\partial \beta^2} = 2\sum (x^{(i)})^2,\quad \frac{\partial^2 \ell}{\partial \alpha\partial\beta} = 2\sum x^{(i)}. $$
+    <p>$\det H = 4\left[n\sum(x^{(i)})^2 - \bigl(\sum x^{(i)}\bigr)^2\right] = 4n\sum (x^{(i)} - \bar{x})^2 \ge 0$。<br>
+    $x^{(i)}$ がすべて同じでない限り正で、ヘッセ行列は <strong>正定値</strong>。よって停留点は唯一の <strong>最小値</strong>。$\quad\square$</p>
+  </details>
+
+  <details>
+    <summary>計算例：3 点のデータ $(1, 2), (2, 3), (3, 5)$</summary>
+    <p><strong>Step 1：</strong>平均</p>
+    $$ \bar{x} = \frac{1+2+3}{3} = 2,\quad \bar{y} = \frac{2+3+5}{3} = \frac{10}{3} $$
+
+    <p><strong>Step 2：</strong>偏差と偏差積</p>
+    <table>
+      <thead><tr><th>$i$</th><th>$x - \bar{x}$</th><th>$y - \bar{y}$</th><th>積</th><th>$(x - \bar{x})^2$</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>$-1$</td><td>$-4/3$</td><td>$4/3$</td><td>$1$</td></tr>
+        <tr><td>2</td><td>$0$</td><td>$-1/3$</td><td>$0$</td><td>$0$</td></tr>
+        <tr><td>3</td><td>$1$</td><td>$5/3$</td><td>$5/3$</td><td>$1$</td></tr>
+        <tr><td colspan="3" style="text-align:right;"><strong>合計</strong></td><td><strong>$3$</strong></td><td><strong>$2$</strong></td></tr>
+      </tbody>
+    </table>
+    $$ S_{xy} = 3,\quad S_{xx} = 2. $$
+
+    <p><strong>Step 3：</strong>パラメータ</p>
+    $$ \hat\beta = \frac{S_{xy}}{S_{xx}} = \frac{3}{2},\quad \hat\alpha = \frac{10}{3} - \frac{3}{2}\cdot 2 = \frac{10}{3} - 3 = \frac{1}{3}. $$
+
+    <p><strong>回帰直線</strong>：$y = \dfrac{3}{2}x + \dfrac{1}{3}$</p>
+
+    <details>
+      <summary>当てはまりの確認</summary>
+      <p>$x = 1, 2, 3$ での予測値と実測：</p>
+      <ul>
+        <li>$\hat{y}(1) = 3/2 + 1/3 = 11/6 \approx 1.83$（実測 2、誤差 1/6）</li>
+        <li>$\hat{y}(2) = 3 + 1/3 = 10/3 \approx 3.33$（実測 3、誤差 1/3）</li>
+        <li>$\hat{y}(3) = 9/2 + 1/3 = 29/6 \approx 4.83$（実測 5、誤差 1/6）</li>
+      </ul>
+      <p>誤差の和は $1/6 - 1/3 + 1/6 = 0$（Step 1 の通り重心を通る）。</p>
+    </details>
+  </details>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li>共分散 $S_{xy}$ は単位依存、相関 $r_{xy}$ は $[-1, 1]$ に正規化されて単位無依存</li>
+    <li>相関 ≠ 因果。共通原因（交絡因子）に注意</li>
+    <li>最小二乗法：$\partial\ell/\partial\alpha = 0,\ \partial\ell/\partial\beta = 0$ の連立を解いて</li>
+    <li>$\hat\beta = S_{xy} / S_{xx}$、$\hat\alpha = \bar{y} - \hat\beta\bar{x}$</li>
+    <li>回帰直線は必ず重心 $(\bar{x}, \bar{y})$ を通る</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="01.html" class="prev">第1回 データの種類と代表値</a>
+    <a href="03.html" class="next">第3回 最尤推定とベイズ決定</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>

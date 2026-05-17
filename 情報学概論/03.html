@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第3回 マルチエージェントとゲーム理論 ｜ 情報学概論</title>
+<link rel="stylesheet" href="../assets/style.css">
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" defer></script>
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="../index.html">共有ノート</a> ／ <a href="index.html">情報学概論</a> ／ 第3回</div>
+</header>
+
+<main>
+  <h1>第3回 マルチエージェントとゲーム理論</h1>
+  <div class="meta">
+    <span class="tag">講義</span>
+  </div>
+
+  <h2>この回の流れ</h2>
+  <p><strong>前半</strong>：マルチエージェントシステム（MAS）と LLM ベースの AI エージェントの研究事例。<strong>後半</strong>：複数の意思決定者が互いに影響し合う状況を扱うゲーム理論とメカニズムデザイン（オークション・セキュリティゲーム）。</p>
+
+  <figure>
+    <svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="第3回の流れ">
+      <defs>
+        <marker id="ar03" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4f46e5"/>
+        </marker>
+      </defs>
+      <g font-size="11">
+        <rect x="20"  y="10" width="320" height="40" rx="6" fill="#eef2ff" stroke="#4f46e5"/>
+        <text x="180" y="36" text-anchor="middle" font-weight="600" fill="#4f46e5">前半：MAS と LLM エージェント</text>
+        <rect x="380" y="10" width="320" height="40" rx="6" fill="#fef3c7" stroke="#d97706"/>
+        <text x="540" y="36" text-anchor="middle" font-weight="600" fill="#d97706">後半：ゲーム理論とメカニズムデザイン</text>
+
+        <g>
+          <rect x="20"  y="70"  width="320" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="30"  y="93">1. AI ⊃ ML ⊃ DL ⊃ LLM の入れ子構造</text>
+          <rect x="20"  y="112" width="320" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="30"  y="135">2. LLM の種類（クローズド/オープン/マルチモーダル）</text>
+          <rect x="20"  y="154" width="320" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="30"  y="177">3. ソフトウェアエージェント史（Kay, Maes）</text>
+          <rect x="20"  y="196" width="320" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="30"  y="219">4. 単体 AI vs MAS（社会の知性）</text>
+          <rect x="20"  y="238" width="320" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="30"  y="261">5. 研究事例（BabyAGI / AutoGen / Generative）</text>
+        </g>
+
+        <g>
+          <rect x="380" y="70"  width="320" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="390" y="93">6. ゲーム理論とナッシュ均衡</text>
+          <rect x="380" y="112" width="320" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="390" y="135">7. メカニズムデザイン・オークション</text>
+          <rect x="380" y="154" width="320" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="390" y="177">　 ヴィックリーオークション・RegretNet</text>
+          <rect x="380" y="196" width="320" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="390" y="219">8. セキュリティゲーム（ARMOR, PAWS, …）</text>
+          <rect x="380" y="238" width="320" height="36" rx="4" fill="#fff" stroke="#1f2328"/><text x="390" y="261">　 ポーカー AI（Libratus / Pluribus）</text>
+        </g>
+
+        <text x="360" y="310" text-anchor="middle" font-size="12" fill="#4f46e5">前半は「複数 AI で問題を解く」、後半は「複数の利害を数学的に分析」</text>
+        <text x="360" y="332" text-anchor="middle" font-size="11" fill="#6b7280">共通テーマ：単体最適ではなく相互作用を考える</text>
+      </g>
+    </svg>
+    <figcaption>図 1：前半と後半は「複数主体が関わる」という共通点で結ばれている。</figcaption>
+  </figure>
+
+  <h2>前半：マルチエージェントと LLM</h2>
+
+  <h3>1. AI ⊃ ML ⊃ DL ⊃ LLM の入れ子構造</h3>
+
+  <figure>
+    <svg viewBox="0 0 540 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AIの入れ子構造">
+      <g>
+        <circle cx="270" cy="120" r="115" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.5"/>
+        <text x="270" y="20" text-anchor="middle" font-size="13" font-weight="600" fill="#4f46e5">AI（人工知能）</text>
+
+        <circle cx="270" cy="135" r="90" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+        <text x="270" y="52" text-anchor="middle" font-size="12" font-weight="600" fill="#d97706">ML（機械学習）</text>
+
+        <circle cx="270" cy="150" r="65" fill="#dcfce7" stroke="#059669" stroke-width="1.5"/>
+        <text x="270" y="100" text-anchor="middle" font-size="12" font-weight="600" fill="#059669">DL（深層学習）</text>
+
+        <circle cx="270" cy="170" r="38" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+        <text x="270" y="178" text-anchor="middle" font-size="12" font-weight="600" fill="#dc2626">LLM</text>
+      </g>
+    </svg>
+    <figcaption>図 2：AI の中に ML、その中に DL、さらにその中に LLM。LLM は <strong>AI エージェントの「脳」</strong> として外部ツール（Web 検索・計算機・DB）と組み合わさる。</figcaption>
+  </figure>
+
+  <h3>2. LLM の種類</h3>
+
+  <table>
+    <thead><tr><th>区分</th><th>例</th></tr></thead>
+    <tbody>
+      <tr><td>クローズドソース（企業提供・モデル非公開）</td><td>OpenAI GPT-4o、Anthropic Claude 3.7、Google Gemini 2.0</td></tr>
+      <tr><td>オープンソース</td><td>Meta Llama 3.3、Microsoft Phi-4、DeepSeek R1</td></tr>
+      <tr><td>マルチモーダル</td><td>GPT-4V（テキスト＋画像）、Gemini（＋動画）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3. ソフトウェアエージェントの歴史</h3>
+
+  <div class="callout">
+    <strong>Alan Kay (1984) によるエージェントの起源。</strong>「アイデアは 1950 年代中期に <strong>John McCarthy</strong> が発案、用語は <strong>Oliver Selfridge</strong> が命名。<em>ゴールが与えられると適切なコンピュータ操作を行い、行き詰まったときに人間にアドバイスを求められるシステム</em>を念頭に置いていた」。
+  </div>
+
+  <details>
+    <summary>Pattie Maes（MIT, 1997）のインターフェースエージェント</summary>
+    <p>「ユーザとアプリの間に挟まる層」ではなく <strong>パーソナルアシスタントとしてユーザの隣に並ぶ</strong>。ユーザはエージェントを飛び越えて直接操作もできる。<br>
+    エージェントの学習方法：① 観察と模倣、② フィードバック適応、③ 例示によるトレーニング、④ 他エージェントへの質問。</p>
+  </details>
+
+  <h3>4. 単体 AI vs マルチエージェントシステム</h3>
+
+  <table>
+    <thead><tr><th></th><th>説明</th><th>たとえ</th></tr></thead>
+    <tbody>
+      <tr><td>単体 AI</td><td>一人の人間の知性のモデル</td><td>天才一人</td>
+</tr>
+      <tr><td>マルチエージェントシステム</td><td>社会の知性のモデル</td><td>チームワーク</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>三人寄れば文殊の知恵</strong>。各エージェントは自分の目標を持ち、環境を知覚し、他エージェントと通信し、自律行動する。</p>
+
+  <h3>5. LLM ベースのエージェント研究事例</h3>
+
+  <details>
+    <summary>BabyAGI：タスク駆動型自律エージェント</summary>
+    <p>GPT-4 を核に「目標 → Task Creation → Task Queue → 優先順位付け → Execution → Memory → 次タスクへ」のサイクルを自律的に回す。<a href="https://yoheinakajima.com/task-driven-autonomous-agent-utilizing-gpt-4-pinecone-and-langchain-for-diverse-applications/">原典</a>。</p>
+  </details>
+
+  <details>
+    <summary>AutoGen（Microsoft, 2023）</summary>
+    <p>複数エージェントが <strong>会話しながら</strong> タスクを解くフレームワーク。Joint chat / Hierarchical chat 等の柔軟な会話パターン。「Meta と Tesla の株価チャートを描いて」→ コードを書く AI とレビューする AI がペアでエラーを自動修正しながら完成。</p>
+  </details>
+
+  <details>
+    <summary>LLM エージェントの社会的協調（Zhang et al., 2023）</summary>
+    <p>チェスの駒移動の正誤判定で、3 つのエージェントが最初は誤答 → 互いの回答を参照して <strong>反省と討論</strong> を繰り返す → 3 回後に全員が正解「e2」に収束。<strong>社会心理学的な集団知性</strong> が LLM にも現れる。</p>
+  </details>
+
+  <details>
+    <summary>Theory of Mind（Huao Li et al., EMNLP 2023）</summary>
+    <p>3 体（Alpha, Bravo, Charlie）が爆弾解除ゲームで協力。各エージェントが <strong>信念状態</strong> を更新しながらメッセージと行動を選択：「アルファが Room 0 を調べている → ブラボーを Room 3、チャーリーを Room 5 へ」。</p>
+  </details>
+
+  <details>
+    <summary>Generative Agents（Park et al., UIST 2023）</summary>
+    <p>25 体の LLM エージェントが Sims 風マップで生活。朝のルーティン、カフェでの会話「Hey Klaus, mind if I join you for coffee?」、市長選挙の話「Hey, have you heard anything about the upcoming mayoral election?」。<strong>リアルな人間行動を模倣</strong>できることを実証。</p>
+  </details>
+
+  <h2>後半：ゲーム理論とメカニズムデザイン</h2>
+
+  <h3>6. ゲーム理論とナッシュ均衡</h3>
+
+  <p>複数の意思決定者が互いに影響し合う状況を <strong>数学的に分析</strong> する学問。ノーベル経済学賞を多数輩出（2007 Hurwicz・Maskin・Myerson、2012 Roth・Shapley 等）。</p>
+
+  <div class="callout">
+    <strong>ナッシュ均衡の定義。</strong>戦略の組 $s^* = (s_1^*, \ldots, s_n^*)$ について、すべてのプレイヤー $i$ で
+    $$ f_i(s^*) \geq f_i(s_i,\, s^*_{-i}),\quad \forall s_i \in S_i $$
+    が成り立つ状態。<strong>他人の戦略を固定したとき、自分の戦略を変えても得をしない</strong> ＝ 誰も抜け駆けの動機をもたない安定点。
+  </div>
+
+  <details>
+    <summary>具体例：Alex vs Bob のペイオフ行列</summary>
+    <table>
+      <thead><tr><th></th><th>Bob: A</th><th>Bob: B</th><th>Bob: C</th></tr></thead>
+      <tbody>
+        <tr><td>Alex: A</td><td>7, 7</td><td>0, 10</td><td>5, 4</td></tr>
+        <tr><td>Alex: B</td><td>0, 3</td><td><strong>5, 5 ★</strong></td><td>4, 4</td></tr>
+        <tr><td>Alex: C</td><td>2, 5</td><td>4, 2</td><td>3, 7</td></tr>
+      </tbody>
+    </table>
+    <p><strong>最良応答法</strong>：</p>
+    <ul>
+      <li>Alex の最良応答：Bob=A → A、Bob=B → <strong>B</strong>、Bob=C → A</li>
+      <li>Bob の最良応答：Alex=A → B、Alex=B → <strong>B</strong>、Alex=C → C</li>
+    </ul>
+    <p>両者の印が重なるのは <strong>(B, B) = (5, 5)</strong>。ここが <strong>ナッシュ均衡</strong>。</p>
+  </details>
+
+  <h3>7. メカニズムデザイン：オークション</h3>
+
+  <p><strong>第1価格オークション</strong>：最高入札者が <strong>自分の入札額</strong> をそのまま払う。<br>
+  <strong>第2価格オークション（ヴィックリー）</strong>：最高入札者が <strong>2 番目の入札額</strong> を払う。</p>
+
+  <figure>
+    <svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="第1価格 vs 第2価格">
+      <g font-size="12">
+        <text x="180" y="20" text-anchor="middle" font-weight="600" fill="#dc2626">第1価格（自分の入札額を払う）</text>
+        <rect x="60"  y="40" width="80" height="34" rx="4" fill="#fee2e2" stroke="#dc2626"/>
+        <text x="100" y="62" text-anchor="middle">$23（落札）</text>
+        <rect x="150" y="40" width="80" height="34" rx="4" fill="#fff" stroke="#1f2328"/>
+        <text x="190" y="62" text-anchor="middle">$20</text>
+        <rect x="240" y="40" width="80" height="34" rx="4" fill="#fff" stroke="#1f2328"/>
+        <text x="280" y="62" text-anchor="middle">$18</text>
+        <text x="180" y="110" text-anchor="middle" font-size="11" fill="#6b7280">→ Buyer1 は $23 を支払う（利得 = 0）</text>
+        <text x="180" y="130" text-anchor="middle" font-size="11" fill="#6b7280">→ 必ず「入札額を下げる」動機が働く → <strong>不安定</strong></text>
+
+        <text x="540" y="20" text-anchor="middle" font-weight="600" fill="#059669">第2価格（次点額を払う）</text>
+        <rect x="420" y="40" width="80" height="34" rx="4" fill="#dcfce7" stroke="#059669"/>
+        <text x="460" y="62" text-anchor="middle">$23（落札）</text>
+        <rect x="510" y="40" width="80" height="34" rx="4" fill="#fff" stroke="#1f2328"/>
+        <text x="550" y="62" text-anchor="middle">$20 ← 支払額</text>
+        <rect x="600" y="40" width="80" height="34" rx="4" fill="#fff" stroke="#1f2328"/>
+        <text x="640" y="62" text-anchor="middle">$18</text>
+        <text x="540" y="110" text-anchor="middle" font-size="11" fill="#6b7280">→ Buyer1 は $20 を支払う（利得 = $3）</text>
+        <text x="540" y="130" text-anchor="middle" font-size="11" fill="#6b7280">→ <strong>真の価値で正直に入札</strong> が支配戦略 ＝ 耐戦略性</text>
+      </g>
+    </svg>
+    <figcaption>図 3：ヴィックリー（第2価格）の優れた点は「正直に入札するのが常に最善」。</figcaption>
+  </figure>
+
+  <details>
+    <summary>なぜ第1価格は「不安定」なのか</summary>
+    <p>第1価格で真の価値 $v$ で入札して落札すると利得 $u = v - v = 0$。利益ゼロなので必ず <strong>入札を下げる（bid shading）</strong> 動機がはたらく。ではいくら下げるか？ → 他者の戦略次第で変わる（ベイズ・ナッシュ均衡）。$n$ 人・一様分布の場合の理論的最適：</p>
+    $$ b^*(v) = \frac{n - 1}{n}\cdot v $$
+    <p>つまり 2 人なら真の価値の半分。ただし相手の分布が分からないと計算できないため均衡が不安定。</p>
+  </details>
+
+  <details>
+    <summary>第2価格で「正直入札」が支配戦略な直感</summary>
+    <ul>
+      <li>真の価値 $v$ より <strong>高く</strong> 入札 → 本来落札すべきでない場面でも落札してしまい <strong>損</strong></li>
+      <li>真の価値より <strong>低く</strong> 入札 → 本来落札できた場面を <strong>逃す</strong></li>
+    </ul>
+    <p>どちらにずらしても得しないので $b = v$ が最善。これが <strong>耐戦略性（strategyproof / incentive compatible）</strong>。</p>
+  </details>
+
+  <table>
+    <thead><tr><th>比較</th><th>第1価格</th><th>第2価格（ヴィックリー）</th></tr></thead>
+    <tbody>
+      <tr><td>支払額</td><td>自分の入札額</td><td>次点の入札額</td></tr>
+      <tr><td>正直入札は支配戦略？</td><td>No</td><td>Yes</td></tr>
+      <tr><td>相手の戦略を考慮する必要は？</td><td>Yes</td><td>No</td></tr>
+      <tr><td>耐戦略性</td><td>No</td><td>Yes</td></tr>
+    </tbody>
+  </table>
+
+  <details>
+    <summary>RegretNet：機械学習でオークションを自動設計（Dütting et al., ICML 2019）</summary>
+    <p>複数アイテム × 複数バイヤーでは最適オークションを手で設計するのが極めて困難。これを <strong>ニューラルネットで学習</strong> させる。</p>
+    <ul>
+      <li>Allocation Network $g$：各バイヤーへの配分確率</li>
+      <li>Payment Network $p$：各バイヤーへの支払額</li>
+      <li>損失：収益を最大化しつつ <strong>事後後悔</strong>（嘘の申告で得られる追加利得）を最小化</li>
+    </ul>
+    $$ \mathrm{rgt}_i(w) = \mathbf{E}\!\left[\max_{v'_i} u^w_i(v_i; (v'_i, v_{-i})) - u^w_i(v_i; (v_i, v_{-i}))\right] $$
+    <p>3 bidders × 10 items で収益 5.541（Myerson 5.310 を上回る）かつ後悔 < 0.002。</p>
+  </details>
+
+  <h3>8. セキュリティゲームと拡張形ゲーム</h3>
+
+  <p>ゲーム理論で守備側（Defender）が先に <strong>混合戦略</strong> を決め、攻撃者がそれを観察して最善攻撃を選ぶ <strong>Stackelberg ゲーム</strong> として定式化。実世界で広く運用：</p>
+
+  <table>
+    <thead><tr><th>システム</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td>ARMOR</td><td>LAX 国際空港警察</td></tr>
+      <tr><td>PAWS</td><td>野生動物保護</td></tr>
+      <tr><td>PROTECT / ARMOR-FISH</td><td>米国沿岸警備隊</td></tr>
+      <tr><td>IRIS</td><td>連邦航空保安官サービス</td></tr>
+      <tr><td>GUARDS</td><td>米国運輸保安局（TSA）</td></tr>
+      <tr><td>TRUSTS</td><td>ロサンゼルス郡保安官事務所</td></tr>
+    </tbody>
+  </table>
+
+  <p>（参照：Milind Tambe, <em>Security and Game Theory</em>, Cambridge UP, 2011）</p>
+
+  <details>
+    <summary>ターミナル警備ゲームの例（2×2）</summary>
+    <table>
+      <thead><tr><th></th><th>T1 を守る</th><th>T2 を守る</th></tr></thead>
+      <tbody>
+        <tr><td>T1 を攻撃</td><td>5, −3</td><td><strong>−1, 1</strong></td></tr>
+        <tr><td>T2 を攻撃</td><td>−5, 5</td><td>2, −1</td></tr>
+      </tbody>
+    </table>
+    <p>数値：(攻撃者の得点, 守備者の得点)。場所・時間ごとに異なるゲームを <strong>拡張形ゲーム</strong>（ツリー構造）で表現する。</p>
+  </details>
+
+  <h3>ポーカー AI：不完全情報ゲームの最前線</h3>
+
+  <p>ポーカーは <strong>相手の手札が見えない</strong> 不完全情報ゲーム。通常のゲーム理論を適用しにくい。CMU が <strong>Counterfactual Regret Minimization (CFR)</strong> でブレイクスルー：</p>
+
+  <table>
+    <thead><tr><th>システム</th><th>達成</th></tr></thead>
+    <tbody>
+      <tr><td>Libratus (2017)</td><td>ヘッドアップ・ノーリミットでトッププロ 4 人に 20 日間で勝利（<em>Science</em>）</td></tr>
+      <tr><td>Pluribus (2019)</td><td>6 人ポーカーで人間プロを超える。<em>Science</em> Breakthrough of the Year 次点</td></tr>
+    </tbody>
+  </table>
+
+  <p>CFR の直感：「あの時別の手を打っていたらどうなったか（<strong>反事実的後悔</strong>）」を繰り返し計算し、後悔を最小化する戦略に収束させる手法。</p>
+
+  <h2>講義のまとめ</h2>
+  <ul>
+    <li>AI は入れ子構造：<strong>AI ⊃ ML ⊃ DL ⊃ LLM</strong>。LLM はエージェントの「脳」</li>
+    <li>マルチエージェントは <strong>社会の知性</strong> モデル。BabyAGI・AutoGen・Generative Agents 等が研究最前線</li>
+    <li>ナッシュ均衡：他人の戦略を固定したとき自分も変える動機がない点。最良応答法で探す</li>
+    <li>ヴィックリーオークションは <strong>正直入札が支配戦略</strong>＝耐戦略性が成り立つ。第1価格は不安定</li>
+    <li>RegretNet：ニューラルネットでオークションルール自体を学習する現代的アプローチ</li>
+    <li>セキュリティゲームは実世界で多数稼働。ポーカー AI は <strong>CFR</strong> で人間プロ超え</li>
+  </ul>
+
+  <nav class="pager">
+    <a href="02.html" class="prev">第2回 ChatGPT / Transformer</a>
+    <a href="04.html" class="next">第4回 HCI 概論</a>
+  </nav>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+
+<script type="module" src="../assets/comments.js"></script>
+</body>
+</html>
