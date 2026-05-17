@@ -235,6 +235,112 @@ function escapeHtml(s) {
   }[c]));
 }
 
+// ===== ページ全体コメント =====
+const PAGE_ANCHOR_ID = "__page__";
+
+function ensurePageCommentsSection() {
+  if (document.getElementById("nc-page-section")) return;
+  const section = document.createElement("section");
+  section.id = "nc-page-section";
+  section.innerHTML = `
+    <h2>このページへのコメント</h2>
+    <p class="nc-muted">特定の段落ではなく、ページ全体・回全体に対するコメント・質問・間違い指摘はこちらに書いてください。</p>
+    <div class="nc-page-list"></div>
+    <form class="nc-form nc-page-form">
+      <div class="nc-type-switch">
+        ${Object.entries(TYPES).map(([k, v], i) => `
+          <button type="button" data-type="${k}"
+            class="nc-type-btn ${i === 0 ? "active" : ""}"
+            style="--c:${v.color}">${v.icon} ${v.label}</button>
+        `).join("")}
+      </div>
+      <input type="text" name="author" maxlength="40" placeholder="名前（任意）" class="nc-author">
+      <textarea name="body" maxlength="1000" required placeholder="ここに書き込む…" class="nc-body" rows="3"></textarea>
+      <div class="nc-form-foot">
+        <span class="nc-counter">0 / 1000</span>
+        <button type="submit" class="nc-submit">投稿</button>
+      </div>
+      <p class="nc-error" hidden></p>
+    </form>
+  `;
+  document.querySelector("main").appendChild(section);
+
+  // type switch
+  let selectedType = "comment";
+  section.querySelectorAll(".nc-type-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      selectedType = btn.dataset.type;
+      section.querySelectorAll(".nc-type-btn").forEach(b => b.classList.toggle("active", b === btn));
+    });
+  });
+
+  // counter
+  const ta = section.querySelector(".nc-body");
+  const counter = section.querySelector(".nc-counter");
+  ta.addEventListener("input", () => counter.textContent = `${ta.value.length} / 1000`);
+
+  // submit
+  section.querySelector(".nc-page-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const errEl = section.querySelector(".nc-error");
+    errEl.hidden = true;
+    const body = ta.value.trim();
+    if (!body) return;
+    const author = section.querySelector(".nc-author").value.trim().slice(0, 40);
+    const submitBtn = section.querySelector(".nc-submit");
+    submitBtn.disabled = true;
+    try {
+      await addDoc(collection(db, "comments"), {
+        pageSlug,
+        anchorId: PAGE_ANCHOR_ID,
+        type: selectedType,
+        body,
+        authorName: author || "名無し",
+        createdAt: serverTimestamp()
+      });
+      ta.value = "";
+      counter.textContent = "0 / 1000";
+    } catch (err) {
+      console.error(err);
+      errEl.hidden = false;
+      errEl.textContent = "投稿に失敗しました：" + (err?.message || err);
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+}
+
+function renderPageList(grouped) {
+  const section = document.getElementById("nc-page-section");
+  if (!section) return;
+  const list = section.querySelector(".nc-page-list");
+  const items = (grouped.get(PAGE_ANCHOR_ID) || [])
+    .slice()
+    .sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+
+  list.innerHTML = "";
+  if (!items.length) {
+    list.innerHTML = `<p class="nc-empty">まだ投稿はありません</p>`;
+    return;
+  }
+  for (const it of items) {
+    const row = document.createElement("div");
+    row.className = `nc-item nc-item-${it.type}`;
+    row.style.borderLeftColor = TYPES[it.type]?.color || "#999";
+    const time = it.createdAt?.toDate?.().toLocaleString("ja-JP") || "";
+    row.innerHTML = `
+      <div class="nc-item-head">
+        <span class="nc-item-type" style="background:${TYPES[it.type]?.color}">${TYPES[it.type]?.icon} ${TYPES[it.type]?.label || it.type}</span>
+        <span class="nc-item-author">${escapeHtml(it.authorName || "名無し")}</span>
+        <span class="nc-item-time">${time}</span>
+      </div>
+      <div class="nc-item-body">${escapeHtml(it.body)}</div>
+    `;
+    list.appendChild(row);
+  }
+}
+
 // ===== Firestore購読 =====
 let LATEST_GROUPED = new Map();
 function subscribe() {
@@ -249,6 +355,7 @@ function subscribe() {
     });
     LATEST_GROUPED = grouped;
     renderBadges(grouped);
+    renderPageList(grouped);
     renderOrphans(grouped);
   }, (err) => {
     console.error("Firestore subscribe error:", err);
@@ -257,7 +364,7 @@ function subscribe() {
 
 // 段落テキストが変わってanchor_idが宙に浮いた投稿をページ末尾にまとめて出す
 function renderOrphans(grouped) {
-  const liveIds = new Set();
+  const liveIds = new Set([PAGE_ANCHOR_ID]); // ページ全体コメントは常にlive扱い
   for (const el of anchorTargets()) {
     if (el.dataset.anchorId) liveIds.add(el.dataset.anchorId);
   }
@@ -305,5 +412,6 @@ function renderOrphans(grouped) {
     document.querySelector("main .lectures")
   ) return;
   await assignAnchorIds();
+  ensurePageCommentsSection();
   subscribe();
 })();

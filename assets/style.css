@@ -498,3 +498,27 @@ footer.site {
 #nc-orphans h2 { border-bottom-color: var(--muted); }
 .nc-muted { color: var(--muted); font-size: 0.85rem; }
 .nc-orphan-list { display: flex; flex-direction: column; gap: 4px; }
+
+/* ページ全体コメントセクション */
+#nc-page-section {
+  margin-top: 60px;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+#nc-page-section h2 {
+  margin-top: 0;
+  border-bottom: 2px solid var(--accent-soft);
+}
+#nc-page-section .nc-page-list {
+  margin: 14px 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+#nc-page-section .nc-page-form {
+  border-top: 1px dashed var(--border);
+  padding-top: 14px;
+  margin-top: 14px;
+}
+#nc-page-section .nc-type-switch { margin-bottom: 8px; }
