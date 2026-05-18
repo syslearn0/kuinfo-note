@@ -12,7 +12,8 @@ $root = Split-Path -Parent $PSScriptRoot
 Write-Host "Site root: $root"
 
 $htmlFiles = Get-ChildItem -Path $root -Filter *.html -Recurse -File |
-  Where-Object { $_.FullName -notmatch '\\(node_modules|\.git|tools)\\' }
+  Where-Object { $_.FullName -notmatch '\\(node_modules|\.git|tools|assets)\\' } |
+  Where-Object { $_.Name -ne 'chat.html' }
 
 $marker = 'assets/comments.js'
 

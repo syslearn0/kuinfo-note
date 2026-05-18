@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>みんなのチャット ｜ 共有ノート</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site">
+  <div class="crumbs"><a href="index.html">共有ノート</a> ／ みんなのチャット</div>
+</header>
+
+<main>
+  <h1>みんなのチャット</h1>
+  <div class="meta">
+    <span class="tag">雑談</span>
+    <span>毎日 0:00 に表示がリセットされます</span>
+  </div>
+
+  <div id="chat-day" class="callout">本日（<span id="chat-date">…</span>）の発言を表示中</div>
+
+  <div id="chat-log" aria-live="polite"></div>
+
+  <form id="chat-form">
+    <input type="text" id="chat-author" maxlength="40" placeholder="名前（任意）">
+    <textarea id="chat-body" maxlength="500" required placeholder="メッセージ…（最大500文字、Enterで送信／Shift+Enterで改行）" rows="2"></textarea>
+    <div class="chat-foot">
+      <span id="chat-counter">0 / 500</span>
+      <button type="submit" id="chat-send">送信</button>
+    </div>
+    <p id="chat-error" hidden></p>
+  </form>
+</main>
+
+<footer class="site">情報学科・共有ノート</footer>
+<script type="module" src="assets/chat.js"></script>
+</body>
+</html>
